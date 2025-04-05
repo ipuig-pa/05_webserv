@@ -1,26 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:24:22 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/05 16:33:55 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/05 16:40:28 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#include "Config.hpp"
 
-#include <cstring> //inc strlen, strcpy, strcmp, strcat
-
-class Server
+//parser
+void readConf(const std::string& _path, Config& conf)
 {
-public:
-	Server();
-	virtual ~Server();
-	void entry();
-};
-
-#endif
+	//to read conf file & err handle
+}

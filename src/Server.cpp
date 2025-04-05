@@ -1,26 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:24:22 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/05 16:33:55 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/05 16:27:23 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#include "Server.hpp"
+#include <iostream>
 
-#include <cstring> //inc strlen, strcpy, strcmp, strcat
-
-class Server
-{
-public:
-	Server();
-	virtual ~Server();
-	void entry();
-};
-
-#endif
