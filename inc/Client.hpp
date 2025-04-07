@@ -1,27 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:06:38 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 13:01:06 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WEBSERV_HPP
-#define WEBSERV_HPP
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
 
-#include <iostream>
-#include <string>
-#include <cstring> //inc strlen, strcpy, strcmp, strcat
-#include <fcntl.h> //for fcntl()
-#include <netinet/in.h> //for sockaddr_in
-#include <poll.h> //see later
+#include "webserv.hpp"
 
+/**
+ * accept (new) client connection,
+ * read from and write to clients,
+ * keep non-blocking
+*/
 
-
-
+class Client //or struct?
+{
+public:
+	int clientFd;
+	std::string content; //data for/from client
+	bool wrtFlag;
+	Client (int fd); //to init attributes in class
+	// ~Client();
+};
 
 #endif

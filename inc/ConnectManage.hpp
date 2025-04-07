@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 10:56:47 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 11:09:18 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/07 13:04:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,6 @@
 #ifndef CONNECTMANAGE_HPP
 #define CONNECTMANAGE_HPP
 
-#include <poll.h> //see later
+#include "webserv.hpp"
 
 #endif
