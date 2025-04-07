@@ -1,28 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.hpp                                         :+:      :+:    :+:   */
+/*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:10:16 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 13:19:38 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#ifndef HTTPREQUEST_HPP
+#define HTTPREQUEST_HPP
 
 #include "webserv.hpp"
 
-struct Config
+enum methodType
 {
-	int port;
-	std::string server_names;
-	std::string root;
-	// [...] other var to implement
+	GET,
+	POST,
+	DELETE,
+	INVALID
 };
 
-void readConf(const std::string& _path, Config& conf);
+class HttpRequest
+{
+private:
+	//attirbute (server name, method, path, header [...])
+	//public or private??
+public:
+	//getters (name, method, state [...])
+	//setter ([...])
+};
 
 #endif

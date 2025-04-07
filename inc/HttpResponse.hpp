@@ -1,28 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.hpp                                         :+:      :+:    :+:   */
+/*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:10:16 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 13:23:15 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#ifndef HTTPRESPONSE_HPP
+#define HTTPRESPONSE_HPP
 
 #include "webserv.hpp"
+#include "HttpRequest.hpp"
 
-struct Config
+class HttpResponse
 {
-	int port;
-	std::string server_names;
-	std::string root;
-	// [...] other var to implement
+	
 };
-
-void readConf(const std::string& _path, Config& conf);
 
 #endif
