@@ -1,19 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.cpp                                         :+:      :+:    :+:   */
+/*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 11:21:10 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 11:21:59 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#ifndef WEBSERV_HPP
+#define WEBSERV_HPP
 
-//parser
-void readConf(const std::string& _path, Config& conf)
-{
-	//to read conf file & err handle
-}
+#include <iostream>
+#include <string>
+#include <cstring> //inc strlen, strcpy, strcmp, strcat
+#include <fcntl.h> //for fcntl()
+#include <netinet/in.h> //for sockaddr_in
+
+#endif

@@ -1,19 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.cpp                                         :+:      :+:    :+:   */
+/*   ConnectManage.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 11:21:10 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/07 10:56:47 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 11:09:18 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+/**
+ * QUESTION: choose which? ==> go webserve.md, detailed notes
+ */
 
-//parser
-void readConf(const std::string& _path, Config& conf)
-{
-	//to read conf file & err handle
-}
+#ifndef CONNECTMANAGE_HPP
+#define CONNECTMANAGE_HPP
+
+#include <poll.h> //see later
+
+#endif

@@ -6,10 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/05 16:54:26 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/07 11:22:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Socket.hpp"
 
-//set up basic socket server and bind to port fron config_file
+
+//TASK: set up basic socket server and bind to port fron config_file

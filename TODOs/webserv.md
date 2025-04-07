@@ -65,3 +65,11 @@ MAIN TASK:
 		- CGI
 		- file upload
 
+Conection manage method: 
+ - select(), poll(), epoll()
+	*Max_FD*:	-1024-(FD_SETSIZE); NO-limit; can treat as NO-limit(I milion~)
+	*scalling*: slow; slow; fast
+	*kernel*: full copy eveytime; FCET; kernel-managed list
+	*OS support*: POSIX; POSIX; LINUX only
+*select()*: create a big bitmask (FD_SET), check all one by one everytime
+*poll()*: use array of *pollfd* structs, check all 1-by-1; no fd limit
