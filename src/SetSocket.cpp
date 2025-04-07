@@ -1,30 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Socket.hpp                                         :+:      :+:    :+:   */
+/*   SetSocket.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 11:20:17 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 13:43:59 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SOCKET_HPP
-#define SOCKET_HPP
+#include "SetSocket.hpp"
 
-#include "webserv.hpp"
-#include "Config.hpp"
-
-class Socket
-{
-private:
-	int socketFd;
-	int _port;
-public:
-	Socket(const Config& confFile);
-	~Socket();
-	void setSocket();
-};
-
-#endif
+/**
+ * TASK:
+ * set up basic socket, bind to config port (fron config_file)
+ * listen to upcoming connection (non-blocking)
+*/

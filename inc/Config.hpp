@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:10:16 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/07 13:45:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "webserv.hpp"
 
-struct Config
+struct Config //or class
 {
 	int port;
 	std::string server_names;

@@ -1,16 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Socket.cpp                                         :+:      :+:    :+:   */
+/*   SetSocket.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 11:22:10 by ewu              ###   ########.fr       */
+/*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
+/*   Updated: 2025/04/07 13:41:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Socket.hpp"
+#ifndef SETSOCKET_HPP
+#define SETSOCKET_HPP
 
+#include "webserv.hpp"
+#include "Config.hpp"
 
-//TASK: set up basic socket server and bind to port fron config_file
+class Socket
+{
+private:
+	int socketFd;
+	int _port;
+public:
+	Socket(const Config& confFile);
+	~Socket();
+	void setSocket();
+};
+
+#endif
