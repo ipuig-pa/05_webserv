@@ -1,7 +1,7 @@
 NAME = webserv
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinclude
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc
 
 SRC_DIR = src
 OBJ_DIR = obj
