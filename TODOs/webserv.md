@@ -73,3 +73,27 @@ Conection manage method:
 	*OS support*: POSIX; POSIX; LINUX only
 *select()*: create a big bitmask (FD_SET), check all one by one everytime
 *poll()*: use array of *pollfd* structs, check all 1-by-1; no fd limit
+
+
+Person 1: Core Server Infrastructure
+
+HTTP request parsing and routing
+TCP/IP socket programming
+Server configuration (reading config files)
+Main event loop and connection handling
+Error handling and logging
+
+Person 2: Request Processing and Response Generation
+
+HTTP response generation
+File handling and MIME type detection
+Implementation of HTTP methods (GET, POST, etc.)
+CGI script execution
+Directory listing generation
+
+Shared Responsibilities:
+
+Overall architecture design
+Testing strategy
+Documentation
+Edge case handling
