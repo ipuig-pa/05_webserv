@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/08 16:31:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/08 18:18:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,12 @@ void	HttpResponse::setStatus(Status &status)
 	_status = new Status(status);
 }
 
+void	HttpResponse::setStatusCode(int code)
+{
+	delete _status;
+	_status = new Status(code);
+}
+
 //correctly implemented!?!?
 void	HttpResponse::setHeader(Header &header)
 {
@@ -65,9 +71,21 @@ void	HttpResponse::setHeader(Header &header)
 	_header = new Header(header);
 }
 
-void	HttpResponse::setBody(std::string body)
+void	HttpResponse::addHeaderField(const std::string& name, const std::string& value)
+{
+	_headers.set(name, value);
+}
+
+void	HttpResponse::setBody(std::string &body)
 {
 	_body = body;
+	_header.set("Content-Length", _body.size());
+	_header.set("Content-Type", getMediaType(body)); //should we take the path instead of the body?! How is it gotten!?
+}
+
+std::string HttpResponse::getHeader(const std::string& name) const
+{
+	return _headers.get(name);
 }
 
 std::string	HttpResponse::toString() const
@@ -79,4 +97,61 @@ std::string	HttpResponse::toString() const
 		response << _body;
 
 	return response.str();
+}
+
+void	HttpResponse::handleGetRequest(const HttpRequest &request, const Config &config)
+{
+}
+
+void	HttpResponse::handlePostRequest(const HttpRequest &request, const Config &config)
+{
+}
+
+void	HttpResponse::handleDeleteRequest(const HttpRequest &request, const Config &config)
+{
+}
+
+void	HttpResponse::handleInvalidRequest(const HttpRequest &request, const Config &config)
+{
+}
+
+void	HttpResponse::processRequest(const HttpRequest &request, const Config &config)
+{
+	void	(*handleMethod[])() = {
+		&HttpResponse::handleGetRequest, 
+		&HttpResponse::handlePostRequest, 
+		&HttpResponse::handleDeleteRequest, 
+		&HttpResponse::handleInvalidRequest};
+
+	handleMethod[request.getMethod()](request, config);
+}
+
+
+
+//https://www.rfc-editor.org/rfc/rfc9110#media.type
+//give somehow the path and not the body!?!?
+//use switch or something more elegant!?!?
+std::string		getMediaType(const std::string& path)
+{
+	std::string extension = path.substr(path.find_last_of('.') + 1);
+	
+	if (extension == "html" || extension == "htm")
+		return "text/html";
+	else if (extension == "css")
+		return "text/css";
+	else if (extension == "js")
+		return "application/javascript";
+	else if (extension == "png")
+		return "image/png";
+	else if (extension == "jpg" || extension == "jpeg")
+		return "image/jpeg";
+	else if (extension == "gif")
+		return "image/gif";
+	else if (extension == "pdf")
+		return "application/pdf";
+	else if (extension == "txt")
+		return "text/plain";
+	// Add more types if needed
+
+	return "application/octet-stream"; // Default binary type
 }

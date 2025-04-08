@@ -1,3 +1,9 @@
+09/04/2025:
+- handle GET request (functions in http response class)
+- properly settle getMediaType and ContentType
+- handle DELETE, POST, etc request (functions in http response class)
+- Read related RFC more carefully
+
 Person 2: Request Processing and Response Generation
 
 HTTP response generation
@@ -11,22 +17,23 @@ Person 2: Request Processing and Response Generation
 
 Response Structure Creation:
 
-Generate status line (HTTP version, status code, reason phrase)
+<!-- Generate status line (HTTP version, status code, reason phrase)
 Construct response headers
-Prepare response body
+Prepare response body -->
+* Read RFC for situations in which display body, length, etc.!?
 
 
 Status Code Handling:
 
-Implement all required HTTP status codes (200, 404, 500, etc.)
-Generate appropriate error pages
+<!-- Implement all required HTTP status codes (200, 404, 500, etc.) -->
+* Generate appropriate error pages
 
 
 Header Management:
 
-Set Content-Type, Content-Length headers
+* Set Content-Type, Content-Length headers
 Handle conditional headers (If-Modified-Since, etc.)
-Implement caching headers
+* Implement caching headers
 
 
 Response Compression:
