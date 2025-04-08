@@ -1,20 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.cpp                                         :+:      :+:    :+:   */
+/*   parseConf.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:46:16 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/08 13:16:05 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Config.hpp"
+#include "parseConf.hpp"
 
 //parser for config, read, tokenize, and store the data
 
-void readConf(const std::string& _path, Config& conf)
+void readConf(const std::string key)
 {
 	//to read conf file & err handle
 }
