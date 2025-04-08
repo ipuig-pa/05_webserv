@@ -6,11 +6,34 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/08 13:34:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/08 17:05:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Header.hpp"
+
+Header::Header()
+{
+}
+
+Header::Header(Header& other)
+{
+	*this = other;
+}
+
+//correctly implemented!?!?!?
+Header	&Header::operator=(Header &other)
+{
+	if (this != &other)
+	{
+		_fields = other._fields;
+	}
+	return *this;
+}
+
+Header::~Header()
+{
+}
 
 //overload the function operator, to enable struct behave like a function
 //compares the string a and b in a case insensitive manner
@@ -26,7 +49,7 @@ void Header::set(const std::string& name, const std::string& value)
 }
 
 // Get a field value (returns empty string if not found)
-std::string Header::get(const std::string& name) const 
+std::string Header::get(const std::string& name) const
 {
 	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.find(name);
 	if (it != _fields.end())
@@ -34,29 +57,34 @@ std::string Header::get(const std::string& name) const
 	return "";
 }
 
+// Get all headers
+const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const
+{
+	return _fields;
+}
+
 // Check if a header exists
-bool Header::check_exist(const std::string& name) const {
+bool Header::check_exist(const std::string& name) const
+{
 	return _fields.find(name) != _fields.end();
 }
 
 // Remove a header
-void Header::remove(const std::string& name) {
+void Header::remove(const std::string& name)
+{
 	_fields.erase(name);
 }
 
-// Get all headers
-const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const {
-	return _fields;
-}
-
 // Parse headers from a string (for request parsing)
-bool Header::parse(const std::string& headerStr) {
+bool Header::parse(const std::string& headerStr)
+{
 	// Implementation to parse header string
 	// ...
 }
 
 // Serialize headers to a string (for response generation)
-std::string Header::toString() const {
+std::string Header::toString() const
+{
 	std::stringstream ss;
 	for (std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.begin(); 
 		 it != _fields.end(); ++it) {

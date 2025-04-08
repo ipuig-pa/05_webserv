@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/08 13:34:44 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/08 16:42:35 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,18 @@ private:
 	std::map<std::string, std::string, CaseInsensitiveCompare> _fields;
 
 public:
-	//implement constructors and destructor
+	Header();
+	Header(Header& other);
+	Header	&operator=(Header &other);
+	~Header();
+
 	void set(const std::string& name, const std::string& value);
 	std::string get(const std::string& name) const;
+	const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const;
+
 	bool check_exist(const std::string& name) const;
 	void remove(const std::string& name);
-	const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const;
+
 	// Parse headers from a string (for request parsing)
 	bool parse(const std::string& headerStr); //
 	std::string toString() const;
