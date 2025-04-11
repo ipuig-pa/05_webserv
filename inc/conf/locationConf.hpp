@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/08 14:32:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/09 13:04:22 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ public:
 	std::string _path; //where path starts: /images (ie: go under this dir)
 	std::string _root; //where to get files: ./www/images
 	bool autoindex; //flag to show list of files if no INDEX file
-	std::vector<std::string> methods;
+	std::vector<std::string> _methods;
 	std::string cgi_path; //run script to generate customized content
 };
 
