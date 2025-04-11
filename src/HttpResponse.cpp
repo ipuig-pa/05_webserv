@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/08 18:18:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/11 11:52:03 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ void	HttpResponse::setBody(std::string &body)
 {
 	_body = body;
 	_header.set("Content-Length", _body.size());
-	_header.set("Content-Type", getMediaType(body)); //should we take the path instead of the body?! How is it gotten!?
 }
 
 std::string HttpResponse::getHeader(const std::string& name) const
@@ -95,42 +94,13 @@ std::string	HttpResponse::toString() const
 	response << _status.toString() << _header.toString() << "\r\n";
 	if (!_body.empty())
 		response << _body;
-
 	return response.str();
 }
-
-void	HttpResponse::handleGetRequest(const HttpRequest &request, const Config &config)
-{
-}
-
-void	HttpResponse::handlePostRequest(const HttpRequest &request, const Config &config)
-{
-}
-
-void	HttpResponse::handleDeleteRequest(const HttpRequest &request, const Config &config)
-{
-}
-
-void	HttpResponse::handleInvalidRequest(const HttpRequest &request, const Config &config)
-{
-}
-
-void	HttpResponse::processRequest(const HttpRequest &request, const Config &config)
-{
-	void	(*handleMethod[])() = {
-		&HttpResponse::handleGetRequest, 
-		&HttpResponse::handlePostRequest, 
-		&HttpResponse::handleDeleteRequest, 
-		&HttpResponse::handleInvalidRequest};
-
-	handleMethod[request.getMethod()](request, config);
-}
-
-
 
 //https://www.rfc-editor.org/rfc/rfc9110#media.type
 //give somehow the path and not the body!?!?
 //use switch or something more elegant!?!?
+//where to include this function!!????
 std::string		getMediaType(const std::string& path)
 {
 	std::string extension = path.substr(path.find_last_of('.') + 1);
