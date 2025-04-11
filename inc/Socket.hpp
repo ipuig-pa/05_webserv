@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   SetSocket.hpp                                      :+:      :+:    :+:   */
+/*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:41:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/11 12:41:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SETSOCKET_HPP
-#define SETSOCKET_HPP
+#ifndef SOCKET_HPP
+#define SOCKET_HPP
 
 #include "webserv.hpp"
 #include "Config.hpp"

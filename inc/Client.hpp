@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:54:20 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/11 13:09:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,31 @@
  * keep non-blocking
 */
 
+enum processState
+{
+	READING_REQUEST,
+	PROCESSING,
+	SENDING_RESPONSE,
+	BOUNCED
+};
+
 class Client //or struct?
 {
-public:
-	int clientFd;
+private:
+	HttpRequest		_request;
+	HttpResponse	_response;
+	Socket			_socket;
+	processState	_state;
+
+	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
 	bool wrtFlag;
+
+public:
 	Client (int fd); //to init attributes in class
 	// ~Client();
+	HttpRequest		&getRequest(void);
+	Socket			&getSocket(void);
 };
 
 #endif

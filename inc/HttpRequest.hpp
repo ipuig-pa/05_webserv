@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/07 13:19:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/11 12:48:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@ enum methodType
 class HttpRequest
 {
 private:
+	Header		_header;
+	methodType	_method;
+	std::string	_body;
+	std::string	_path;
+
 	//attirbute (server name, method, path, header [...])
 	//public or private??
 public:
