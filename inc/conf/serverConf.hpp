@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   serverConf.hpp                                     :+:      :+:    :+:   */
+/*   ServerConf.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/10 17:08:04 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/13 16:38:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,30 @@ class locationConf;
 //setter for varible, set val to an instance of server
 class ServerConf
 {
-public:
+private:
 	int port;
 	std::string server_name;
 	std::string root_dir;
 	std::map<int, std::string> err_page; //err_code, url
 	size_t max_body_size; //max body size (required by subject)
 	std::vector<locationConf> locs; //a set of location_blocks in server_configuration
-	// other var to add later
+	// [...] other var to add later
+	
 public:
-	//init instance
-	ServerConf();
-	//pass para from usr.conf
+	ServerConf(); //init instance
 	ServerConf(int _port, const std::string& _servname, const std::string& _root);
 	~ServerConf();
 	// ServerConf(const ServerConf& other);
 	// ServerConf& operator=(const ServerConf& other);
 
 	//getters and setters
+	void setPort(std::string s);
+	void setSrvName(std::string s);
+	void setHost(std::string s);
+	void setRoot(std::string s);
+	void setIndex(std::string s);
+	void setErr(std::string s); //return std::map<> pair??
+	void parseLocation(locationConf _location); //todo: setter for var in this class
 };
 
 /** clear explanation of static and CGI
