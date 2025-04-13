@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/13 16:38:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/13 16:46:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public:
 	// ServerConf(const ServerConf& other);
 	// ServerConf& operator=(const ServerConf& other);
 
-	//getters and setters
+	//setters
 	void setPort(std::string s);
 	void setSrvName(std::string s);
 	void setHost(std::string s);
@@ -44,6 +44,14 @@ public:
 	void setIndex(std::string s);
 	void setErr(std::string s); //return std::map<> pair??
 	void parseLocation(locationConf _location); //todo: setter for var in this class
+	
+	//getters
+	int& getPort() const;
+	std::string& getSrvName() const;
+	std::string& getRoot() const;
+	std::vector<locationConf>& getLocation() const;
+	//[...]
+	
 };
 
 /** clear explanation of static and CGI

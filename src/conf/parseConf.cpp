@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/13 16:22:18 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/13 16:47:51 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void ParseConf::_split(std::string& lines)
 }
 void ParseConf::serv_block(std::string& serv_block, ServerConf& serv)
 {
-	
+	//todo: create a 完整的server-block
 }
 
 void ParseConf::parseToServ()
