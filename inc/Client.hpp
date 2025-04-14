@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 13:09:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/14 10:54:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 
 enum processState
 {
+	NEW_REQUEST,
 	READING_REQUEST,
 	PROCESSING,
 	SENDING_RESPONSE,

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:24:22 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 13:08:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/14 13:14:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,12 @@ private:
 
 public:
 	Server();
-	virtual	~Server(); //why vritual?
-	void	entry();
+	virtual	~Server(); //why vritual? It was like this in first Erya creation, but I think we should delete it
+	void	entry(); // what is this?!?!?
 
 	void						processRequest(Client &client);
 	std::vector<struct pollfd>	&getPoll(void);
+	std::map<int, Client*>		&getClients(void);
 	Socket						&getListenSocket(void);
 };
 

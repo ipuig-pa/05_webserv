@@ -6,13 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 12:37:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/14 13:14:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
 //CONSTRUCTORS
+//check listen_sock creation
 Server::Server()
 {
 	_listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -44,11 +45,16 @@ Socket	&getListenSocket(void) const
 	return (_listen_socket);
 }
 
+std::map<int, Client*>	&getClients(void)
+{
+	return (_clients);
+}
+
 //METHODS: HANDLE REQUESTS
-void	Server::handleGetRequest(Client &client)
+void	Server::handleGetRequest(Client &client, ServerConf &config)
 {
 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
-	std::string path = config.getPathFromUrl(client.getRequest().getPath());
+	// std::string path = config.getPathFromUrl(client.getRequest().getPath());
 
 	if (access(path.c_str(), F_OK | R_OK) != 0) {
 		_status.setStatusCode(404);
@@ -93,15 +99,15 @@ void	Server::handleGetRequest(Client &client)
 	//for large files, consider reading and sending it in chunks
 }
 
-void	Server::handlePostRequest(Client &client)
+void	Server::handlePostRequest(Client &client, ServerConf &config)
 {
 }
 
-void	Server::handleDeleteRequest(Client &client)
+void	Server::handleDeleteRequest(Client &client, ServerConf &config)
 {
 }
 
-void	Server::handleInvalidRequest(Client &client)
+void	Server::handleInvalidRequest(Client &client, ServerConf &config)
 {
 	_status.setStatusCode(405);
 }
@@ -114,7 +120,7 @@ void	Server::processRequest(Client &client)
 		&Server::handleDeleteRequest, 
 		&Server::handleInvalidRequest};
 
-	handleMethod[client.getRquest().getMethod()](client);
+	handleMethod[client.getRquest().getMethod()](client, this->_config);
 
 	// Switch to interested in writing -> CHECK!!! Need the client class implemented!
 	for (size_t i = 0; i < _poll_fds.size(); i++) {
