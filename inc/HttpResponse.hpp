@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 13:06:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:27:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,6 @@ public:
 	std::string	&getHeader(const std::string& name);//needed?!!?
 
 	std::string	toString() const;
-
-
 };
 
 std::string		getMediaType(std::string Content);

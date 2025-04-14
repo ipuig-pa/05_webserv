@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/14 13:28:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/14 15:19:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int main(int ac, char **av)
 		// if listening socket is ready, accept new clients (keep listening socket always in [0])
 		if (server.getPoll().data()[0].revents & POLLIN)
 		{
-			Client client = server.acceptNewConnection();//TO BE IMPLEMENTED!!!
+			server.acceptNewConnection();//TO BE IMPLEMENTED!!!
 			continue; //so start the loop againg, and check again poll, including this new client
 		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop)
@@ -75,16 +75,16 @@ int main(int ac, char **av)
 				//?????
 				//Each client can have an array/vector / map of files linked to it inside!?!?
 				if (server.getPoll().data()[i].revents & POLLIN) {
-					server.handleReadReady(i);
+					server.handleFileRead(i);
 				}
 				// Handle client socket ready for writing
 				if (server.getPoll().data()[i].revents & POLLOUT) {
-					server.handleWriteReady(i);
+					server.handleFileWrite(i);
 				}
 			}
 			// Handle errors or closed connections -> maybe erase from poll here all the closed connections, so no interference to the i is done in between the loop??
 			if (server.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-				handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
+				server.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
 			}
 		}
 	}

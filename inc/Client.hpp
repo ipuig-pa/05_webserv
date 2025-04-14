@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/14 10:54:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/14 16:27:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,16 +37,23 @@ private:
 	HttpResponse	_response;
 	Socket			_socket;
 	processState	_state;
+	int				_file_fd;
 
 	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
 	bool wrtFlag;
 
 public:
-	Client (int fd); //to init attributes in class
-	// ~Client();
+	Client();
+	Client(int fd); //to init attributes in class
+	~Client();
+
 	HttpRequest		&getRequest(void);
 	Socket			&getSocket(void);
+	processState	getState(void);
+	void			setState(processState state);
+	void			setResponse(HttpResponse response);
+	void			setFileFd(int file_fd);
 };
 
 #endif
