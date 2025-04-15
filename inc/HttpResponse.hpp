@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 13:06:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:53:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,22 @@
 # include "Header.hpp"
 # include "Status.hpp"
 
+enum responseState
+{
+	READING,
+	READ,
+	SENT
+};
+
 class HttpResponse
 {
 private:
-	Status		_status;
-	Header		_header;
-	std::string	_body; //(https://datatracker.ietf.org/doc/html/rfc9112#section-6.3)
+	Status			_status;
+	Header			_header;
+	std::string		_body; //(https://datatracker.ietf.org/doc/html/rfc9112#section-6.3)
 	//add some attribute ot method to check if the response is complete and track how much has been sent.
-	size_t		bytesSent;
+	size_t			_bytesSent;
+	responseState	_state;
 
 public:
 	HttpResponse();
@@ -40,10 +48,11 @@ public:
 	void		addHeaderField(const std::string& name, const std::string& value);
 	void		setBody(const std::string &body);
 	std::string	&getHeader(const std::string& name);//needed?!!?
+	void		setState(responseState state);
 
 	std::string	toString() const;
-
-
+	std::string	statusToString() const;
+	std::string	headersToString() const;
 };
 
 std::string		getMediaType(std::string Content);

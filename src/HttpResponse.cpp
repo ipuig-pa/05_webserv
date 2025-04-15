@@ -6,24 +6,24 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 11:52:03 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/15 11:56:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse()
-	:_status(new Status), _header(new Header), _body(nullptr)
+	:_status(new Status), _header(new Header), _body(nullptr), _state(READING)
 {
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header)
-	:_status(new Status(status)), _header(new Header(header)), _body(nullptr)
+	:_status(new Status(status)), _header(new Header(header)), _body(nullptr), _state(READING)
 {
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header, std::string body)
-	:_status(new Status(status)), _header(new Header(header)), _body(body)
+	:_status(new Status(status)), _header(new Header(header)), _body(body), _state(READING)
 {
 }
 
@@ -95,6 +95,20 @@ std::string	HttpResponse::toString() const
 	if (!_body.empty())
 		response << _body;
 	return response.str();
+}
+
+
+std::string	HttpResponse::statusToString() const
+{
+	return _status.toString();
+}
+
+std::string	HttpResponse::headersToString() const
+{
+	std::stringstream	header;
+
+	header << _header.toString() << "\r\n";
+	return header.str();
 }
 
 //https://www.rfc-editor.org/rfc/rfc9110#media.type
