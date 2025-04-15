@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/14 16:25:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/15 14:42:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,20 +74,28 @@ void	Server::handleClientRead(Client &client)
 
 void	Server::handleClientWrite(Client &client)
 {
-
+	if (client.getState == SENDING_RESPONSE)
+	{
+		if (!client.sendResponseChunk())
+			//error handling??
+	}
 }
 
-void	Server::handleFileRead(int fd)// fd or what?
+void	Server::handleFileRead(Client &client)
 {
-	char buffer[4096]; //Adjust buffer size
-	ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
-	if (bytesRead > 0) {
-		client.appendToResponseBody(buffer, bytesRead);
-	} else if (bytesRead == 0) {
-		// File is completely read
-		client.finalizeResponse();
-		close(fd);
-		removeFromPollSet(fd);//do it here or mark somehow not to disturb with the main loop indices!?!?
+	if (client.getResponse().getState() == READING)
+	{
+		char buffer[4096]; //Adjust buffer size
+		ssize_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
+		if (bytesRead > 0) {
+			client.appendToResponseBuffer(buffer, bytesRead); //store in the buffer that is used to send response, and also 
+			//keep track of bytes read and bytes sent
+		} else if (bytesRead == 0) {
+			// File is completely read
+			client.getResponse().setState(READ);
+			close(client.getFileFd());//do here or somewhere after!?
+			removeFromPollSet(fd);//do it here or mark somehow not to disturb with the main loop indices!?!?
+		}
 	}
 	//read the file in binnary and "copy" somehow to the message body, and update also header Content_Length with the body size
 	//for large files, consider reading and sending it in chunks
