@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/13 13:06:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/15 15:53:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,23 +48,44 @@ void rmSpace(std::string& single_line)
 	}
 	else
 		single_line = ""; //it's empty line
-	// return single_line;
 }
 
-// std::vector<std::string> createToken(const std::string& lines)
-void cleanConf(std::string& lines)
+void createTokens(const std::string& lines, std::vector<std::string>& tokens)
 {
-	std::string clean_lines;
 	std::stringstream tmp(lines);
 	std::string single_line;
+	
 	while (std::getline(tmp, single_line));
 	{
 		rmHash(single_line);
 		rmSpace(single_line);
 		if (!single_line.empty()) //if not empty, put line into vector (store the tokens parsed to serverconf)
 		{
-			clean_lines += single_line;
+			std::string token;
+			std::stringstrem tk_line(single_line);//remove inside spaces and create tokens
+			while (tk_line >> token)
+			{
+				tokens.push_back(token);				
+			}
 		}
 	}
-	lines = clean_lines;
 }
+
+// return single_line;
+	
+// void cleanConf(std::string& lines)
+// {
+// 	std::string clean_lines;
+// 	std::stringstream tmp(lines);
+// 	std::string single_line;
+// 	while (std::getline(tmp, single_line));
+// 	{
+// 		rmHash(single_line);
+// 		rmSpace(single_line);
+// 		if (!single_line.empty()) //if not empty, put line into vector (store the tokens parsed to serverconf)
+// 		{
+// 			clean_lines += single_line + '\n'; //or no '\n'?
+// 		}
+// 	}
+// 	lines = clean_lines;
+// }

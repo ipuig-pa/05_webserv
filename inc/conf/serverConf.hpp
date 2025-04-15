@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/13 16:46:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/14 11:05:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,12 @@ public:
 	
 };
 
+/**
+ * Response Codes:
+	2xx: Success (200 OK, 201 Created)
+	4xx: Client errors (400 Bad Request, 401 Unauthorized, 403 Forbidden)
+	5xx: Server errors (500 Internal Server Error)
+ */
 /** clear explanation of static and CGI
  * STATIC: no database interact, no backend processing, al-read-made
  * 		- like the cake in the fridge

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:38:06 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/13 13:06:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/15 15:39:16 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@
 std::string read_conf(const std::string& confFile);
 void rmHash(std::string& single_line);
 void rmSpace(std::string& single_line);
-void cleanConf(std::string& lines);
-
-// std::string rmHash(std::string& single_line);
-// std::string rmSpace(std::string& single_line);
+std::vector<std::string> tokenize(const std::string& s);
+void createTokens(const std::string& lines, std::vector<std::string>& tokens)
+// void cleanConf(std::string& lines);
 // std::vector<std::string> createToken(const std::string& lines);
+
 #endif
