@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/15 14:42:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/16 14:53:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,25 +83,31 @@ void	Server::handleClientWrite(Client &client)
 
 void	Server::handleFileRead(Client &client)
 {
-	if (client.getResponse().getState() == READING)
+	if (client.getResponse().getState() == READING && client.getEmptyBuffer() == true)
 	{
 		char buffer[4096]; //Adjust buffer size
 		ssize_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
-		if (bytesRead > 0) {
-			client.appendToResponseBuffer(buffer, bytesRead); //store in the buffer that is used to send response, and also 
-			//keep track of bytes read and bytes sent
-		} else if (bytesRead == 0) {
-			// File is completely read
+		if (bytesRead > 0)
+		{
+			client.setBuffer(buffer, bytesRead);
+			client.setEmptyBuffer == false;
+		}
+		else if (bytesRead == 0)
+		{
 			client.getResponse().setState(READ);
-			close(client.getFileFd());//do here or somewhere after!?
-			removeFromPollSet(fd);//do it here or mark somehow not to disturb with the main loop indices!?!?
+			close(client.getFileFd());
+			client.setFileFd(-1);
+			ersaseFromPoll(client.getFileFd());
 		}
 	}
-	//read the file in binnary and "copy" somehow to the message body, and update also header Content_Length with the body size
-	//for large files, consider reading and sending it in chunks
 }
 
 void	Server::handleFileWrite(int fd)// fd or what?
+{
+	
+}
+
+void	Server::handleDirectoryRequest(std::string path, Rquest &request, ServerConf &config)
 {
 	
 }
@@ -183,6 +189,18 @@ void	Server::processRequest(Client &client)
 void	Server::handleConnectionClosed(???)
 {
 
+}
+
+void	Server::eraseFromPoll(int fd)
+{
+	for (int i = server.getPoll().size() - 1; i > 0; i--) 
+	{
+		if (server.getPoll().data()[i].fd == fd)
+		{
+			server.getPoll().erase(i);
+			return ;
+		}
+	}
 }
 
 /*handle directory request:

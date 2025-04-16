@@ -6,19 +6,19 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/15 11:56:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/16 12:49:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse()
-	:_status(new Status), _header(new Header), _body(nullptr), _state(READING)
+	:_status(new Status), _header(new Header), _body(nullptr), _state(READING), _body_presence(true)
 {
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header)
-	:_status(new Status(status)), _header(new Header(header)), _body(nullptr), _state(READING)
+	:_status(new Status(status)), _header(new Header(header)), _body(nullptr), _state(READING), _body_presence(true)
 {
 }
 
@@ -62,6 +62,8 @@ void	HttpResponse::setStatusCode(int code)
 {
 	delete _status;
 	_status = new Status(code);
+	if (code == 204 || code == 304)
+		_body_presence = false;
 }
 
 //correctly implemented!?!?

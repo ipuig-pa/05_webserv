@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:24:22 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/14 15:36:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/16 11:25:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ public:
 	void	handleFileRead(int fd); // fd or what?
 	void	handleFileWrite(int fd); // fd or what?
 	void	handleConnectionClosed(???);
+	void	eraseFromPoll(int fd);
 };
 
 #endif

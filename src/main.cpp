@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/14 15:19:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/16 11:04:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ int main(int ac, char **av)
 			server.acceptNewConnection();//TO BE IMPLEMENTED!!!
 			continue; //so start the loop againg, and check again poll, including this new client
 		}
-		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop)
-		for (int i = 0; i < server.getPoll().size(); i++) {
+		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
+		for (int i = server.getPoll().size() - 1; i > 0; i--) {
 			if (server.getPoll().data()[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
 				continue;
 			//get fd

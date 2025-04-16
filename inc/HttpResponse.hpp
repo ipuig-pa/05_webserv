@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/15 11:53:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/16 12:47:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class HttpResponse
 private:
 	Status			_status;
 	Header			_header;
+	bool			_body_presence;
 	std::string		_body; //(https://datatracker.ietf.org/doc/html/rfc9112#section-6.3)
 	//add some attribute ot method to check if the response is complete and track how much has been sent.
 	size_t			_bytesSent;

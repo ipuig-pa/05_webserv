@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/15 12:05:16 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/16 10:58:32 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ private:
 	int				_file_fd;
 	std::string		_response_buffer;
 	size_t			_bytes_sent;
+	bool			_empty_buffer;
 
 	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
@@ -53,13 +54,15 @@ public:
 	HttpRequest		&getRequest(void);
 	Socket			&getSocket(void);
 	clientState		getState(void);
-	void			getFileFd(void);
+	int				getFileFd(void);
+	bool			getEmptyBuffer(void);
 	void			setState(clientState state);
 	void			setResponse(HttpResponse response);
 	void			setFileFd(int file_fd);
+	void			setBuffer(buffer, bytesRead);
+	void			setEmptyBuffer(bool value);
 
 	bool			sendResponseChunk(void);
-	appendToResponseBuffer(buffer, bytesRead);
 };
 
 #endif
