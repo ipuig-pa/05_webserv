@@ -8,7 +8,7 @@ OBJ_DIR = obj
 
 VPATH = $(SRC_DIR):\
 
-SOURCES = \
+SOURCES = Client.cpp\
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)
 #$(SRCS:.cpp=.o)

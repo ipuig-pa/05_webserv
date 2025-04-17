@@ -1,8 +1,29 @@
-09/04/2025:
-- handle GET request (functions in http response class)
+Week 14/04/2025
+- handle GET request
+- send chunks to client
 - properly settle getMediaType and ContentType
-- handle DELETE, POST, etc request (functions in http response class)
+
+17/04/2025
+- directory listing
+
+18/04/2025
+- handle DELETE, POST, etc request
+- Install NGINX and telnet to check (directory listing in special)
+
+19-20/04/2025
+- Have a working program with default config
+- Error pages
+
+Week 21/04/2025
+- CGI
+
+Week
+- caching
+
+Check:
+- Presence of message body just in the cases when needed https://datatracker.ietf.org/doc/html/rfc9112#name-message-body-length
 - Read related RFC more carefully
+
 
 Person 2: Request Processing and Response Generation
 
