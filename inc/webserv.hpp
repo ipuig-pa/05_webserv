@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/11 15:20:39 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/17 10:58:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #include <netinet/in.h> //for sockaddr_in
 #include <poll.h> //see later, select() or epoll() (prob not)
 #include <sys/stat.h> //use stat(), and stat struct, to get and hold information about a file or directory.
+#include <dirent.h>// for readdir
 
 //possible use of containers
 #include <map>

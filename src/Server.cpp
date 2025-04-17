@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 14:53:09 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/17 13:14:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,57 @@ void	Server::handleFileWrite(int fd)// fd or what?
 	
 }
 
-void	Server::handleDirectoryRequest(std::string path, Rquest &request, ServerConf &config)
+void	Server::handleDirectoryRequest(Client &client, Rquest &request, ServerConf &config)
 {
+	std::string path = getPathFromUrl(client.getRequest().getPath(), config); 
+	// Check for index files first
+	std::vector<std::string> indexFiles = _config.getIndexFiles(path); // how is it stored in config??
+
+	for (const std::string& indexFile : indexFiles) {
+		std::string fullPath = path + "/" + indexFile;
+		// Check if the index file exists and is readable
+		if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
+			// Found an index file, modify the request path and process as a file request:
+			// If path doesn't end with '/', add it
+			if (path[path.length() - 1] != '/') {
+				path += "/";
+			}
+			// Update the request path to include the index file
+			client.getRequest().setPath(path + indexFile);
+			// Process as a normal file GET request
+			handleGetRequest(client, request, config);
+			return;
+		}
+	}
+	// No index file found, check if directory listing is enabled
+	if (_config.isDirectoryListingEnabled(path)) { //CHECK HOW IS STORED IN CONFIG FILE!?!
+		handleDirectoryListing(client, path);
+	} else {
+		// Directory listing is disabled and no index file exists
+		client.getResponse().setStatusCode(403); // Forbidden
+	}
+}
+
+void	Server::handleDirectoryListing(Client &client, Rquest &request, ServerConf &config)
+{
+	DIR				*dirp = opendir(path.c_str());
+	if (!dirp)
+	{
+		client.getResponse().setStatusCode(500); //Internal server error
+		return;
+	}
+	//Build HTML Content: check with telnet - nginx what exactly to build
+	struct dirent	dirent;
+	while ((dirent = readdir(dirp)) != NULL)
+	{
+		
+		dirent->d_name;
+	}
+	if (errno) // will catch errors from readdir
+	{
+		std::cerr << "Poll error: " << strerror(errno) << std::endl;
+		//handle error
+	}
 	
 }
 
