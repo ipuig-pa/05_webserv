@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 15:19:45 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/16 14:43:15 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ private:
 	std::vector<ServerConf> _servers; //vector of servers, has mutil 'server{}' with all para
 	std::vector<std::string> _single_server; //tokenized, vector of config for ONE sever
 	int server_count;
+	
 //type alias for categoryhandler
 //'CategoryHandler' is the name for a PTR to a member funcion of this class
-	bool _insideBlock;
 	typedef size_t (ParseConf::*CategoryHandler)(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf);
 //std::map that stores the mapping: from STR ("listen", "root") to functions
 	std::map<std::string, CategoryHandler> _handlers;

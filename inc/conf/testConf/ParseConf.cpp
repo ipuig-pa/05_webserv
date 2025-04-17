@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 16:11:56 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/16 14:55:31 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,21 +125,16 @@ void ParseConf::_createServBlock()
 ServerConf ParseConf::_addCategory(const std::vector<std::string>& tokens)
 {
 	ServerConf servConf;
-	_insideBlock = true;
 	for (size_t pos = 0; pos < tokens.size(); ++pos)
 	{
 		std::string _cate = tokens[pos];
 		if (_handlers.find(_cate) != _handlers.end()) //match found!
 		{
-			if (!_insideBlock && _cate != "location")
-				throw std::runtime_error("Error: category after location block.");
 			CategoryHandler funcToCall = _handlers[_cate];
 			pos = (this->*funcToCall)(tokens, pos, servConf);
-			if (_cate == "location")
-				_insideBlock = false;
 		}
 		else if (_cate != "{" && _cate != "}")
-			throw std::runtime_error("Error: misplaced category: " + _cate);
+			throw std::runtime_error("Error: misplaced category to add" + _cate);
 	}
 	return servConf;
 }
@@ -157,26 +152,8 @@ void ParseConf::_initHandler()
 	_handlers["autoindex"] = &ParseConf::parseAutoIndex;
 }
 
-size_t ParseConf::parseListen(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
-{
-	if (i + 1 >= tokens.size())
-		throw std::runtime_error("Error: no parameter after 'listen'.");
-	if (servConf.getPort()) //port already exist in this server{} block
-		throw std::runtime_error("Error: port already exist.");
-	servConf.setPort(tokens[i + 1]);
-	i += 1;
-	return i;
-}
-size_t ParseConf::parseHost(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
-{
-	if (i + 1 >= tokens.size())
-		throw std::runtime_error("Error: no parameter after 'host'.");
-	if (servConf.getHost().empty()) //port already exist in this server{} block
-		throw std::runtime_error("Error: host already exist.");
-	servConf.setHost(tokens[i + 1]);
-	i += 1;
-	return i;
-}
+
+
 
 // size_t ParseConf::leftBracket(std::string& lines, size_t pos)
 // {
