@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/17 14:47:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/17 16:36:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,17 +40,20 @@ public:
 	~ParseConf();
 	
 	int entryParser(const std::string& confFile); //main entry for whole read-parse-create process
-	bool _valid(std::string& lines); //some helper func for check validity
-	bool _allDigit(const std::string& s);
-	bool _hasSemiclone(const std::string& s);
-	size_t _blockEnd(const std::vector<std::string>& tokens, size_t i);
+	
+	//some helper func for check validity
+	// bool _allDigit(const std::string& s);
+	// bool _hasSemicolon(const std::string& s);
+	
 	void _split(const std::vector<std::string>& tokens); //if multi 'server{}' found, split it
 	void _addToServBlock(const std::vector<std::string>& tokens, size_t left, size_t right);
-	std::vector<std::string> tokenize(const std::string& srv_block);
-	std::string rmvSemicolon(const std::string& token);
 	void _createServBlock(); //create a single 'server{}' block, push_back() to _servers
+	size_t _blockEnd(const std::vector<std::string>& tokens, size_t i);
 	ServerConf _addCategory(const std::vector<std::string>& tokens);
-
+	// std::string rmvSemicolon(const std::string& token);
+	std::vector<std::string> tokenize(const std::string& srv_block);
+	// std::vector<std::string> errTokens(const std::vector<std::string>& tokens, size_t& i);
+	
 	//mapping with str to sub-functions
 	void _initHandler();
 	size_t parseListen(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf);
