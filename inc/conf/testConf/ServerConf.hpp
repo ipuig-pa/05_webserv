@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 16:02:05 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/16 14:17:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,12 @@ class locationConf;
 class ServerConf
 {
 private:
-	int _port;
-	std::string _server_name;
-	std::string _root_dir;
-	std::string _host;
-	std::map<int, std::string> _error_page; //err_code, url
-	size_t _max_body_size; //max body size (required by subject)
-	std::vector<locationConf> _locs; //a set of location_blocks in server_configuration
+	int port;
+	std::string server_name;
+	std::string root_dir;
+	std::map<int, std::string> error_page; //err_code, url
+	size_t max_body_size; //max body size (required by subject)
+	std::vector<locationConf> locs; //a set of location_blocks in server_configuration
 	// [...] other var to add later
 	
 public:
@@ -37,9 +36,8 @@ public:
 	// ServerConf(const ServerConf& other);
 	// ServerConf& operator=(const ServerConf& other);
 	
-	//setters, pass 'const std::string& s' or pass COPY???
+	//setters
 	void setPort(std::string s);
-	void setHost(std::string s);
 	void setSrvName(std::string s);
 	void setHost(std::string s);
 	void setRoot(std::string s);
@@ -49,12 +47,9 @@ public:
 	
 	//getters
 	int& getPort() const;
-	std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
 	std::string& getSrvName() const;
 	std::string& getRoot() const;
-	int& getIndex() const;
 	std::vector<locationConf>& getLocation() const;
-	std::map<int, std::string>& getErrPage() const;
 	//[...]
 	
 };
