@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/15 11:26:32 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 12:16:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define SOCKET_HPP
 
 #include "webserv.hpp"
-#include "Config.hpp"
+#include "serverConfig.hpp"
 
 class Socket
 {

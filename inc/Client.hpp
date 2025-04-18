@@ -6,14 +6,17 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 10:58:32 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 12:22:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
+# define CLIENT_HPP
 
-#include "webserv.hpp"
+# include "webserv.hpp"
+# include "HttpRequest.hpp"
+# include "HttpResponse.hpp"
+# include "Header.hpp"
 
 /**
  * accept (new) client connection,
@@ -35,7 +38,7 @@ class Client //or struct?
 private:
 	HttpRequest		_request;
 	HttpResponse	_response;
-	Socket			_socket; //use directly socket fd instead of whole socket? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
+	int				_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState		_state;
 	int				_file_fd;
 	std::string		_response_buffer;
@@ -47,19 +50,19 @@ private:
 	bool wrtFlag;
 
 public:
-	Client();
+	// Client();
 	Client(int fd); //to init attributes in class
 	~Client();
 
 	HttpRequest		&getRequest(void);
-	Socket			&getSocket(void);
+	int				&getSocket(void);
 	clientState		getState(void);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
 	void			setState(clientState state);
 	void			setResponse(HttpResponse response);
 	void			setFileFd(int file_fd);
-	void			setBuffer(buffer, bytesRead);
+	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
 
 	bool			sendResponseChunk(void);

@@ -8,7 +8,13 @@ OBJ_DIR = obj
 
 VPATH = $(SRC_DIR):\
 
-SOURCES = Client.cpp\
+SOURCES =	Client.cpp \
+			Header.cpp \
+			HttpRequest.cpp \
+			HttpResponse.cpp \
+			Server.cpp \
+			Status.cpp \
+			main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)
 #$(SRCS:.cpp=.o)

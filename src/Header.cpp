@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/08 17:05:26 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 12:54:28 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Header::Header()
 {
+	set("Host", "localhost"); //FOR TESTING PURPOSE, CHANGE
 }
 
 Header::Header(Header& other)
@@ -58,7 +59,7 @@ std::string Header::get(const std::string& name) const
 }
 
 // Get all headers
-const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const
+const std::map<std::string, std::string, Header::CaseInsensitiveCompare>& Header::getAll() const
 {
 	return _fields;
 }
@@ -75,12 +76,12 @@ void Header::remove(const std::string& name)
 	_fields.erase(name);
 }
 
-// Parse headers from a string (for request parsing)
-bool Header::parse(const std::string& headerStr)
-{
-	// Implementation to parse header string
-	// ...
-}
+// // Parse headers from a string (for request parsing)
+// bool Header::parse(const std::string& headerStr)
+// {
+// 	// Implementation to parse header string
+// 	// ...
+// }
 
 // Serialize headers to a string (for response generation)
 std::string Header::toString() const

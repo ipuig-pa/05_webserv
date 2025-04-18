@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/17 13:14:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 12:15:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@ Server::Server()
 {
 	_listen_sock = socket(AF_INET, SOCK_STREAM, 0); //or create outside and use setters!?
 
-	fcntl(listen_sock, F_SETFL, O_NONBLOCK);
+	fcntl(_listen_sock, F_SETFL, O_NONBLOCK);
 	struct pollfd listen_pollfd = {_listen_sock, POLLIN, 0};
 	_poll_fds.push_back(listen_pollfd);
-	_config = //default!!?
+	// _config = //default!!?
 }
 
-Server::Server(ServerConf config)
-{
-	_listen_sock = socket(AF_INET, SOCK_STREAM, 0);//or create outside and use setters!?
+// Server::Server(ServerConf config)
+// {
+// 	_listen_sock = socket(AF_INET, SOCK_STREAM, 0);//or create outside and use setters!?
 
-	fcntl(listen_sock, F_SETFL, O_NONBLOCK);
-	struct pollfd listen_pollfd = {_listen_sock, POLLIN, 0};
-	_poll_fds.push_back(listen_pollfd);
-	_config = config; //or create outside and use setters!?
-}
+// 	fcntl(listen_sock, F_SETFL, O_NONBLOCK);
+// 	struct pollfd listen_pollfd = {_listen_sock, POLLIN, 0};
+// 	_poll_fds.push_back(listen_pollfd);
+// 	_config = config; //or create outside and use setters!?
+// }
 
 //ACCESSORS
 std::vector<struct pollfd>	&Server::getPoll(void) const
@@ -62,14 +62,14 @@ void	Server::acceptNewConnection()
 	_poll_fds.push_back(cli_sock_fd);
 }
 
-void	Server::handleClientRead(Client &client)
-{
-	if (client.getState == NEW_REQUEST)
-		parseRequest(); //inside parseRequest, change the client state to ReadingRequest, and somehow keep track when it is completed
-		//Check when it is completed (buffered and parsing!?)
-	else if (client.getState == PROCESSING)
-		processRequest(client);
-}
+// void	Server::handleClientRead(Client &client)
+// {
+// 	if (client.getState == NEW_REQUEST)
+// 		parseRequest(); //inside parseRequest, change the client state to ReadingRequest, and somehow keep track when it is completed
+// 		//Check when it is completed (buffered and parsing!?)
+// 	else if (client.getState == PROCESSING)
+// 		processRequest(client);
+// }
 
 
 void	Server::handleClientWrite(Client &client)
@@ -102,10 +102,23 @@ void	Server::handleFileRead(Client &client)
 	}
 }
 
-void	Server::handleFileWrite(int fd)// fd or what?
-{
-	
-}
+// void	Server::handleFileWrite(Client &client)
+// {
+// 	if (client.getResponse().getState() == WRITING && client.getEmptyBuffer() == false)
+// 	{
+// 		write(client.getFileFd(), _response_buffer.c_str(), _response_buffer.length());
+// 		_empty_buffer = true;
+// 		return true;
+// 	}
+// 	//check somehow when it is already finished, and error handling. Close and erase from poll when needed.
+// 		// else if (bytesRead == 0)
+// 		// {
+// 		// 	client.getResponse().setState(READ);
+// 		// 	close(client.getFileFd());
+// 		// 	client.setFileFd(-1);
+// 		// 	ersaseFromPoll(client.getFileFd());
+// 		// }
+// }
 
 void	Server::handleDirectoryRequest(Client &client, Rquest &request, ServerConf &config)
 {
@@ -181,14 +194,14 @@ void	Server::handleGetRequest(Client &client, ServerConf &config, HttpResponse &
 	int file_fd = open(path.c_str(), O_RDONLY);
 
 	if (file_fd == -1) {
-		client.prepareErrorResponse(404);
+		response.setStatusCode(404);
 		return;
 	}
 	// Set non-blocking
 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
 	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
 
-	response.setStatusCode(200);
+	response.setStatusCode(200); //OK
 	response.setHeaderField("Content-Type", getMediaType(path));
 	response.setHeaderField("Content-Length", std::to_string(file_stat.st_size));
 
@@ -199,13 +212,30 @@ void	Server::handleGetRequest(Client &client, ServerConf &config, HttpResponse &
 	_poll_fds.push_back(file);
 }
 
-void	Server::handlePostRequest(Client &client, ServerConf &config, HttpResponse &response)
-{
-}
+// void	Server::handlePostRequest(Client &client, ServerConf &config, HttpResponse &response)
+// {
+// 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //should be this same function or get the post somehow different?!
 
-void	Server::handleDeleteRequest(Client &client, ServerConf &config, HttpResponse &response)
-{
-}
+// 	int file_fd = open(path.c_str(), O_CREAT, O_APPEND); //more flags?!?
+// 	if (file_fd == -1) {
+// 		response.setStatusCode(404);
+// 		return;
+// 	}
+
+// 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
+// 	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
+// 	response.setStatusCode(201); //created
+// 	response.setHeaderField("Location", client.getRequest().getPath()); // URI should be there
+	
+// 	client.setFd(file_fd);
+
+// 	struct pollfd file = {file_fd, POLLIN, 0};
+// 	_poll_fds.push_back(file);
+// }
+
+// void	Server::handleDeleteRequest(Client &client, ServerConf &config, HttpResponse &response)
+// {
+// }
 
 void	Server::handleInvalidRequest(Client &client, ServerConf &config, HttpResponse &response)
 {
@@ -235,10 +265,10 @@ void	Server::processRequest(Client &client)
 	client.setState(SENDING_RESPONSE);
 }
 
-void	Server::handleConnectionClosed(???)
-{
+// void	Server::handleConnectionClosed(???)
+// {
 
-}
+// }
 
 void	Server::eraseFromPoll(int fd)
 {

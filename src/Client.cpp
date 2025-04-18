@@ -6,25 +6,25 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 12:50:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 12:34:07 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client()
-{
-	//create a new socket?!?!
-}
+// Client::Client()
+// {
+// 	//create a new socket?!?!
+// }
 
 Client::Client(int socket)
-	:_socket(socket), _state(NEW_REQUEST), _bytes_sent(0), _file_fd(-1), _empty_buffer(true)
+	:_socket(socket), _state(NEW_REQUEST), _file_fd(-1), _bytes_sent(0), _empty_buffer(true)
 {
-	//_request;
-	//_response;
+	//_request
+	//_response
 }
 
-HttpRequest		&Client::getRequest(void) const
+HttpRequest		&Client::getRequest(void)
 {
 	return (_request);
 }
@@ -71,11 +71,11 @@ bool	Client::sendResponseChunk(void)
 		std::string	status = _response.statusToString();
 		std::string	headers = _response.headersToString();
 
-		size_t sent = send(_socket.getFd(), status.c_str(), status.length(), 0);
+		size_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
 			return false;
 		_bytes_sent = sent;
-		sent = send(_socket.getFd(), headers.c_str(), headers.length(), 0);
+		sent = send(_socket, headers.c_str(), headers.length(), 0);
 		if (sent < 0)
 			return false;
 		_bytes_sent += sent;
@@ -85,7 +85,7 @@ bool	Client::sendResponseChunk(void)
 	{
 		if (!_empty_buffer)
 		{
-			size_t sent = send(_socket.getFd(), _response_buffer.c_str(), _response_buffer.length(), 0);
+			size_t sent = send(_socket, _response_buffer.c_str(), _response_buffer.length(), 0);
 			if (sent < 0)
 				return false;
 			_empty_buffer = true;
@@ -95,12 +95,13 @@ bool	Client::sendResponseChunk(void)
 		if (_empty_buffer && _file_fd == -1 && _response.getState() != READ) //or handle the case where there was a fd and is already sent!
 		{
 			std::string	body = _response.bodyToString();
-			size_t	sent = send(_socket.getFd(), body.c_str(), body.length(), 0);
+			size_t	sent = send(_socket, body.c_str(), body.length(), 0);
 			if (sent < 0)
 				return false;
 			_bytes_sent += sent;
 			return true;
 		}
 	}
+	return false; //!?!?!?
 	//else set it as already sent
 }

@@ -6,28 +6,32 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 12:49:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 13:04:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse()
-	:_status(new Status), _header(new Header), _body(nullptr), _state(READING), _body_presence(true)
+	:_body_presence(true), _body(nullptr), _state(READING)
 {
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header)
-	:_status(new Status(status)), _header(new Header(header)), _body(nullptr), _state(READING), _body_presence(true)
+	:_body_presence(true), _body(nullptr), _state(READING)
 {
+	_status = Status(status);
+	_header = Header(header);
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header, std::string body)
-	:_status(new Status(status)), _header(new Header(header)), _body(body), _state(READING)
+	:_body_presence(true), _body(body), _state(READING)
 {
+	_status = Status(status);
+	_header = Header(header);
 }
 
-HttpResponse::HttpResponse(const HttpResponse &other)
+HttpResponse::HttpResponse(const HttpResponse &other)s
 {
 	*this = other;
 }
@@ -84,9 +88,14 @@ void	HttpResponse::setBody(std::string &body)
 	_header.set("Content-Length", _body.size());
 }
 
-std::string HttpResponse::getHeader(const std::string& name) const
+std::string HttpResponse::getHeader(const std::string& name)
 {
 	return _headers.get(name);
+}
+
+responseState HttpResponse::getState(void) const
+{
+	return _state;
 }
 
 std::string	HttpResponse::toString() const
@@ -99,6 +108,11 @@ std::string	HttpResponse::toString() const
 	return response.str();
 }
 
+std::string	HttpResponse::bodyToString() const
+{
+	if (!_body.empty())
+		return _body.str();
+}
 
 std::string	HttpResponse::statusToString() const
 {
@@ -111,6 +125,11 @@ std::string	HttpResponse::headersToString() const
 
 	header << _header.toString() << "\r\n";
 	return header.str();
+}
+
+bool	HttpResponse::getBodyPresence(void) const
+{
+	return _body_presence;
 }
 
 //https://www.rfc-editor.org/rfc/rfc9110#media.type

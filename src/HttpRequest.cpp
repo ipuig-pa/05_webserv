@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/08 12:12:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/18 12:55:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,3 +34,14 @@
 				Content-Length: 256
 	3️⃣ msg body:
 */
+
+//FOR TESTING PURPOSE:
+HttpRequest::HttpRequest()
+	: _method(GET), _body(nullptr), _path("/src/")
+{
+}
+
+int	HttpRequest::getMethod(void) const
+{
+	return (_method);
+}

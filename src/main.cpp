@@ -6,26 +6,26 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 11:04:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 11:58:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 
-//to check everything!
 int main(int ac, char **av)
 {
 	//create the server object, which creates listening socket object inside, and adds it to poll, in the constructor
 	if (ac == 1)
 		Server		server; //default constrcutor, with default path to config, and a listening socket
+	/*UNCOMMENT
 	else if (ac == 2)
 	{
 		ServerConf	config;
 		config = parseConfig(av[1]); //or whatever it is called
 		Server		server(config);
-	}
-	//how to check while server running?! -> include all this function inside a Server Method call RUN?!!?!?
-	while (serverRunning)
+	}*/
+	//change while(1) to while(server running) or similar -> how to check while server running?! -> include all this function inside a Server Method call RUN?!!?!?
+	while (1)
 	{
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
 		int ready = poll(server.getPoll().data(), server.getPoll().size(), -1);
@@ -38,7 +38,7 @@ int main(int ac, char **av)
 				// have into account other errors for specific behavior???
 				if (errno == ENOMEM) // Not enough space/cannot allocate memory
 				{
-					cleanupAndExit(); //TO BE IMPLEMENTED!
+					// cleanupAndExit(); //TO BE IMPLEMENTED!
 					return (1);
 				}
 			}
@@ -47,7 +47,7 @@ int main(int ac, char **av)
 		// if listening socket is ready, accept new clients (keep listening socket always in [0])
 		if (server.getPoll().data()[0].revents & POLLIN)
 		{
-			server.acceptNewConnection();//TO BE IMPLEMENTED!!!
+			server.acceptNewConnection();
 			continue; //so start the loop againg, and check again poll, including this new client
 		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
@@ -78,14 +78,14 @@ int main(int ac, char **av)
 					server.handleFileRead(i);
 				}
 				// Handle client socket ready for writing
-				if (server.getPoll().data()[i].revents & POLLOUT) {
-					server.handleFileWrite(i);
-				}
+				// if (server.getPoll().data()[i].revents & POLLOUT) {
+				// 	server.handleFileWrite(i);
+				// }
 			}
 			// Handle errors or closed connections -> maybe erase from poll here all the closed connections, so no interference to the i is done in between the loop??
-			if (server.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-				server.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
-			}
+			// if (server.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+			// 	server.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
+			// }
 		}
 	}
 	else

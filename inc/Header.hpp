@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/08 17:32:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/18 12:52:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ public:
 	void remove(const std::string& name);
 
 	// Parse headers from a string (for request parsing)
-	bool parse(const std::string& headerStr);
+	// bool parse(const std::string& headerStr);
 	std::string toString() const;
 };
 
