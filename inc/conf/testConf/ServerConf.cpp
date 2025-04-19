@@ -6,19 +6,19 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 09:40:52 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 11:28:37 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConf.hpp"
 
 ServerConf::ServerConf() {
-	// _port = 0;
-	// _server_name = "";
-	// _root_dir = "";
-	// _host = "";
-	// _max_body_size = 0;
-	// _srv_autoindex = false;
+	_port = 0;
+	_server_name = "";
+	_root_dir = "";
+	_host = "localhost";
+	_max_body_size = 0;
+	_srv_autoindex = false;
 }
 ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
 ServerConf::~ServerConf() {}
@@ -45,7 +45,7 @@ void ServerConf::setPort(std::string s)
 {
 	if (!_hasSemicolon(s))
 		throw std::runtime_error("Error: xxxx");
-		
+	
 }
 void ServerConf::setSrvName(std::string s) {}
 void ServerConf::setHost(std::string s) {}

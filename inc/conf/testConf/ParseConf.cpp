@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 09:40:07 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 12:44:37 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,14 +275,13 @@ size_t ParseConf::parseErrPage(const std::vector<std::string>& tokens, size_t i,
 	{
 		std::string tmp_tk = tokens[i]; //should be at the pos of 1st error-code
 		err_tks.push_back(tmp_tk);
-		
-		if (ServerConf::_hasSemicolon(tmp_tk))
-		{
+		if (ServerConf::_hasSemicolon(tmp_tk)) {
 			err_tks.back() = ServerConf::rmvSemicolon(tmp_tk); 
 			break ;	//reach end of this category
 		}
-		if (i + 1 >= tokens.size())
+		if (i + 1 >= tokens.size()) {
 			throw std::runtime_error("Error: invalid format of error page parsed.");
+		}
 	}
 	servConf.setErr(err_tks); //check duplication inside!
 	return i;

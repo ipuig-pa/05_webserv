@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 09:29:32 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 13:42:23 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@
 class ServerConf
 {
 private:
-	int _port;
+	unsigned int _port;
+	unsigned int _max_body_size;
 	std::string _server_name;
 	std::string _root_dir;
 	std::string _host;
 	std::string _index;
 	std::map<int, std::string> _error_page; //err_code, url
-	size_t _max_body_size;
 	bool _srv_autoindex; //default as false in construtor
 	std::map<std::string, LocationConf> _locations;
 	// std::vector<LocationConf> _location; //a set of location_blocks in server_configuration
@@ -47,6 +47,7 @@ public:
 	bool _allDigit(const std::string& s);
 	static bool _hasSemicolon(const std::string& s);
 	static std::string rmvSemicolon(const std::string& token);
+	bool _codeRange(const std::string& errtoken);
 
 	//setters, pass 'const std::string& s' or pass COPY???
 	void setPort(std::string s);
@@ -62,7 +63,7 @@ public:
 	
 	//getters
 	const int& getPort() const;
-	const int& getCMBS() const;
+	int getCMBS() const;
 	const bool getAutoIndex() const;
 	const std::string& getRoot() const;
 	const std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
@@ -90,39 +91,5 @@ public:
  * 		- can read, process data
  * 		- return customize HTML
  * 		- login sys, search feature in WEB, contact form in WEB
- * void ServerConf::setErrorPages(std::vector<std::string> &parametr)
-{
-	if (parametr.empty())
-		return;
-	if (parametr.size() % 2 != 0)
-		throw std::runtime_error("Error page initialization failed: unmatched code/path pair");
-
-	for (size_t i = 0; i < parametr.size() - 1; i += 2)
-	{
-		const std::string& codeStr = parametr[i];
-		const std::string& path = parametr[i + 1];
-
-		// Validate code
-		if (codeStr.size() != 3 || !std::all_of(codeStr.begin(), codeStr.end(), ::isdigit))
-			throw std::runtime_error("Invalid error code: " + codeStr);
-
-		short code = std::stoi(codeStr);
-		if (code < 400 || statusCodeString(code) == "Undefined")
-			throw std::runtime_error("Unsupported error code: " + codeStr);
-
-		// Check path existence (can be customized with your checkFile or getTypePath)
-		if (ConfigFile::getTypePath(path) != 2 && // not absolute?
-			(ConfigFile::getTypePath(this->_root + path) != 1 ||
-			 ConfigFile::checkFile(this->_root + path, 0) == -1 ||
-			 ConfigFile::checkFile(this->_root + path, 4) == -1))
-		{
-			throw std::runtime_error("Invalid or inaccessible error page file: " + this->_root + path);
-		}
-
-		// Store the path
-		this->_error_pages[code] = path;
-	}
-}
-
  */
 #endif
