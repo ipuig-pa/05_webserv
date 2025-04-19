@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/17 16:36:30 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 08:54:28 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,9 @@ public:
 	//some helper func for check validity
 	// bool _allDigit(const std::string& s);
 	// bool _hasSemicolon(const std::string& s);
+
+	//getter for test private attribute
+	std::vector<std::string>& getSrvBlock();
 	
 	void _split(const std::vector<std::string>& tokens); //if multi 'server{}' found, split it
 	void _addToServBlock(const std::vector<std::string>& tokens, size_t left, size_t right);

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 11:11:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 09:07:20 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,10 @@ void rmHash(std::string& single_line)
 // std::string rmSpace(std::string& single_line)
 void rmSpace(std::string& single_line)
 {
-	size_t pos = single_line.find_first_not_of(' \t\r\n'); //if cannt find non-space, rt: npos
+	size_t pos = single_line.find_first_not_of(" \t\r\n"); //if cannt find non-space, rt: npos
 	if (pos != std::string::npos)
 	{
-		size_t end = single_line.find_last_not_of(' \t\r\n');
+		size_t end = single_line.find_last_not_of(" \t\r\n");
 		int len = end - pos + 1;
 		single_line = single_line.substr(pos, len);
 	}
@@ -55,7 +55,7 @@ void createTokens(const std::string& lines, std::vector<std::string>& tokens)
 	std::stringstream tmp(lines);
 	std::string single_line;
 	
-	while (std::getline(tmp, single_line));
+	while (std::getline(tmp, single_line))
 	{
 		rmHash(single_line);
 		rmSpace(single_line);

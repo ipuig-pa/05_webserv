@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 14:55:31 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 09:40:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,35 @@ ParseConf::~ParseConf() {}
 
 //read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
 // -> create serverBlock and actual instance of serverConf
-int ParseConf::entryParser(const std::string& confFile)
-{
-	std::vector<std::string> tokens;
-	std::string lines = read_conf(confFile);
-	createTokens(lines, tokens);
-	_split(tokens);
-	_createServBlock();
+// int ParseConf::entryParser(const std::string& confFile)
+// {
+// 	std::vector<std::string> tokens;
+// 	std::string lines = read_conf(confFile);
+// 	createTokens(lines, tokens);
+// 	_split(tokens);
+// 	_createServBlock();
 	
 
-	return (0);
-}
+// 	return (0);
+// }
 
-bool ParseConf::_valid(std::string& lines) {}
+// bool ParseConf::_allDigit(const std::string& s)//return true if all digit
+// {
+// 	return std::all_of(s.begin(), s.end(), ::isdigit);
+// }
+
+// bool ParseConf::_hasSemicolon(const std::string& s)
+// {
+// 	if (!s.empty() && s.back() == ';')
+// 		return true;
+// 	return false;
+// }
+// std::string ParseConf::rmvSemicolon(const std::string& token)
+// {
+// 	if (!token.empty() && token.back() == ';')
+// 		return token.substr(0, token.size() - 1);
+// 	return token;
+// }
 
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ParseConf::_split(const std::vector<std::string>& tokens)
@@ -60,7 +76,7 @@ size_t ParseConf::_blockEnd(const std::vector<std::string>& tokens, size_t i)
 {
 	if (i + 1 >= tokens.size() || tokens[i + 1] != "{")
 	{
-		throw std::runtime_error("Error: unpaired server block.");
+		throw std::runtime_error("Error: missing '{' in block scope.");
 	}
 	int incident_level = 1;
 	for (size_t j = i + 2; j < tokens.size(); ++j)
@@ -74,7 +90,7 @@ size_t ParseConf::_blockEnd(const std::vector<std::string>& tokens, size_t i)
 				return j;
 		}
 	}
-	throw std::runtime_error("Error: unpaired server block.");
+	throw std::runtime_error("Error: unpaired '{}' block.");
 }
 
 //add a BIG STR to std::vector<std::string> _single_server
@@ -119,22 +135,32 @@ void ParseConf::_createServBlock()
 		this->_servers.push_back(servConf);
 	}
 }
+std::vector<std::string>& ParseConf::getSrvBlock()
+{
+	return _single_server;
+}
 
 //listen; server_name; host; root; CMBS; index; error_page; location; autoindex
 //use func pointer directing to sub-category
 ServerConf ParseConf::_addCategory(const std::vector<std::string>& tokens)
 {
 	ServerConf servConf;
+	bool _insideBlock = true;
+	bool default_auto = false;
 	for (size_t pos = 0; pos < tokens.size(); ++pos)
 	{
 		std::string _cate = tokens[pos];
 		if (_handlers.find(_cate) != _handlers.end()) //match found!
 		{
+			if (!_insideBlock && _cate != "location")
+				throw std::runtime_error("Error: category after location block.");
 			CategoryHandler funcToCall = _handlers[_cate];
 			pos = (this->*funcToCall)(tokens, pos, servConf);
+			if (_cate == "location")
+				_insideBlock = false;
 		}
-		else if (_cate != "{" && _cate != "}")
-			throw std::runtime_error("Error: misplaced category to add" + _cate);
+		// else if (_cate != "{" && _cate != "}")
+		// 	throw std::runtime_error("Error: misplaced category: " + _cate);
 	}
 	return servConf;
 }
@@ -152,19 +178,131 @@ void ParseConf::_initHandler()
 	_handlers["autoindex"] = &ParseConf::parseAutoIndex;
 }
 
+size_t ParseConf::parseListen(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+		throw std::runtime_error("Error: no parameter after 'listen'.");
+	if (servConf.getPort()) //port already exist in this server{} block
+		throw std::runtime_error("Error: port already exist.");
+	servConf.setPort(tokens[i + 1]);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseHost(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+		throw std::runtime_error("Error: no parameter after 'host'.");
+	if (servConf.getHost().empty()) //port already exist in this server{} block
+		throw std::runtime_error("Error: 'host' already exist.");
+	servConf.setHost(tokens[i + 1]);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseRoot(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+		throw std::runtime_error("Error: no parameter after 'root'.");
+	if (servConf.getRoot().empty()) //port already exist in this server{} block
+		throw std::runtime_error("Error: 'root' already exist.");
+	servConf.setRoot(tokens[i + 1]);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseSvrName(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+		throw std::runtime_error("Error: no parameter after 'server_name'.");
+	if (servConf.getSrvName().empty()) //port already exist in this server{} block
+		throw std::runtime_error("Error: 'server_name' already exist.");
+	servConf.setSrvName(tokens[i + 1]);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseCMBS(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+	throw std::runtime_error("Error: no parameter after 'client_max_body_size'.");
+	if (servConf.getCMBS()) //port already exist in this server{} block
+	throw std::runtime_error("Error: 'client_max_body_size' already exist.");
+	servConf.setCMBS(tokens[i + 1]);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseIndex(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+	throw std::runtime_error("Error: no parameter after 'index'.");
+	if (servConf.getIndex().empty()) //port already exist in this server{} block
+	throw std::runtime_error("Error: 'index' already exist.");
+	servConf.setIndex(tokens[i + 1]);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseAutoIndex(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+	throw std::runtime_error("Error: no parameter after 'autoindex'.");
+	if (servConf.getAutoIndex() != false) //port already exist in this server{} block
+	throw std::runtime_error("Error: 'autoindex' already set.");
+	std::string tmp_auto = ServerConf::rmvSemicolon(tokens[i + 1]);
+	bool _flag = false;
+	if (tmp_auto == "on" || tmp_auto == "ON")
+	_flag = true;
+	else if (tmp_auto == "off" || tmp_auto == "OFF")
+	_flag = false;
+	else
+	throw std::runtime_error("Error: invalid value for autoindex.");
+	servConf.setAutoIndex(_flag);
+	i += 1;
+	return i;
+}
+size_t ParseConf::parseLocation(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size())
+		throw std::runtime_error("Error: no parameter after 'location'.");
+	i++; //move the the '/path'
+	std::string _path = tokens[i];
+	size_t _locEnd = _blockEnd(tokens, i);
+	std::vector<std::string> loc_tokens(tokens.begin() + i + 2, tokens.begin() + _locEnd);//pos i+2: the 1st element after '{'
+	servConf._addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
+	return _locEnd;
+}
+//std::map<int, std::string>& getErrPage() const;
+size_t ParseConf::parseErrPage(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	std::vector<std::string> err_tks;
+	while (++i < tokens.size())
+	{
+		std::string tmp_tk = tokens[i]; //should be at the pos of 1st error-code
+		err_tks.push_back(tmp_tk);
+		
+		if (ServerConf::_hasSemicolon(tmp_tk))
+		{
+			err_tks.back() = ServerConf::rmvSemicolon(tmp_tk); 
+			break ;	//reach end of this category
+		}
+		if (i + 1 >= tokens.size())
+			throw std::runtime_error("Error: invalid format of error page parsed.");
+	}
+	servConf.setErr(err_tks); //check duplication inside!
+	return i;
+}
+
+
+
 
 
 
 // size_t ParseConf::leftBracket(std::string& lines, size_t pos)
 // {
-// 	size_t i = pos;
-// 	while (i < lines.length() && std::isspace(lines[i]))
-// 		i++;
-// 	if (lines.compare(i, 6, "server") != 0) //int compare (size_t pos, size_t len, const char* s) const, >> 0==equal
-// 		throw std::runtime_error("Error: cannot find server.");
-// 	i = i + 6; //skip 'server'
-// 	while (i < lines.length() && std::isspace(lines[i]))
-// 		i++;
+	// 	size_t i = pos;
+	// 	while (i < lines.length() && std::isspace(lines[i]))
+	// 		i++;
+	// 	if (lines.compare(i, 6, "server") != 0) //int compare (size_t pos, size_t len, const char* s) const, >> 0==equal
+	// 		throw std::runtime_error("Error: cannot find server.");
+	// 	i = i + 6; //skip 'server'
+	// 	while (i < lines.length() && std::isspace(lines[i]))
+	// 		i++;
 // 	if (i >= lines.length() || (lines[i] != '{'))
 // 		throw std::runtime_error("Error: invalid bracket block");
 // 	return i;

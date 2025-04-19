@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 11:11:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 09:05:22 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void createTokens(const std::string& lines, std::vector<std::string>& tokens)
 	std::stringstream tmp(lines);
 	std::string single_line;
 	
-	while (std::getline(tmp, single_line));
+	while (std::getline(tmp, single_line))
 	{
 		rmHash(single_line);
 		rmSpace(single_line);

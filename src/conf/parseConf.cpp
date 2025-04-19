@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/17 16:41:26 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 09:41:47 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,17 @@ ParseConf::~ParseConf() {}
 
 //read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
 // -> create serverBlock and actual instance of serverConf
-int ParseConf::entryParser(const std::string& confFile)
-{
-	std::vector<std::string> tokens;
-	std::string lines = read_conf(confFile);
-	createTokens(lines, tokens);
-	_split(tokens);
-	_createServBlock();
+// int ParseConf::entryParser(const std::string& confFile)
+// {
+// 	std::vector<std::string> tokens;
+// 	std::string lines = read_conf(confFile);
+// 	createTokens(lines, tokens);
+// 	_split(tokens);
+// 	_createServBlock();
 	
 
-	return (0);
-}
+// 	return (0);
+// }
 
 // bool ParseConf::_allDigit(const std::string& s)//return true if all digit
 // {
@@ -134,6 +134,10 @@ void ParseConf::_createServBlock()
 		// servConf = parseToServ(tokens);
 		this->_servers.push_back(servConf);
 	}
+}
+std::vector<std::string>& ParseConf::getSrvBlock()
+{
+	return _single_server;
 }
 
 //listen; server_name; host; root; CMBS; index; error_page; location; autoindex

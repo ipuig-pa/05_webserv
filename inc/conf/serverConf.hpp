@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/17 16:40:59 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 09:29:32 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,14 @@ private:
 	std::string _server_name;
 	std::string _root_dir;
 	std::string _host;
+	std::string _index;
 	std::map<int, std::string> _error_page; //err_code, url
 	size_t _max_body_size;
 	bool _srv_autoindex; //default as false in construtor
-	std::vector<LocationConf> _location; //a set of location_blocks in server_configuration
+	std::map<std::string, LocationConf> _locations;
+	// std::vector<LocationConf> _location; //a set of location_blocks in server_configuration
 	
 	// std::vector<std::string> _error_page;
-	// std::map<std::string, LocationConf> _locations;
 	// [...] other var to add later
 	
 public:
@@ -51,7 +52,7 @@ public:
 	void setPort(std::string s);
 	void setHost(std::string s);
 	void setSrvName(std::string s);
-	void setHost(std::string s);
+
 	void setRoot(std::string s);
 	void setCMBS(std::string s);
 	void setIndex(std::string s);
@@ -60,15 +61,15 @@ public:
 	void _addLocation(std::string& _path, std::vector<std::string>& loc_tokens); //todo: setter for var in this class
 	
 	//getters
-	int& getPort() const;
-	int& getCMBS() const;
-	bool getAutoIndex() const;
-	std::string& getRoot() const;
-	std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
-	std::string& getIndex() const;
-	std::string& getSrvName() const;
-	std::map<int, std::string>& getErrPage() const;
-	std::map<std::string, LocationConf>& getLocation() const;
+	const int& getPort() const;
+	const int& getCMBS() const;
+	const bool getAutoIndex() const;
+	const std::string& getRoot() const;
+	const std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
+	const std::string& getIndex() const;
+	const std::string& getSrvName() const;
+	const std::map<int, std::string>& getErrPage() const;
+	const std::map<std::string, LocationConf>& getLocation() const;
 	// std::vector<std::string>& getErrPage() const;
 	// std::vector<LocationConf>& getLocation() const;
 	//[...]
