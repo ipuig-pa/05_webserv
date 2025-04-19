@@ -6,14 +6,14 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 13:42:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 16:13:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERCONF_HPP
 #define SERVERCONF_HPP
 
-#define MAX_BODY 1048576 //random set now
+#define MAX_BODY 2*1024*1024 //2 megebyte, random set now
 #include "webserv.hpp"
 #include "LocationConf.hpp"
 // class LocationConf;
@@ -74,6 +74,17 @@ public:
 	// std::vector<std::string>& getErrPage() const;
 	// std::vector<LocationConf>& getLocation() const;
 	//[...]
+	
+	//map<string, function<void()>> parser list for location block
+	void parseLocRoot(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseMethod(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocAuto(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocIndex(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseAlias(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocCMBS(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiPath(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiExtension(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseReturn(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
 	
 };
 

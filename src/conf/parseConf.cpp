@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 12:45:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 15:01:59 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,18 +276,6 @@ size_t ParseConf::parseAutoIndex(const std::vector<std::string>& tokens, size_t 
 	i += 1;
 	return i;
 }
-size_t ParseConf::parseLocation(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
-{
-	if (i + 1 >= tokens.size()) {
-		throw std::runtime_error("Error: no parameter after 'location'.");
-	}
-	i++; //move the the '/path'
-	std::string _path = tokens[i];
-	size_t _locEnd = _blockEnd(tokens, i);
-	std::vector<std::string> loc_tokens(tokens.begin() + i + 2, tokens.begin() + _locEnd);//pos i+2: the 1st element after '{'
-	servConf._addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
-	return _locEnd;
-}
 //std::map<int, std::string>& getErrPage() const;
 size_t ParseConf::parseErrPage(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
@@ -307,6 +295,18 @@ size_t ParseConf::parseErrPage(const std::vector<std::string>& tokens, size_t i,
 	return i;
 }
 
+size_t ParseConf::parseLocation(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
+{
+	if (i + 1 >= tokens.size()) {
+		throw std::runtime_error("Error: no parameter after 'location'.");
+	}
+	i++; //move the the '/path'
+	std::string _path = tokens[i];
+	size_t _locEnd = _blockEnd(tokens, i);
+	std::vector<std::string> loc_tokens(tokens.begin() + i + 2, tokens.begin() + _locEnd);//pos i+2: the 1st element after '{'
+	servConf._addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
+	return _locEnd;
+}
 
 
 

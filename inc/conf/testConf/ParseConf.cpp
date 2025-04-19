@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 12:44:37 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 16:27:51 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,6 @@ size_t ParseConf::parseErrPage(const std::vector<std::string>& tokens, size_t i,
 	servConf.setErr(err_tks); //check duplication inside!
 	return i;
 }
-
 
 
 

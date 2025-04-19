@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 13:48:49 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/19 16:45:38 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,10 +145,67 @@ void ServerConf::setCMBS(std::string s)
 	} //is this necessary?? not sure...
 	this->_max_body_size = (unsigned int)tmp;
 }
+
+//use ofstd::map<string, std::function<void<>>
 void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
 {
-	//big chunk, do later
+	LocationConf locBlock;
+	locBlock.setLocPath(_path);
+	size_t i = 0;
+	std::map<std::string, std::function<void()>> _locHandler = {
+		{"root", [&](){ parseLocRoot(locBlock, loc_tokens, i); }},
+		{"allow_methods", [&](){ parseMethod(locBlock, loc_tokens, i); }},
+		{"client_max_body_size", [&](){ parseLocCMBS(locBlock, loc_tokens, i); }},
+		{"autoindex", [&](){ parseLocAuto(locBlock, loc_tokens, i); }},
+		{"alias", [&](){ parseAlias(locBlock, loc_tokens, i); }},
+		{"index", [&](){ parseLocIndex(locBlock, loc_tokens, i); }},
+		{"CGI_Path", [&](){ parseCgiPath(locBlock, loc_tokens, i); }},
+		{"CGI_Extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
+		{"return", [&](){ parseReturn(locBlock, loc_tokens, i); }}
+	};
+	while (i < loc_tokens.size())
+	{
+		const std::string& _key = loc_tokens[i];
+		if (_locHandler.find(_key) != _locHandler.end()) {
+			_locHandler[_key]();
+			++i;
+		}
+		else {
+			throw std::runtime_error("");
+		}
+	}
 }
+//todo: to write the specific parser for location
+
+void ServerConf::parseLocRoot(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseMethod(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseLocAuto(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseLocIndex(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseAlias(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseLocCMBS(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseCgiPath(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseCgiExtension(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+void ServerConf::parseReturn(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
+	
+}
+	
+
 
 //getters
 const int& ServerConf::getPort() const {
