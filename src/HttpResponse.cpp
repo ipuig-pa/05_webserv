@@ -6,32 +6,28 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/18 13:04:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 11:41:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse()
-	:_body_presence(true), _body(nullptr), _state(READING)
+	:_status(), _header(), _body_presence(true), _body(""), _state(READING)
 {
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header)
-	:_body_presence(true), _body(nullptr), _state(READING)
+	:_status(status), _header(header), _body_presence(true), _body(""), _state(READING)
 {
-	_status = Status(status);
-	_header = Header(header);
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header, std::string body)
-	:_body_presence(true), _body(body), _state(READING)
+	:_status(status), _header(header), _body_presence(true), _body(body), _state(READING)
 {
-	_status = Status(status);
-	_header = Header(header);
 }
 
-HttpResponse::HttpResponse(const HttpResponse &other)s
+HttpResponse::HttpResponse(const HttpResponse &other)
 {
 	*this = other;
 }
@@ -40,32 +36,28 @@ HttpResponse	&HttpResponse::operator=(const HttpResponse &other)
 {
 	if (this != &other)
 	{
-		delete _header;
-		delete _status;
-		new Header(other._header);
-		new Status(other._status);
+		_status = other._status;
+		_header = other._header;
+		_body_presence = other._body_presence;
 		_body = other._body;
+		_state = other._state;
 	}
 	return *this;
 }
 
 HttpResponse::~HttpResponse()
 {
-	delete _status;
-	delete _header;
 }
 
 //correctly implemented!?!?
 void	HttpResponse::setStatus(Status &status)
 {
-	delete _status;
-	_status = new Status(status);
+	_status = status;
 }
 
 void	HttpResponse::setStatusCode(int code)
 {
-	delete _status;
-	_status = new Status(code);
+	_status = Status(code);
 	if (code == 204 || code == 304)
 		_body_presence = false;
 }
@@ -73,24 +65,23 @@ void	HttpResponse::setStatusCode(int code)
 //correctly implemented!?!?
 void	HttpResponse::setHeader(Header &header)
 {
-	delete _header;
-	_header = new Header(header);
+	_header = header;
 }
 
-void	HttpResponse::addHeaderField(const std::string& name, const std::string& value)
+void	HttpResponse::setHeaderField(const std::string& name, const std::string& value)
 {
-	_headers.set(name, value);
+	_header.set(name, value);
 }
 
-void	HttpResponse::setBody(std::string &body)
+void	HttpResponse::setBody(const std::string &body)
 {
 	_body = body;
-	_header.set("Content-Length", _body.size());
+	_header.set("Content-Length", std::to_string(_body.size()));
 }
 
 std::string HttpResponse::getHeader(const std::string& name)
 {
-	return _headers.get(name);
+	return _header.get(name);
 }
 
 responseState HttpResponse::getState(void) const
@@ -108,10 +99,9 @@ std::string	HttpResponse::toString() const
 	return response.str();
 }
 
-std::string	HttpResponse::bodyToString() const
+std::string	&HttpResponse::getBody()
 {
-	if (!_body.empty())
-		return _body.str();
+	return _body;
 }
 
 std::string	HttpResponse::statusToString() const

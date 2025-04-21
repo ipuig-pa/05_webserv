@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/18 12:54:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 10:35:33 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ Header::Header()
 	set("Host", "localhost"); //FOR TESTING PURPOSE, CHANGE
 }
 
-Header::Header(Header& other)
+Header::Header(const Header &other)
 {
 	*this = other;
 }
 
 //correctly implemented!?!?!?
-Header	&Header::operator=(Header &other)
+Header	&Header::operator=(const Header &other)
 {
 	if (this != &other)
 	{

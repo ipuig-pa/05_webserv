@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/18 12:52:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 10:35:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ private:
 
 public:
 	Header();
-	Header(Header& other);
-	Header	&operator=(Header &other);
+	Header(const Header& other);
+	Header	&operator=(const Header &other);
 	~Header();
 
 	void set(const std::string& name, const std::string& value);

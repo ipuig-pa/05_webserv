@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/18 12:22:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 11:08:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ public:
 	~Client();
 
 	HttpRequest		&getRequest(void);
+	HttpResponse	&getResponse(void);
 	int				&getSocket(void);
 	clientState		getState(void);
 	int				getFileFd(void);

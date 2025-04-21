@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/18 12:56:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 12:06:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ private:
 public:
 	HttpRequest();
 	int	getMethod(void) const;
+	std::string	&getPath(void);
+	void	setPath(const std::string &path);
 	//getters (name, method, state [...])
 	//setter ([...])
 };

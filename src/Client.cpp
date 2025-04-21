@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/18 12:34:07 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 11:28:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,11 @@ Client::Client(int socket)
 HttpRequest		&Client::getRequest(void)
 {
 	return (_request);
+}
+
+HttpResponse	&Client::getResponse(void)
+{
+	return (_response);
 }
 
 clientState	Client::getState(void)
@@ -94,7 +99,7 @@ bool	Client::sendResponseChunk(void)
 		}
 		if (_empty_buffer && _file_fd == -1 && _response.getState() != READ) //or handle the case where there was a fd and is already sent!
 		{
-			std::string	body = _response.bodyToString();
+			std::string	body = _response.getBody();
 			size_t	sent = send(_socket, body.c_str(), body.length(), 0);
 			if (sent < 0)
 				return false;

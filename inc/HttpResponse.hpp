@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/18 13:00:07 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 11:41:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,18 +42,18 @@ public:
 	HttpResponse	&operator=(const HttpResponse &other);
 	~HttpResponse();
 
-	std::string	&getHeader(const std::string& name);//needed?!!?
+	std::string	getHeader(const std::string& name);//needed?!!?
+	std::string	&getBody();
 	responseState	getState(void) const;
 	bool		getBodyPresence(void) const;
 	void		setStatus(Status &status);
 	void		setStatusCode(int code);
 	void		setHeader(Header &header);
-	void		addHeaderField(const std::string& name, const std::string& value);
+	void		setHeaderField(const std::string& name, const std::string& value);
 	void		setBody(const std::string &body);
 	void		setState(responseState state);
 
 	std::string	toString() const;
-	std::string	bodyToString() const;
 	std::string	statusToString() const;
 	std::string	headersToString() const;
 };
