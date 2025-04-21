@@ -6,41 +6,44 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/18 12:15:00 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:26:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
+//Check most suitable arguments to pass to each member methods
+
 //CONSTRUCTORS
 //check listen_sock creation
 Server::Server()
+	:_config()
 {
-	_listen_sock = socket(AF_INET, SOCK_STREAM, 0); //or create outside and use setters!?
+	_listen_socket = socket(AF_INET, SOCK_STREAM, 0); //or create outside and use setters!?
 
-	fcntl(_listen_sock, F_SETFL, O_NONBLOCK);
-	struct pollfd listen_pollfd = {_listen_sock, POLLIN, 0};
+	fcntl(_listen_socket, F_SETFL, O_NONBLOCK);
+	struct pollfd listen_pollfd = {_listen_socket, POLLIN, 0};
 	_poll_fds.push_back(listen_pollfd);
-	// _config = //default!!?
 }
 
-// Server::Server(ServerConf config)
-// {
-// 	_listen_sock = socket(AF_INET, SOCK_STREAM, 0);//or create outside and use setters!?
+Server::Server(ServerConf config)
+	:_config(config)
+{
+	_listen_socket = socket(AF_INET, SOCK_STREAM, 0);//or create outside and use setters!?
 
-// 	fcntl(listen_sock, F_SETFL, O_NONBLOCK);
-// 	struct pollfd listen_pollfd = {_listen_sock, POLLIN, 0};
-// 	_poll_fds.push_back(listen_pollfd);
-// 	_config = config; //or create outside and use setters!?
-// }
+	fcntl(_listen_socket, F_SETFL, O_NONBLOCK);
+	struct pollfd listen_pollfd = {_listen_socket, POLLIN, 0};
+	_poll_fds.push_back(listen_pollfd);
+	_config = config; //or create outside and use setters!?
+}
 
 //ACCESSORS
-std::vector<struct pollfd>	&Server::getPoll(void) const
+std::vector<struct pollfd>	&Server::getPoll(void)
 {
 	return (_poll_fds);
 }
 
-Socket	&Server::getListenSocket(void) const
+int	Server::getListenSocket(void)
 {
 	return (_listen_socket);
 }
@@ -53,7 +56,7 @@ std::map<int, Client*>	&Server::getClients(void)
 //METHODS
 void	Server::acceptNewConnection()
 {
-	Socket	client_socket = socket(AF_INET, SOCK_STREAM, 0); //CHECK ARGUMENTS!!?!?
+	int		client_socket = socket(AF_INET, SOCK_STREAM, 0); //CHECK ARGUMENTS!!?!?
 	Client	*client = new Client(client_socket);
 
 	_clients.insert(std::pair<int, Client*>(client_socket, client));
@@ -62,22 +65,24 @@ void	Server::acceptNewConnection()
 	_poll_fds.push_back(cli_sock_fd);
 }
 
-// void	Server::handleClientRead(Client &client)
-// {
+void	Server::handleClientRead(Client &client)
+{
+	(void)client;
 // 	if (client.getState == NEW_REQUEST)
 // 		parseRequest(); //inside parseRequest, change the client state to ReadingRequest, and somehow keep track when it is completed
 // 		//Check when it is completed (buffered and parsing!?)
 // 	else if (client.getState == PROCESSING)
 // 		processRequest(client);
-// }
+}
 
 
 void	Server::handleClientWrite(Client &client)
 {
-	if (client.getState == SENDING_RESPONSE)
+	if (client.getState() == SENDING_RESPONSE)
 	{
 		if (!client.sendResponseChunk())
 			//error handling??
+			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
 	}
 }
 
@@ -90,20 +95,21 @@ void	Server::handleFileRead(Client &client)
 		if (bytesRead > 0)
 		{
 			client.setBuffer(buffer, bytesRead);
-			client.setEmptyBuffer == false;
+			client.setEmptyBuffer(false);
 		}
 		else if (bytesRead == 0)
 		{
 			client.getResponse().setState(READ);
 			close(client.getFileFd());
 			client.setFileFd(-1);
-			ersaseFromPoll(client.getFileFd());
+			eraseFromPoll(client.getFileFd());
 		}
 	}
 }
 
-// void	Server::handleFileWrite(Client &client)
-// {
+void	Server::handleFileWrite(Client &client)
+{
+	(void)client;
 // 	if (client.getResponse().getState() == WRITING && client.getEmptyBuffer() == false)
 // 	{
 // 		write(client.getFileFd(), _response_buffer.c_str(), _response_buffer.length());
@@ -118,16 +124,18 @@ void	Server::handleFileRead(Client &client)
 // 		// 	client.setFileFd(-1);
 // 		// 	ersaseFromPoll(client.getFileFd());
 // 		// }
-// }
+}
 
-void	Server::handleDirectoryRequest(Client &client, Rquest &request, ServerConf &config)
+void	Server::handleDirectoryRequest(Client &client, HttpRequest &request, ServerConf &config)
 {
-	std::string path = getPathFromUrl(client.getRequest().getPath(), config); 
-	// Check for index files first
+	//*******get correct conf from ServerConf / LocationConf*****
+	std::string path = getPathFromUrl(client.getRequest().getPath(), config);
+	//Check for index files first
+	//somehow retreive location conf -> ServerConf should have some public function getLocationConf(std::string path)
 	std::vector<std::string> indexFiles = _config.getIndexFiles(path); // how is it stored in config??
 
-	for (const std::string& indexFile : indexFiles) {
-		std::string fullPath = path + "/" + indexFile;
+	for (size_t i = 0; i < indexFiles.size(); i++) {
+		std::string fullPath = path + "/" + indexFiles[i];
 		// Check if the index file exists and is readable
 		if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
 			// Found an index file, modify the request path and process as a file request:
@@ -136,59 +144,61 @@ void	Server::handleDirectoryRequest(Client &client, Rquest &request, ServerConf 
 				path += "/";
 			}
 			// Update the request path to include the index file
-			client.getRequest().setPath(path + indexFile);
+			client.getRequest().setPath(path + indexFiles[i]);
 			// Process as a normal file GET request
-			handleGetRequest(client, request, config);
+			handleGetRequest(client, client.getResponse(), config);
 			return;
 		}
 	}
 	// No index file found, check if directory listing is enabled
-	if (_config.isDirectoryListingEnabled(path)) { //CHECK HOW IS STORED IN CONFIG FILE!?!
-		handleDirectoryListing(client, path);
+	if (_config.getAutoIndex()) { //CHECK IF THIS IS REALLY THE PARAM WE NEED TO CHECK IF DIRECTORY LISTING IS ENABLED!?!?! -> should be different depending on the location or all the server has the same!?!?
+		handleDirectoryListing(client, request, config);
 	} else {
 		// Directory listing is disabled and no index file exists
 		client.getResponse().setStatusCode(403); // Forbidden
 	}
 }
 
-void	Server::handleDirectoryListing(Client &client, Rquest &request, ServerConf &config)
+void	Server::handleDirectoryListing(Client &client, HttpRequest &request, ServerConf &config)
 {
-	DIR				*dirp = opendir(path.c_str());
+	std::string path = getPathFromUrl(request.getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
+	DIR	*dirp = opendir(path.c_str());
+
 	if (!dirp)
 	{
 		client.getResponse().setStatusCode(500); //Internal server error
 		return;
 	}
 	//Build HTML Content: check with telnet - nginx what exactly to build
-	struct dirent	dirent;
-	while ((dirent = readdir(dirp)) != NULL)
+	struct dirent	*dirent = readdir(dirp);
+	while (dirent)
 	{
-		
-		dirent->d_name;
+		//write the HTML content: d_name etc
+		//dirent->d_name;
+		dirent = readdir(dirp);
 	}
 	if (errno) // will catch errors from readdir
 	{
 		std::cerr << "Poll error: " << strerror(errno) << std::endl;
 		//handle error
 	}
-	
 }
 
-void	Server::handleGetRequest(Client &client, ServerConf &config, HttpResponse &response)
+void	Server::handleGetRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	// std::string path = config.getPathFromUrl(client.getRequest().getPath());
 
 	if (access(path.c_str(), F_OK | R_OK) != 0) {
-		_status.setStatusCode(404);
+		response.setStatusCode(404);
 		return;
 	}
 	struct stat file_stat;
-	stat(path, &file_stat);
+	stat(path.c_str(), &file_stat);
 	if (S_ISDIR(file_stat.st_mode))
 	{
 		//handle directory request (implement function! -> use readdir)
-		handleDirectoryRequest(path, request, config);
+		handleDirectoryRequest(client, client.getRequest(), config);
 		return ;
 	}
 	int file_fd = open(path.c_str(), O_RDONLY);
@@ -205,15 +215,18 @@ void	Server::handleGetRequest(Client &client, ServerConf &config, HttpResponse &
 	response.setHeaderField("Content-Type", getMediaType(path));
 	response.setHeaderField("Content-Length", std::to_string(file_stat.st_size));
 
-	client.setFd(file_fd);
+	client.setFileFd(file_fd);
 
 	// Add this fd to poll() monitoring
 	struct pollfd file = {file_fd, POLLIN, 0};
 	_poll_fds.push_back(file);
 }
 
-// void	Server::handlePostRequest(Client &client, ServerConf &config, HttpResponse &response)
-// {
+void	Server::handlePostRequest(Client &client, HttpResponse &response, ServerConf &config)
+{
+	(void)client;
+	(void)config;
+	(void)response;
 // 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //should be this same function or get the post somehow different?!
 
 // 	int file_fd = open(path.c_str(), O_CREAT, O_APPEND); //more flags?!?
@@ -231,34 +244,39 @@ void	Server::handleGetRequest(Client &client, ServerConf &config, HttpResponse &
 
 // 	struct pollfd file = {file_fd, POLLIN, 0};
 // 	_poll_fds.push_back(file);
-// }
+}
 
-// void	Server::handleDeleteRequest(Client &client, ServerConf &config, HttpResponse &response)
-// {
-// }
+void	Server::handleDeleteRequest(Client &client, HttpResponse &response, ServerConf &config)
+{
+	(void)client;
+	(void)config;
+	(void)response;
+}
 
-void	Server::handleInvalidRequest(Client &client, ServerConf &config, HttpResponse &response)
+void	Server::handleInvalidRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
 	response.setStatusCode(405);
+	(void)config;
+	(void)client;
 }
 
 void	Server::processRequest(Client &client)
 {
 	HttpResponse	response;
 	
-	void	(*handleMethod[])() = {
+	void	(Server::*handleMethod[])(Client &, HttpResponse &, ServerConf &) = {
 		&Server::handleGetRequest, 
 		&Server::handlePostRequest, 
 		&Server::handleDeleteRequest, 
 		&Server::handleInvalidRequest};
 
 	client.setResponse(response);
-	handleMethod[client.getRequest().getMethod()](client, this->_config, response);
+	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), this->_config);
 
 	// Switch to interested in writing -> CHECK!!! Need the client class implemented!
 	for (size_t i = 0; i < _poll_fds.size(); i++) {
-		if (_poll_fds(data)[i].fd == client.getSocket().fd) {
-			_poll_fds(data)[i].events = POLLOUT;
+		if (_poll_fds[i].fd == client.getSocket()) {
+			_poll_fds[i].events = POLLOUT;
 			break;
 		}
 	}
@@ -272,14 +290,38 @@ void	Server::processRequest(Client &client)
 
 void	Server::eraseFromPoll(int fd)
 {
-	for (int i = server.getPoll().size() - 1; i > 0; i--) 
+	for (int i = getPoll().size() - 1; i > 0; i--) 
 	{
-		if (server.getPoll().data()[i].fd == fd)
+		if (getPoll().data()[i].fd == fd)
 		{
-			server.getPoll().erase(i);
+			getPoll().erase(getPoll().begin() + i);
 			return ;
 		}
 	}
+}
+
+std::string	server::getPathFromUrl(const std::string &urlpath, const ServerConf &config)
+{
+	LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
+
+	if (!location)
+	{
+		return config.getRoot() + urlpath;
+	}
+	std::string locationPath = location->getPath();
+	std::string locationRoot = location->getRoot(); // it sould return serverConf root if it does not exist??
+	//needed??
+	if (locationRoot.empty())
+		locationRoot = config->getRoot();
+	// Remove the location prefix from the URL path and append to the location's root
+	std::string relativePath = urlpath;
+	if (urlpath.find(locationPath) == 0) {
+		relativePath = urlpath.substr(locationPath.length());
+	}
+	if (!relativePath.empty() && relativePath[0] != '/') {
+		relativePath = "/" + relativePath;
+	}
+	return locationRoot + relativePath;
 }
 
 /*handle directory request:
@@ -314,3 +356,34 @@ Direct directory access: Allows iterating through directory entries
 Access to file information: Each dirent structure contains basic file information
 Required for directory listing: Essential for implementing directory listing in your web server
 */
+
+
+
+//TO MOVE TO THE SERVERCONF CLASS
+LocationConf	*serverConf::getMatchingLocation(std::string urlpath)
+{
+	std::map<std::string, LocationConf>::iterator it;
+	LocationConf	*longest_match == nullptr
+	size_t			match;
+
+	for(it = _locations.begin(); it != _locations.end(); ++it)
+	{
+		if ((it->first).compare(urlpath) == 0)
+			return (&it->second);
+	}
+	match = 0;
+	for(it = _locations.begin(); it != _locations.end(); ++it)
+	{
+		if (!(it->first).empty() && (it->first).back() == '/' && urlpath.find(it->first) == 0)
+		{
+			if ((it->first).size() > match)
+			{
+				match = (it->first).size()
+				longest_match = &it->second;
+			}
+		}
+	}
+	if (longest_match)
+		return (longest_match);
+	return (_root);
+}

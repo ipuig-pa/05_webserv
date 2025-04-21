@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 15:25:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/21 17:07:38 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include <unistd.h> //for access
 #include <sys/stat.h> //use stat(), and stat struct, to get and hold information about a file or directory.
 #include <dirent.h>// for readdir
+#include <unistd.h> // for read, close, ...??
 
 //possible use of containers
 #include <map>
