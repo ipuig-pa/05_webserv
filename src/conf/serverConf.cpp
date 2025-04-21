@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 16:45:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/21 12:26:49 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void ServerConf::setPort(std::string s)
 	}
 	unsigned int tmp = std::stoi(s);
 	if (tmp > 65353)
-		throw std::runtime_error("Error: too big prot number.");
+		throw std::runtime_error("Error: too big port number.");
 	this->_port = tmp;
 }
 void ServerConf::setSrvName(std::string s)
@@ -146,6 +146,7 @@ void ServerConf::setCMBS(std::string s)
 	this->_max_body_size = (unsigned int)tmp;
 }
 
+void ServerConf::_locValidCheck() {}
 //use ofstd::map<string, std::function<void<>>
 void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
 {
@@ -163,22 +164,33 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 		{"CGI_Extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
 		{"return", [&](){ parseReturn(locBlock, loc_tokens, i); }}
 	};
-	while (i < loc_tokens.size())
-	{
+	while (i < loc_tokens.size()) {
 		const std::string& _key = loc_tokens[i];
 		if (_locHandler.find(_key) != _locHandler.end()) {
 			_locHandler[_key]();
 			++i;
 		}
 		else {
-			throw std::runtime_error("");
+			throw std::runtime_error("Error: passed parameter in location is invalid" + _key);
 		}
 	}
+	_locValidCheck();
 }
 //todo: to write the specific parser for location
 
-void ServerConf::parseLocRoot(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
+void ServerConf::parseLocRoot(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()){
+		throw std::runtime_error("Error: location: no parameter after 'root'.");
+	}
+	++i;
+	if (!_hasSemicolon(loc_tks[i]))
+		throw std::runtime_error("Error: location: invalid 'root' token.");
+	if (servConf.getRoot().empty()){
+		throw std::runtime_error("Error: 'root' already exist.");
+	}
+	servConf.setRoot(tokens[i + 1]);
+	i += 1;
 }
 void ServerConf::parseMethod(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
 	

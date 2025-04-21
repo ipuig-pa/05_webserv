@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 16:13:25 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/21 12:53:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,13 @@ public:
 	// ServerConf& operator=(const ServerConf& other);
 	
 	//checker
-	bool _allDigit(const std::string& s);
+	static bool _allDigit(const std::string& s);
 	static bool _hasSemicolon(const std::string& s);
 	static std::string rmvSemicolon(const std::string& token);
+	static int _validPath();
 	bool _codeRange(const std::string& errtoken);
+	void _locValidCheck();
+	int _cgiValid();
 
 	//setters, pass 'const std::string& s' or pass COPY???
 	void setPort(std::string s);

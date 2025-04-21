@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:38:06 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/16 13:56:41 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/21 15:23:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 //read and process .conf, return raw conflines
 //then process (skip comments, invalid var/value etc...), return vec of lines, already processed
+
 
 std::string read_conf(const std::string& confFile);
 void rmHash(std::string& single_line);
