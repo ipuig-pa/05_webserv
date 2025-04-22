@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 15:01:59 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 08:04:23 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,18 @@ ParseConf::~ParseConf() {}
 
 //read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
 // -> create serverBlock and actual instance of serverConf
-// int ParseConf::entryParser(const std::string& confFile)
-// {
-// 	std::vector<std::string> tokens;
-// 	std::string lines = read_conf(confFile);
-// 	createTokens(lines, tokens);
-// 	_split(tokens);
-// 	_createServBlock();
-	
-
-// 	return (0);
-// }
+#include "ReadConf.hpp"
+int ParseConf::testMain(const std::string& fileName)
+{
+	//add path check logic here for server block
+	std::vector<std::string> tokens;
+	std::string lines = read_conf(fileName);
+	createTokens(lines, tokens);
+	_split(tokens);
+	_createServBlock();
+	//inside location{}, path_valid check needed
+	return (0);
+}
 
 // bool ParseConf::_allDigit(const std::string& s)//return true if all digit
 // {

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 08:54:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 08:02:32 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@
 
 #include "webserv.hpp"
 #include "ReadConf.hpp"
+#include "FileUtils.hpp"
 #include "ServerConf.hpp"
-// class ServerConf;
 
 class ParseConf
 {
@@ -39,11 +39,7 @@ public:
 	ParseConf();
 	~ParseConf();
 	
-	int entryParser(const std::string& confFile); //main entry for whole read-parse-create process
-	
-	//some helper func for check validity
-	// bool _allDigit(const std::string& s);
-	// bool _hasSemicolon(const std::string& s);
+	int testMain(const std::string& fileName); //main entry for whole read-parse-create process
 
 	//getter for test private attribute
 	std::vector<std::string>& getSrvBlock();

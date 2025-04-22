@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 17:06:04 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 08:46:09 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,11 +51,11 @@ int FileUtils::_pathValid(const std::string _filePath, int _permission)
 int FileUtils::_blockPathValid(const std::string _path, const std::string _index)
 {
 	std::string _fullPath = _path + _index;
-	if (_pathType(_index) == 1 && _pathValid(_index, R_OK) == 0)
+	if (_pathType(_index) == 2 && _pathValid(_index, R_OK) == 0)
 	{
 		return 0;
 	}
-	if (_pathType(_fullPath) == 1 && _pathValid(_fullPath, R_OK) == 0)
+	if (_pathType(_fullPath) == 2 && _pathValid(_fullPath, R_OK) == 0)
 	{
 		return 0;
 	}

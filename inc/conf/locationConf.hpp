@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 14:36:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 13:31:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class LocationConf
 	//for dynamic content
 	std::vector<std::string> cgi_path; //run script to generate customized content
 	std::vector<std::string> cgi_extension; //for surfix to treat as CGI: .py; .php; ...
+	std::map<std::string, std::string> _path_extension;
 	bool _locAuto; //flag to show list of files if no INDEX file
 	std::string _locIndex;
 	//other optional, may not use
@@ -46,7 +47,8 @@ class LocationConf
 	void setCgiExtenion(std::string s);
 	void setLocIndex(std::string s);
 	void setLocAuto(bool _flag);
-	// void setReturn(std::string s);
+	void setReturn(std::string s);
+	void setPathExMap(std::map<std::string, std::string> pathExtend);
 	
 	//getters
 	const std::string& getLocPath() const;
@@ -57,8 +59,11 @@ class LocationConf
 	const std::string& getLocIndex() const;
 	const bool getLocAuto() const;
 	const std::string& getReturn() const;
-	const std::string& getCgiPath() const;
-	const std::string& getCgiExtension() const;
+	// const std::string& getCgiPath() const;
+	const std::vector<std::string>& getCgiPath() const;
+	// const std::string& getCgiExtension() const;
+	const std::vector<std::string>& getCgiExtension() const;
+	const std::map<std::string, std::string>& getPathExMap() const;
 };
 
 /**
