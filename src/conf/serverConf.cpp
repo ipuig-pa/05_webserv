@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 12:26:49 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 15:58:24 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,25 @@ void ServerConf::setCMBS(std::string s)
 	this->_max_body_size = (unsigned int)tmp;
 }
 
-void ServerConf::_locValidCheck() {}
+/** TASKS:
+ * 1. check CGI parameters: CGI path/extension/index.html
+ * 	 - FileUtils class is called for path checking!
+ * 2. compare CGI_path and Cgi extension(.php, .py, .sh [...])
+ * 3. normal path check: 
+ * 		- root: start with '/', or root var is empty
+ */
+void ServerConf::_locValidCheck(LocationConf& loc)
+{
+	if (loc.getLocPath() == "/cgi") //cgi handle
+	{
+		if (CgiChecker::_checkCGI(loc) != true) //has errors!
+		{
+			throw std::runtime_error("");
+		}
+	}
+	//normal static check
+}
+
 //use ofstd::map<string, std::function<void<>>
 void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
 {
@@ -186,11 +204,11 @@ void ServerConf::parseLocRoot(LocationConf& loc, const std::vector<std::string>&
 	++i;
 	if (!_hasSemicolon(loc_tks[i]))
 		throw std::runtime_error("Error: location: invalid 'root' token.");
-	if (servConf.getRoot().empty()){
-		throw std::runtime_error("Error: 'root' already exist.");
-	}
-	servConf.setRoot(tokens[i + 1]);
-	i += 1;
+	// if (servConf.getRoot().empty()){
+	// 	throw std::runtime_error("Error: 'root' already exist.");
+	// }
+	// servConf.setRoot(tokens[i + 1]);
+	// i += 1;
 }
 void ServerConf::parseMethod(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
 	

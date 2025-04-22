@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 14:51:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 11:27:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 11:34:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ int main(int ac, char **av)
 				ServerConf svr;
 				std::cout << svr.getHost() << " ** ";
 				svr = parser._addCategory(single_tk);
+				// this->tmp.server.push_back(svr);
 				std::cout << svr.getHost() << " + "; //todo: have to finishe setters for this test step
 			}
 		}

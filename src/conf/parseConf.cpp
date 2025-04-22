@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 15:01:59 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 14:24:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,18 @@ ParseConf::~ParseConf() {}
 
 //read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
 // -> create serverBlock and actual instance of serverConf
-// int ParseConf::entryParser(const std::string& confFile)
-// {
-// 	std::vector<std::string> tokens;
-// 	std::string lines = read_conf(confFile);
-// 	createTokens(lines, tokens);
-// 	_split(tokens);
-// 	_createServBlock();
-	
-
-// 	return (0);
-// }
+#include "ReadConf.hpp"
+int ParseConf::testMain(const std::string& fileName)
+{
+	//add path check logic here for server block
+	std::vector<std::string> tokens;
+	std::string lines = read_conf(fileName);
+	createTokens(lines, tokens);
+	_split(tokens);
+	_createServBlock();
+	//inside location{}, path_valid check needed
+	return (0);
+}
 
 // bool ParseConf::_allDigit(const std::string& s)//return true if all digit
 // {
@@ -53,8 +54,10 @@ ParseConf::~ParseConf() {}
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ParseConf::_split(const std::vector<std::string>& tokens)
 {	
-	if (std::find(tokens.begin(), tokens.end(), "server") == tokens.end()) // iterator to search 'server'
+	// iterator to search 'server'
+	if (std::find(tokens.begin(), tokens.end(), "server") == tokens.end()) {
 		throw std::runtime_error("Error: cannot find server."); //will be caught by try-catch block
+	}
 	size_t i = 0;
 	while (i < tokens.size())
 	{	if (tokens[i] == "server")
