@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 11:00:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/22 13:15:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,20 @@
 
 //do we really use this class?? Should be in fact a virtual class, and both client and server inherit from it?!?!?!
 #include "webserv.hpp"
-#include "serverConfig.hpp"
+#include "ServerConf.hpp"
 
 class Socket
 {
 private:
-	int _socket_fd;
-	int _port;
+	int					_socket_fd;
+	int					_port;
+	struct sockaddr_in	_address;
+
+	void	setaddress();
+	
 public:
-	Socket(const Config& confFile);
+	Socket();
+	Socket(const ServerConf& confFile);
 	~Socket();
 	void	setSocket();
 	void	getFd();

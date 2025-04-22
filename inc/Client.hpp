@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 11:08:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/22 12:24:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ private:
 	std::string		_response_buffer;
 	size_t			_bytes_sent;
 	bool			_empty_buffer;
+	ServerConfig&	_currentConfig;
 
 	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
