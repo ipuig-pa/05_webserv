@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MultiServer.cpp                                         :+:      :+:    :+:   */
+/*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 10:55:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/22 18:06:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,9 @@ void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> serv_config)
 		fcntl(listen_fd, F_SETFL, O_NONBLOCK);
 		struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
 		_poll.push_back(listen_polllfd);
-		_sockets.emplace(listen_fd, serv_conf[i]);
+		_sockets.emplace(listen_fd, listen_socket);
 	}
 }
-
 
 //ACCESSORS
 std::vector<struct pollfd>	&MultiServer::getPoll(void)
@@ -58,18 +57,22 @@ std::map<int, Client*>	&MultiServer::getClients(void)
 }
 
 //METHODS
-void	MultiServer::acceptNewConnection()
+void	MultiServer::acceptNewConnection(const int listen_socket)
 {
-	int		client_socket = socket(AF_INET, SOCK_STREAM, 0); //CHECK ARGUMENTS!!?!?
-	Client	*client = new Client(client_socket);
-
+	sockaddr_in	client_addr;
+	socklen_t addr_len = sizeof(client_addr);
+	client_socket = accept(listen_socket, &client_addr, addr_len);
+	
+	if (client_socket == -1)
+	{
+		//handle error
+	}
+	client = new Client(client_socket);
 	_clients.insert(std::pair<int, Client*>(client_socket, client));
 	fcntl(client_socket, F_SETFL, O_NONBLOCK);
 	struct pollfd cli_sock_fd = {client_socket, POLLIN, 0};
 	_poll.push_back(cli_sock_fd);
 }
-
-
 
 // void	MultiServer::handleConnectionClosed(???)
 // {
@@ -86,30 +89,6 @@ void	MultiServer::eraseFromPoll(int fd)
 			return ;
 		}
 	}
-}
-
-std::string	MultiServer::getPathFromUrl(const std::string &urlpath, const ServerConf &config)
-{
-	LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
-
-	if (!location)
-	{
-		return config.getRoot() + urlpath;
-	}
-	std::string locationPath = location->getLocPath();
-	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
-	//needed??
-	if (locationRoot.empty())
-		locationRoot = config.getRoot();
-	// Remove the location prefix from the URL path and append to the location's root
-	std::string relativePath = urlpath;
-	if (urlpath.find(locationPath) == 0) {
-		relativePath = urlpath.substr(locationPath.length());
-	}
-	if (!relativePath.empty() && relativePath[0] != '/') {
-		relativePath = "/" + relativePath;
-	}
-	return locationRoot + relativePath;
 }
 
 //change to MultiServer syntax
@@ -136,18 +115,21 @@ void	MultiServer::run()
 			}
 			continue; // Skip this iteration and try polling again
 		}
-		// if listening socket is ready, accept new clients (keep listening socket always in [0])
-		if (_poll.data()[0].revents & POLLIN)
-		{
-			acceptNewConnection();
-			continue; //so start the loop againg, and check again poll, including this new client
-		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
 		for (int i = _poll.size() - 1; i > 0; i--) {
-			if (_poll.data()[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
+			if (_poll[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
 				continue;
 			//get fd
-			int fd = _poll.data()[i].fd;
+			int fd = _poll[i].fd;
+			// if it is a listenint socket and it is ready, accept new clients (keep listening socket always in [0])
+			if (_sockets.find(fd) != _sockets.end())
+			{
+				if (_poll[i].revents & POLLIN)
+				{
+					MultiServer::acceptNewConnection(fd);
+					//continue; //so start the loop againg, and check again poll, including this new client
+				}
+			}
 			// Check if this is a client socket and handle client sockets if it is
 			if (_clients.find(fd) != _clients.end()) 
 			{

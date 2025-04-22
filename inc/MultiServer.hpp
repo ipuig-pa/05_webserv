@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/22 16:46:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/22 17:58:41 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,11 @@ class MultiServer
 private:
 	std::vector<std::vector<ServerConf>>	_serv_config; // int							_listen_socket; //maybe this should be just the fd of the socket class if server inherits from socket!?!?
 	std::vector<struct pollfd>				_poll;
-	std::map<int, std::vector<ServerConf*>>	_sockets; //map each socket fd to a server conf vector (all the serverconf that share the same port, so the same listening socket)
+	std::map<int, Socket*>					_sockets; //maps each socket fd to the object socket
 	std::map<int, Client*>					_clients;//int should be the fd of the client socket
 
 	void	init_sockets(std::vector<std::vector<ServerConf>> serv_config);
+	void	acceptNewConnection(const int listen_socket);
 
 public:
 	MultiServer();
@@ -41,10 +42,8 @@ public:
 
 	void	run();
 
-	void	acceptNewConnection(); // has to add the fd of the socket in the _clients map
 //	void	handleConnectionClosed(???);
 	void	eraseFromPoll(int fd);
-	std::string	getPathFromUrl(const std::string &urlpath, const ServerConf &config);
 };
 
 #endif

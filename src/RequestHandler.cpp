@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/22 16:41:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/22 18:00:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,4 +229,28 @@ void	RequestHandler::handlePostRequest(Client &client, HttpResponse &response, R
 
 // 	struct pollfd file = {file_fd, POLLIN, 0};
 // 	_poll_fds.push_back(file);
+}
+
+std::string	RequestHandler::getPathFromUrl(const std::string &urlpath, const ServerConf &config)
+{
+	LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
+
+	if (!location)
+	{
+		return config.getRoot() + urlpath;
+	}
+	std::string locationPath = location->getLocPath();
+	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
+	//needed??
+	if (locationRoot.empty())
+		locationRoot = config.getRoot();
+	// Remove the location prefix from the URL path and append to the location's root
+	std::string relativePath = urlpath;
+	if (urlpath.find(locationPath) == 0) {
+		relativePath = urlpath.substr(locationPath.length());
+	}
+	if (!relativePath.empty() && relativePath[0] != '/') {
+		relativePath = "/" + relativePath;
+	}
+	return locationRoot + relativePath;
 }
