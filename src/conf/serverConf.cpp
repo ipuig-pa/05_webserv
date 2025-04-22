@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 13:43:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 15:58:24 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,17 @@ void ServerConf::setCMBS(std::string s)
  * 3. normal path check: 
  * 		- root: start with '/', or root var is empty
  */
-void ServerConf::_locValidCheck() {}
+void ServerConf::_locValidCheck(LocationConf& loc)
+{
+	if (loc.getLocPath() == "/cgi") //cgi handle
+	{
+		if (CgiChecker::_checkCGI(loc) != true) //has errors!
+		{
+			throw std::runtime_error("");
+		}
+	}
+	//normal static check
+}
 
 //use ofstd::map<string, std::function<void<>>
 void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)

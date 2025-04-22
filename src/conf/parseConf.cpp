@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 08:04:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 14:24:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,10 @@ int ParseConf::testMain(const std::string& fileName)
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ParseConf::_split(const std::vector<std::string>& tokens)
 {	
-	if (std::find(tokens.begin(), tokens.end(), "server") == tokens.end()) // iterator to search 'server'
+	// iterator to search 'server'
+	if (std::find(tokens.begin(), tokens.end(), "server") == tokens.end()) {
 		throw std::runtime_error("Error: cannot find server."); //will be caught by try-catch block
+	}
 	size_t i = 0;
 	while (i < tokens.size())
 	{	if (tokens[i] == "server")

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 12:53:53 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/22 14:25:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #define MAX_BODY 2*1024*1024 //2 megebyte, random set now
 #include "webserv.hpp"
 #include "LocationConf.hpp"
-// class LocationConf;
+#include "CgiChecker.hpp"
 
 //setter for varible, set val to an instance of server
 class ServerConf
