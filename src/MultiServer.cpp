@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
+/*   MultiServer.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,51 +10,54 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "MultiServer.hpp"
 
 //Check most suitable arguments to pass to each member methods
 
 //CONSTRUCTORS
 //check listen_sock creation
-Server::Server()
-	:_config()
+MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
+	:_serv_config(serv_config)
 {
-	_listen_socket = socket(AF_INET, SOCK_STREAM, 0); //or create outside and use setters!?
-
-	fcntl(_listen_socket, F_SETFL, O_NONBLOCK);
-	struct pollfd listen_pollfd = {_listen_socket, POLLIN, 0};
-	_poll_fds.push_back(listen_pollfd);
+	init_sockets(_serv_config);
 }
 
-Server::Server(ServerConf config)
-	:_config(config)
+~MultiServer::MultiServer()
 {
-	_listen_socket = socket(AF_INET, SOCK_STREAM, 0);//or create outside and use setters!?
-
-	fcntl(_listen_socket, F_SETFL, O_NONBLOCK);
-	struct pollfd listen_pollfd = {_listen_socket, POLLIN, 0};
-	_poll_fds.push_back(listen_pollfd);
-	_config = config; //or create outside and use setters!?
 }
+
+void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> serv_config)
+{
+	for(i = 0; i < serv_config.size(); i++)
+	{
+		Socket *listen_socket = new Socket(serv_conf[i][0]);
+		listen_fd = socket->getFd();
+		fcntl(listen_fd, F_SETFL, O_NONBLOCK);
+		struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
+		_poll_fds.push_back(listen_pollfd);
+		//CONTINUE FROM HERE, including to _sockets map
+	}
+}
+
 
 //ACCESSORS
-std::vector<struct pollfd>	&Server::getPoll(void)
+std::vector<struct pollfd>	&MultiServer::getPoll(void)
 {
 	return (_poll_fds);
 }
 
-int	Server::getListenSocket(void)
+int	MultiServer::getListenSocket(void)
 {
 	return (_listen_socket);
 }
 
-std::map<int, Client*>	&Server::getClients(void)
+std::map<int, Client*>	&MultiServer::getClients(void)
 {
 	return (_clients);
 }
 
 //METHODS
-void	Server::acceptNewConnection()
+void	MultiServer::acceptNewConnection()
 {
 	int		client_socket = socket(AF_INET, SOCK_STREAM, 0); //CHECK ARGUMENTS!!?!?
 	Client	*client = new Client(client_socket);
@@ -65,7 +68,7 @@ void	Server::acceptNewConnection()
 	_poll_fds.push_back(cli_sock_fd);
 }
 
-void	Server::handleClientRead(Client &client)
+void	MultiServer::handleClientRead(Client &client)
 {
 	(void)client;
 // 	if (client.getState == NEW_REQUEST)
@@ -76,7 +79,7 @@ void	Server::handleClientRead(Client &client)
 }
 
 
-void	Server::handleClientWrite(Client &client)
+void	MultiServer::handleClientWrite(Client &client)
 {
 	if (client.getState() == SENDING_RESPONSE)
 	{
@@ -86,7 +89,7 @@ void	Server::handleClientWrite(Client &client)
 	}
 }
 
-void	Server::handleFileRead(Client &client)
+void	MultiServer::handleFileRead(Client &client)
 {
 	if (client.getResponse().getState() == READING && client.getEmptyBuffer() == true)
 	{
@@ -107,7 +110,7 @@ void	Server::handleFileRead(Client &client)
 	}
 }
 
-void	Server::handleFileWrite(Client &client)
+void	MultiServer::handleFileWrite(Client &client)
 {
 	(void)client;
 // 	if (client.getResponse().getState() == WRITING && client.getEmptyBuffer() == false)
@@ -126,12 +129,12 @@ void	Server::handleFileWrite(Client &client)
 // 		// }
 }
 
-void	Server::handleDirectoryRequest(Client &client, HttpRequest &request, ServerConf &config)
+void	MultiServer::handleDirectoryRequest(Client &client, HttpRequest &request, MultiServerConf &config)
 {
-	//*******get correct conf from ServerConf / LocationConf*****
+	//*******get correct conf from MultiServerConf / LocationConf*****
 	std::string path = getPathFromUrl(client.getRequest().getPath(), config);
 	//Check for index files first
-	//somehow retreive location conf -> ServerConf should have some public function getLocationConf(std::string path)
+	//somehow retreive location conf -> MultiServerConf should have some public function getLocationConf(std::string path)
 	std::vector<std::string> indexFiles = _config.getIndexFiles(path); // how is it stored in config??
 
 	for (size_t i = 0; i < indexFiles.size(); i++) {
@@ -151,7 +154,7 @@ void	Server::handleDirectoryRequest(Client &client, HttpRequest &request, Server
 		}
 	}
 	// No index file found, check if directory listing is enabled
-	if (_config.getAutoIndex()) { //CHECK IF THIS IS REALLY THE PARAM WE NEED TO CHECK IF DIRECTORY LISTING IS ENABLED!?!?! -> should be different depending on the location or all the server has the same!?!?
+	if (_config.getAutoIndex()) { //CHECK IF THIS IS REALLY THE PARAM WE NEED TO CHECK IF DIRECTORY LISTING IS ENABLED!?!?! -> should be different depending on the location or all the Multiserver has the same!?!?
 		handleDirectoryListing(client, request, config);
 	} else {
 		// Directory listing is disabled and no index file exists
@@ -159,14 +162,14 @@ void	Server::handleDirectoryRequest(Client &client, HttpRequest &request, Server
 	}
 }
 
-void	Server::handleDirectoryListing(Client &client, HttpRequest &request, ServerConf &config)
+void	MultiServer::handleDirectoryListing(Client &client, HttpRequest &request, MultiServerConf &config)
 {
 	std::string path = getPathFromUrl(request.getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	DIR	*dirp = opendir(path.c_str());
 
 	if (!dirp)
 	{
-		client.getResponse().setStatusCode(500); //Internal server error
+		client.getResponse().setStatusCode(500); //Internal Multiserver error
 		return;
 	}
 	//Build HTML Content: check with telnet - nginx what exactly to build
@@ -184,7 +187,7 @@ void	Server::handleDirectoryListing(Client &client, HttpRequest &request, Server
 	}
 }
 
-void	Server::handleGetRequest(Client &client, HttpResponse &response, ServerConf &config)
+void	MultiServer::handleGetRequest(Client &client, HttpResponse &response, MultiServerConf &config)
 {
 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	// std::string path = config.getPathFromUrl(client.getRequest().getPath());
@@ -222,7 +225,7 @@ void	Server::handleGetRequest(Client &client, HttpResponse &response, ServerConf
 	_poll_fds.push_back(file);
 }
 
-void	Server::handlePostRequest(Client &client, HttpResponse &response, ServerConf &config)
+void	MultiServer::handlePostRequest(Client &client, HttpResponse &response, MultiServerConf &config)
 {
 	(void)client;
 	(void)config;
@@ -246,29 +249,29 @@ void	Server::handlePostRequest(Client &client, HttpResponse &response, ServerCon
 // 	_poll_fds.push_back(file);
 }
 
-void	Server::handleDeleteRequest(Client &client, HttpResponse &response, ServerConf &config)
+void	MultiServer::handleDeleteRequest(Client &client, HttpResponse &response, MultiServerConf &config)
 {
 	(void)client;
 	(void)config;
 	(void)response;
 }
 
-void	Server::handleInvalidRequest(Client &client, HttpResponse &response, ServerConf &config)
+void	MultiServer::handleInvalidRequest(Client &client, HttpResponse &response, MultiServerConf &config)
 {
 	response.setStatusCode(405);
 	(void)config;
 	(void)client;
 }
 
-void	Server::processRequest(Client &client)
+void	MultiServer::processRequest(Client &client)
 {
 	HttpResponse	response;
 	
-	void	(Server::*handleMethod[])(Client &, HttpResponse &, ServerConf &) = {
-		&Server::handleGetRequest, 
-		&Server::handlePostRequest, 
-		&Server::handleDeleteRequest, 
-		&Server::handleInvalidRequest};
+	void	(MultiServer::*handleMethod[])(Client &, HttpResponse &, MultiServerConf &) = {
+		&MultiServer::handleGetRequest, 
+		&MultiServer::handlePostRequest, 
+		&MultiServer::handleDeleteRequest, 
+		&MultiServer::handleInvalidRequest};
 
 	client.setResponse(response);
 	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), this->_config);
@@ -283,12 +286,12 @@ void	Server::processRequest(Client &client)
 	client.setState(SENDING_RESPONSE);
 }
 
-// void	Server::handleConnectionClosed(???)
+// void	MultiServer::handleConnectionClosed(???)
 // {
 
 // }
 
-void	Server::eraseFromPoll(int fd)
+void	MultiServer::eraseFromPoll(int fd)
 {
 	for (int i = getPoll().size() - 1; i > 0; i--) 
 	{
@@ -300,16 +303,16 @@ void	Server::eraseFromPoll(int fd)
 	}
 }
 
-std::string	Server::getPathFromUrl(const std::string &urlpath, const ServerConf &config)
+std::string	MultiServer::getPathFromUrl(const std::string &urlpath, const MultiServerConf &config)
 {
-	LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
+	LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in MultiserverConf class!!!!
 
 	if (!location)
 	{
 		return config.getRoot() + urlpath;
 	}
 	std::string locationPath = location->getLocPath();
-	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
+	std::string locationRoot = location->getLocRoot(); // it sould return MultiserverConf root if it does not exist??
 	//needed??
 	if (locationRoot.empty())
 		locationRoot = config.getRoot();
@@ -324,13 +327,14 @@ std::string	Server::getPathFromUrl(const std::string &urlpath, const ServerConf 
 	return locationRoot + relativePath;
 }
 
-void	Server::run()
+//change to MultiServer syntax
+void	MultiServer::run()
 {
-	//change while(1) to while(server running) or similar -> how to check while server running?! -> include all this function inside a Server Method call RUN?!!?!?
+	//change while(1) to while(Multiserver running) or similar -> how to check while Multiserver running?! -> include all this function inside a MultiServer Method call RUN?!!?!?
 	while (1)
 	{
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
-		int ready = poll(server.getPoll().data(), server.getPoll().size(), -1);
+		int ready = poll(Multiserver.getPoll().data(), Multiserver.getPoll().size(), -1);
 
 		if (ready < 0)
 		{
@@ -347,27 +351,27 @@ void	Server::run()
 			continue; // Skip this iteration and try polling again
 		}
 		// if listening socket is ready, accept new clients (keep listening socket always in [0])
-		if (server.getPoll().data()[0].revents & POLLIN)
+		if (Multiserver.getPoll().data()[0].revents & POLLIN)
 		{
-			server.acceptNewConnection();
+			Multiserver.acceptNewConnection();
 			continue; //so start the loop againg, and check again poll, including this new client
 		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
-		for (int i = server.getPoll().size() - 1; i > 0; i--) {
-			if (server.getPoll().data()[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
+		for (int i = Multiserver.getPoll().size() - 1; i > 0; i--) {
+			if (Multiserver.getPoll().data()[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
 				continue;
 			//get fd
-			int fd = server.getPoll().data()[i].fd;
+			int fd = Multiserver.getPoll().data()[i].fd;
 			// Check if this is a client socket and handle client sockets if it is
-			if (server.getClients().find(fd) != server.getClients().end()) 
+			if (Multiserver.getClients().find(fd) != Multiserver.getClients().end()) 
 			{
 				// Handle reading from client
 				if (_poll_fds[i].revents & POLLIN) {
-					server.handleClientRead(getClients()[fd]);
+					Multiserver.handleClientRead(getClients()[fd]);
 				}
 				// Handle writing to client
 				if (_poll_fds[i].revents & POLLOUT) {
-					server.handleClientWrite(getClients()[fd]);
+					Multiserver.handleClientWrite(getClients()[fd]);
 				}
 			}
 			//handle file descriptors belonging to files
@@ -376,17 +380,17 @@ void	Server::run()
 				// Find which client it belongs to
 				//?????
 				//Each client can have an array/vector / map of files linked to it inside!?!?
-				if (server.getPoll().data()[i].revents & POLLIN) {
-					server.handleFileRead(i);
+				if (Multiserver.getPoll().data()[i].revents & POLLIN) {
+					Multiserver.handleFileRead(i);
 				}
 				// Handle client socket ready for writing
-				// if (server.getPoll().data()[i].revents & POLLOUT) {
-				// 	server.handleFileWrite(i);
+				// if (Multiserver.getPoll().data()[i].revents & POLLOUT) {
+				// 	Multiserver.handleFileWrite(i);
 				// }
 			}
 			// Handle errors or closed connections -> maybe erase from poll here all the closed connections, so no interference to the i is done in between the loop??
-			// if (server.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-			// 	server.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
+			// if (Multiserver.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+			// 	Multiserver.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
 			// }
 		}
 	}
@@ -422,13 +426,13 @@ Advantages of using readdir()
 
 Direct directory access: Allows iterating through directory entries
 Access to file information: Each dirent structure contains basic file information
-Required for directory listing: Essential for implementing directory listing in your web server
+Required for directory listing: Essential for implementing directory listing in your web Multiserver
 */
 
 
 
-//TO MOVE TO THE SERVERCONF CLASS
-// LocationConf	*ServerConf::getMatchingLocation(std::string urlpath)
+//TO MOVE TO THE MultiSERVERCONF CLASS
+// LocationConf	*MultiServerConf::getMatchingLocation(std::string urlpath)
 // {
 // 	std::map<std::string, LocationConf>::iterator it;
 // 	LocationConf	*longest_match == nullptr
