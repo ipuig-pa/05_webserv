@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 13:15:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 15:37:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@
  * listen to upcoming connection (non-blocking)
 */
 
-Socket::Socket(const ServerConf& config)
-	:_socket_fd(-1), _port(confFile.getPort())
+Socket::Socket(std::vector<ServerConf> config)
+	:_socket_fd(-1), _port(confFile.getPort()), _conf(config)
 {
 	//creating socket on IP "???" and port "_port"
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -31,7 +31,7 @@ Socket::Socket(const ServerConf& config)
 	int opt = 1;
 	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	//set up the address structure to use
-	setaddress(config);
+	setaddress(config[0]);
 	// Bind socket to the address and port
 	if (bind(listen_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
 		// Handle listen error -> throw exception / runtime error!?!?!?
@@ -54,7 +54,32 @@ Socket::setaddress(const ServerConf& config)
 	address.sin_port = htons(_port);// Convert port to network byte order
 }
 
-void	getFd()
+int	Socket::getFd()
 {
-	return (_socket_fd)
+	return _socket_fd;
+}
+
+int	Socket::getPort()
+{
+	return _port;
+}
+
+struct sockaddr_in	Socket::getAddress()
+{
+	return _address;
+}
+
+ServerConf	*Socket::getDefaultConf()
+{
+	return _conf[0];
+}
+
+ServerConf	*Socket::getConf(std::string name)
+{
+	for(size_t i=0; i < _conf.size(); i++)
+	{
+		if ((_conf[i]->getHost()).compare(name) == 0)
+			return (_conf[i])
+	}
+	return (this->getDefaultConf());
 }

@@ -8,11 +8,12 @@ OBJ_DIR = obj
 
 VPATH = $(SRC_DIR):\
 
-SOURCES =	Client.cpp \
-			Header.cpp \
+SOURCES =	MultiServer.cpp \
+			Client.cpp \
+			RequestHandler.cpp \
 			HttpRequest.cpp \
 			HttpResponse.cpp \
-			Server.cpp \
+			Header.cpp \
 			Status.cpp \
 			main.cpp
 

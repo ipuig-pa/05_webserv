@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 12:06:44 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:19:03 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ enum methodType
 class HttpRequest
 {
 private:
-	//Header		_header;
+	Header		_header;
 	methodType	_method;
 	std::string	_body;
 	std::string	_path;
@@ -36,8 +36,11 @@ private:
 	//public or private??
 public:
 	HttpRequest();
+
 	int	getMethod(void) const;
 	std::string	&getPath(void);
+	std::string	getHeader(const std::string& name);//needed?!!?
+
 	void	setPath(const std::string &path);
 	//getters (name, method, state [...])
 	//setter ([...])
