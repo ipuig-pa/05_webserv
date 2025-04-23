@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/22 17:58:41 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:14:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,25 +22,24 @@
 class MultiServer
 {
 private:
-	std::vector<std::vector<ServerConf>>	_serv_config; // int							_listen_socket; //maybe this should be just the fd of the socket class if server inherits from socket!?!?
+	std::vector<std::vector<ServerConf> >	_serv_config; // int							_listen_socket; //maybe this should be just the fd of the socket class if server inherits from socket!?!?
 	std::vector<struct pollfd>				_poll;
 	std::map<int, Socket*>					_sockets; //maps each socket fd to the object socket
 	std::map<int, Client*>					_clients;//int should be the fd of the client socket
 
-	void	init_sockets(std::vector<std::vector<ServerConf>> serv_config);
-	void	acceptNewConnection(const int listen_socket);
+	void	init_sockets(std::vector<std::vector<ServerConf> > serv_config);
+	void	acceptNewConnection(Socket *listen_socket);
 
 public:
 	MultiServer();
-	MultiServer(std::vector<std::vector<ServerConf>> serv_config);
+	MultiServer(std::vector<std::vector<ServerConf> > serv_config);
 	~MultiServer();
 //	void	entry(); // what is this?!?!?
 
 	std::vector<struct pollfd>	&getPoll(void);
 	std::map<int, Client*>		&getClients(void);
-	int							getListenSocket(void); //needed!?? Convert to Socket type!?!?
 
-	void	run();
+	int		run();
 
 //	void	handleConnectionClosed(???);
 	void	eraseFromPoll(int fd);

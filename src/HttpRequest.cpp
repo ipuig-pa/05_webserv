@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 12:06:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:16:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,11 @@ int	HttpRequest::getMethod(void) const
 std::string	&HttpRequest::getPath(void)
 {
 	return _path;
+}
+
+std::string HttpRequest::getHeader(const std::string& name)
+{
+	return _header.get(name);
 }
 
 void	HttpRequest::setPath(const std::string &path)

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 17:36:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 15:37:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,17 +54,32 @@ Socket::setaddress(const ServerConf& config)
 	address.sin_port = htons(_port);// Convert port to network byte order
 }
 
-void	getFd()
+int	Socket::getFd()
 {
 	return _socket_fd;
 }
 
-void	getPort()
+int	Socket::getPort()
 {
 	return _port;
 }
 
-void	getAddress()
+struct sockaddr_in	Socket::getAddress()
 {
 	return _address;
+}
+
+ServerConf	*Socket::getDefaultConf()
+{
+	return _conf[0];
+}
+
+ServerConf	*Socket::getConf(std::string name)
+{
+	for(size_t i=0; i < _conf.size(); i++)
+	{
+		if ((_conf[i]->getHost()).compare(name) == 0)
+			return (_conf[i])
+	}
+	return (this->getDefaultConf());
 }

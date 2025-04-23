@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 18:06:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 17:02:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,27 +16,28 @@
 
 //CONSTRUCTORS
 //check listen_sock creation
-MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
+MultiServer::MultiServer(std::vector<std::vector<ServerConf> > serv_config)
 	:_serv_config(serv_config)
 {
 	init_sockets(_serv_config);
 }
 
-~MultiServer::MultiServer()
+MultiServer::~MultiServer()
 {
 	//close and delete Sockers!?!
 }
 
-void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> serv_config)
+void	MultiServer::init_sockets(std::vector<std::vector<ServerConf> > serv_config)
 {
-	for(i = 0; i < serv_config.size(); i++)
+	for(size_t i = 0; i < serv_config.size(); i++)
 	{
-		Socket *listen_socket = new Socket(serv_conf[i][0]);
-		listen_fd = socket->getFd();
+		Socket *listen_socket = new Socket(serv_config[i][0]);
+		int	listen_fd = listen_socket->getFd();
 		fcntl(listen_fd, F_SETFL, O_NONBLOCK);
 		struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
-		_poll.push_back(listen_polllfd);
-		_sockets.emplace(listen_fd, listen_socket);
+		_poll.push_back(listen_pollfd);
+		// _sockets.emplace(listen_fd, listen_socket); (In C++11)
+		_sockets.insert(std::pair<int,Socket*>(listen_fd, listen_socket));
 	}
 }
 
@@ -46,28 +47,24 @@ std::vector<struct pollfd>	&MultiServer::getPoll(void)
 	return (_poll);
 }
 
-int	MultiServer::getListenSocket(void)
-{
-	return (_listen_socket);
-}
-
 std::map<int, Client*>	&MultiServer::getClients(void)
 {
 	return (_clients);
 }
 
 //METHODS
-void	MultiServer::acceptNewConnection(const int listen_socket)
+void	MultiServer::acceptNewConnection(Socket *listen_socket)
 {
 	sockaddr_in	client_addr;
 	socklen_t addr_len = sizeof(client_addr);
-	client_socket = accept(listen_socket, &client_addr, addr_len);
+	int client_socket = accept(listen_socket->getFd(), reinterpret_cast<sockaddr*>(&client_addr), &addr_len);
 	
 	if (client_socket == -1)
 	{
 		//handle error
 	}
-	client = new Client(client_socket);
+	Client *client = new Client(client_socket, listen_socket->getDefaultConf());
+	client->setConfig(listen_socket->getConf(client->getRequest().getHeader("Host")));
 	_clients.insert(std::pair<int, Client*>(client_socket, client));
 	fcntl(client_socket, F_SETFL, O_NONBLOCK);
 	struct pollfd cli_sock_fd = {client_socket, POLLIN, 0};
@@ -92,7 +89,7 @@ void	MultiServer::eraseFromPoll(int fd)
 }
 
 //change to MultiServer syntax
-void	MultiServer::run()
+int	MultiServer::run()
 {
 	RequestHandler	req_hand;
 	//change while(1) to while(Multiserver running) or similar -> how to check while Multiserver running?! -> include all this function inside a MultiServer Method call RUN?!!?!?
@@ -121,25 +118,43 @@ void	MultiServer::run()
 				continue;
 			//get fd
 			int fd = _poll[i].fd;
-			// if it is a listenint socket and it is ready, accept new clients (keep listening socket always in [0])
-			if (_sockets.find(fd) != _sockets.end())
+			// if it is a listening socket and it is ready, accept new clients (keep listening socket always in [0])
+			std::map<int, Socket*>::iterator it_s;
+			it_s = _sockets.find(fd);
+			if (it_s != _sockets.end())
 			{
 				if (_poll[i].revents & POLLIN)
 				{
-					MultiServer::acceptNewConnection(fd);
+					MultiServer::acceptNewConnection(it_s->second);
 					//continue; //so start the loop againg, and check again poll, including this new client
 				}
 			}
+			std::map<int, Client*>::iterator it_c;
+			it_c = _clients.find(fd);
 			// Check if this is a client socket and handle client sockets if it is
-			if (_clients.find(fd) != _clients.end()) 
+			if (it_c != _clients.end()) 
 			{
-				// Handle reading from client
 				if (_poll[i].revents & POLLIN) {
-					req_hand.handleClientRead(getClients()[fd]);
+					req_hand.handleClientRead(*(it_c->second));
+					int	file_fd = (it_c->second)->getFileFd();
+					//If a file has been linked to the client, add its fd to poll() monitoring
+					if (file_fd != -1)
+					{
+						struct pollfd file = {file_fd, POLLIN, 0};
+						_poll.push_back(file);
+					}
+					//After reading, set the client socket to POLLOUT
+					for (size_t i = 0; i < _poll.size(); i++) {
+						if (_poll[i].fd == fd) {
+							_poll[i].events = POLLOUT;
+							break;
+						}
+					}
+					(it_c->second)->setState(SENDING_RESPONSE);
 				}
 				// Handle writing to client
 				if (_poll[i].revents & POLLOUT) {
-					req_hand.handleClientWrite(getClients()[fd]);
+					req_hand.handleClientWrite(*(it_c->second));
 				}
 			}
 			//handle file descriptors belonging to files
@@ -149,7 +164,14 @@ void	MultiServer::run()
 				//?????
 				//Each client can have an array/vector / map of files linked to it inside!?!?
 				if (_poll.data()[i].revents & POLLIN) {
-					req_hand.handleFileRead(i);
+					it_c = _clients.begin();
+					while (it_c != _clients.end())
+					{
+						if (it_c->first == fd)
+							if (req_hand.handleFileRead(*(it_c->second)))
+								eraseFromPoll(fd);
+						it_c++;
+					}
 				}
 				// Handle client socket ready for writing
 				// if (Multiserver.getPoll().data()[i].revents & POLLOUT) {
@@ -162,6 +184,7 @@ void	MultiServer::run()
 			// }
 		}
 	}
+	return (0);
 }
 
 /*handle directory request:
@@ -199,8 +222,8 @@ Required for directory listing: Essential for implementing directory listing in 
 
 
 
-//TO MOVE TO THE MultiSERVERCONF CLASS
-// LocationConf	*MultiServerConf::getMatchingLocation(std::string urlpath)
+//TO MOVE TO THE SERVERCONF CLASS
+// LocationConf	*ServerConf::getMatchingLocation(std::string urlpath)
 // {
 // 	std::map<std::string, LocationConf>::iterator it;
 // 	LocationConf	*longest_match == nullptr

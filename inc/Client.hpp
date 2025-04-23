@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 12:24:00 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:54:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "HttpRequest.hpp"
 # include "HttpResponse.hpp"
 # include "Header.hpp"
+# include "ServerConf.hpp"
 
 /**
  * accept (new) client connection,
@@ -44,7 +45,7 @@ private:
 	std::string		_response_buffer;
 	size_t			_bytes_sent;
 	bool			_empty_buffer;
-	ServerConfig&	_currentConfig;
+	ServerConf*		_currentConfig;
 
 	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
@@ -52,7 +53,7 @@ private:
 
 public:
 	// Client();
-	Client(int fd); //to init attributes in class
+	Client(int fd, ServerConf *default_conf); //to init attributes in class
 	~Client();
 
 	HttpRequest		&getRequest(void);
@@ -61,11 +62,14 @@ public:
 	clientState		getState(void);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
+	ServerConf		*getConf(void);
+
 	void			setState(clientState state);
 	void			setResponse(HttpResponse response);
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
+	void			setConfig(ServerConf *conf);
 
 	bool			sendResponseChunk(void);
 };

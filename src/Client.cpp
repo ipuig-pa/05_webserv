@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 17:11:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 16:55:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@
 // 	//create a new socket?!?!
 // }
 
-Client::Client(int socket)
-	:_socket(socket), _state(NEW_REQUEST), _file_fd(-1), _bytes_sent(0), _empty_buffer(true)
+Client::Client(int socket, ServerConf *default_conf)
+	:_socket(socket), _state(NEW_REQUEST), _file_fd(-1), _bytes_sent(0), _empty_buffer(true), _currentConfig(default_conf)
 {
-	//_request
+	//_request ->change _currentConfig according to request header (find )
 	//_response
 }
 
-HttpRequest		&Client::getRequest(void)
+HttpRequest	&Client::getRequest(void)
 {
 	return (_request);
 }
@@ -42,6 +42,11 @@ clientState	Client::getState(void)
 bool	Client::getEmptyBuffer(void)
 {
 	return (_empty_buffer);
+}
+
+ServerConf	*Client::getConf(void)
+{
+	return	(_currentConfig);
 }
 
 void	Client::setEmptyBuffer(bool value)
@@ -109,4 +114,9 @@ bool	Client::sendResponseChunk(void)
 	}
 	return false; //!?!?!?
 	//else set it as already sent
+}
+
+void	Client::setConfig(ServerConf *conf)
+{
+	_currentConfig = conf;
 }

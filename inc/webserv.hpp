@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 12:55:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/23 13:23:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,6 @@
 #include <dirent.h>// for readdir
 #include <unistd.h> // for read, close, ...??
 
-#include <netinet/in.h>  // For sockaddr_in structure: 
-// struct sockaddr_in {
-//     sa_family_t    sin_family;  // Address family (AF_INET)
-//     in_port_t      sin_port;    // Port number
-//     struct in_addr sin_addr;    // IP address
-//     unsigned char  sin_zero[8]; // Padding to make the structure same size as sockaddr
-// };
 
 //possible use of containers
 #include <map>
