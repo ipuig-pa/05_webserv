@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 15:58:24 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/23 17:26:12 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ std::string ServerConf::rmvSemicolon(const std::string& token)
 	}
 	return token;
 }
-//TODO
-void ServerConf::setPort(std::string s)
+//TODO: im always kind hesitate to decide pass by ref or copy, so may check and change later
+void ServerConf::setPort(std::string& s)
 {
 	if (!_hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
@@ -147,24 +147,47 @@ void ServerConf::setCMBS(std::string s)
 }
 
 /** TASKS:
- * 1. check CGI parameters: CGI path/extension/index.html
+ * 1. check CGI parameters: CGI path/extension/index.html //done
  * 	 - FileUtils class is called for path checking!
- * 2. compare CGI_path and Cgi extension(.php, .py, .sh [...])
+ * 2. compare CGI_path and Cgi extension(.php, .py, .sh [...]) //done
  * 3. normal path check: 
- * 		- root: start with '/', or root var is empty
+ * 		- root: start with '/', or root var is empty //done
  */
-void ServerConf::_locValidCheck(LocationConf& loc)
+//after parsing, check1: cgi, if not CGI, check static
+bool ServerConf::_locReturnCheck(LocationConf& loc)
 {
-	if (loc.getLocPath() == "/cgi") //cgi handle
-	{
-		if (CgiChecker::_checkCGI(loc) != true) //has errors!
-		{
-			throw std::runtime_error("");
+	//return value be std::vector or reture_code + return_html??
+	//implement later
+	return true;
+}
+void ServerConf::_wrapLocChecker(LocationConf& loc)
+{
+	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
+		loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance
+	}
+	if (!loc.getLocCMBS()) {
+		loc.setLocCMBS(this->_max_body_size);
+	}
+	if (loc.getLocPath() == "/cgi") {
+		if (CgiChecker::_checkCGI(loc) != true) {
+			return ; //detailed error msg wrote in std::cerr alredy
+		}
+	} else {
+		if (loc.getLocPath()[0] != '/') {
+			throw std::runtime_error("Error: path should start with '/'.");
+		}
+		if (loc.getLocRoot().empty()) { 
+			loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
+		}
+		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath() + "/", loc.getLocIndex()) == -1) {
+			throw std::runtime_error("Error: path in loction is invali.");
+		}
+		if (!_locReturnCheck(loc)) {
+			throw std::runtime_error("Error: invalid return parameter.");
 		}
 	}
-	//normal static check
+	this->_location.push_back(loc);
 }
-
 //use ofstd::map<string, std::function<void<>>
 void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
 {
@@ -192,26 +215,51 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 			throw std::runtime_error("Error: passed parameter in location is invalid" + _key);
 		}
 	}
-	_locValidCheck();
+	_wrapLocChecker(locBlock); //checks validity after parsing (cgi an static) and return err_msg
 }
-//todo: to write the specific parser for location
 
-void ServerConf::parseLocRoot(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i)
+//clean at parsing stage, and directly use setter
+//check 在setter中remove‘；’， cuz在parse checking后directly call setter
+void ServerConf::parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()){
 		throw std::runtime_error("Error: location: no parameter after 'root'.");
 	}
+	if (loc.getLocRoot().empty() == false) {
+	 	throw std::runtime_error("Error: 'root' in location already exist.");
+	}
 	++i;
-	if (!_hasSemicolon(loc_tks[i]))
-		throw std::runtime_error("Error: location: invalid 'root' token.");
-	// if (servConf.getRoot().empty()){
-	// 	throw std::runtime_error("Error: 'root' already exist.");
-	// }
-	// servConf.setRoot(tokens[i + 1]);
-	// i += 1;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Error: missing ';' at value passed.");
+	}
+	loc_tks[i] = rmvSemicolon(loc_tks[i]);
+	if (FileUtils::_pathType(loc_tks[i]) == 3) {
+		loc.setLocRoot(loc_tks[i]);
+	}
+	else {
+		loc.setLocRoot(this->_root_dir + loc_tks[i]);
+	}
 }
-void ServerConf::parseMethod(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
+void ServerConf::parseMethod(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()){
+		throw std::runtime_error("Error: location: no parameter after 'methods'.");
+	}
+	//check: or use a flag to check??
+	if (loc.getMethod().empty() == false) {
+	 	throw std::runtime_error("Error: 'method' in location already exist.");
+	}
+	std::vector<std::string> tmp;
+	while (++i < loc_tks.size())
+	{
+		if (_hasSemicolon(loc_tks[i])) {
+			loc_tks[i] = rmvSemicolon(loc_tks[i]);
+			tmp.push_back(loc_tks[i]);
+			break ;//end of method category (method POST DELETE;)
+		}
+		tmp.push_back(loc_tks[i]);
+	}
+	loc.setMethod(tmp);
 }
 void ServerConf::parseLocAuto(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
 	
@@ -262,6 +310,9 @@ const std::string& ServerConf::getSrvName() const {
 const std::map<int, std::string>& ServerConf::getErrPage() const {
 	return this->_error_page;
 }
-const std::map<std::string, LocationConf>& ServerConf::getLocation() const {
-	return this->_locations;
+// const std::map<std::string, LocationConf>& ServerConf::getLocation() const {
+// 	return this->_location;
+// }
+const std::vector<std::string>& ServerConf::getLocation() const {
+	return this->_location;
 }

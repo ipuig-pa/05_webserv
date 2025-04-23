@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 14:24:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/23 16:39:36 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,12 +193,13 @@ size_t ParseConf::parseListen(const std::vector<std::string>& tokens, size_t i, 
 	i += 1;
 	return i;
 }
+//str.empty() => return true if empty, false if non-empty
 size_t ParseConf::parseHost(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()){
 		throw std::runtime_error("Error: no parameter after 'host'.");
 	}
-	if (servConf.getHost().empty()){
+	if (servConf.getHost().empty() == false){
 		throw std::runtime_error("Error: 'host' already exist.");
 	}
 	servConf.setHost(tokens[i + 1]);
@@ -210,7 +211,7 @@ size_t ParseConf::parseRoot(const std::vector<std::string>& tokens, size_t i, Se
 	if (i + 1 >= tokens.size()){
 		throw std::runtime_error("Error: no parameter after 'root'.");
 	}
-	if (servConf.getRoot().empty()){
+	if (servConf.getRoot().empty() == false){
 		throw std::runtime_error("Error: 'root' already exist.");
 	}
 	servConf.setRoot(tokens[i + 1]);
@@ -222,7 +223,7 @@ size_t ParseConf::parseSvrName(const std::vector<std::string>& tokens, size_t i,
 	if (i + 1 >= tokens.size()){
 		throw std::runtime_error("Error: no parameter after 'server_name'.");
 	}
-	if (servConf.getSrvName().empty()){
+	if (servConf.getSrvName().empty() == false){
 		throw std::runtime_error("Error: 'server_name' already exist.");
 	}
 	servConf.setSrvName(tokens[i + 1]);
@@ -246,7 +247,7 @@ size_t ParseConf::parseIndex(const std::vector<std::string>& tokens, size_t i, S
 	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'index'.");
 	}
-	if (servConf.getIndex().empty()) {
+	if (servConf.getIndex().empty() == false) {
 		throw std::runtime_error("Error: 'index' already exist.");
 	}
 	servConf.setIndex(tokens[i + 1]);
@@ -310,8 +311,6 @@ size_t ParseConf::parseLocation(const std::vector<std::string>& tokens, size_t i
 	servConf._addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
 	return _locEnd;
 }
-
-
 
 
 
