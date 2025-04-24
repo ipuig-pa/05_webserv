@@ -6,19 +6,36 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 14:02:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 16:26:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/conf/LocationConf.hpp"
 
-void LocationConf::_cleanLocTk(std::string& tk)
+LocationConf::LocationConf()
 {
-	if (!ServerConf::_hasSemicolon(tk)) {
-		throw std::runtime_error("Error: location: invalid 'root' token.");
-	}
-	tk = ServerConf::rmvSemicolon(tk);
+	_locPath = "";
+	_locRoot = "";
+	_methodSet = false;
+	_cmbsFlag = false;
+	_locCMBS = 1024*2;
+	// cgi_path = "";
+	// cgi_extension = "";
+	_locAuto = false;
+	_autoflag = false;
+	_locIndex = "";
+	_returnUrl = "";
 }
+
+LocationConf::~LocationConf() {}
+
+// void LocationConf::_cleanLocTk(std::string& tk)
+// {
+// 	if (!ServerConf::_hasSemicolon(tk)) {
+// 		throw std::runtime_error("Error: debug message from cleaner.");
+// 	}
+// 	tk = ServerConf::rmvSemicolon(tk);
+// }
 
 void LocationConf::setLocPath(std::string s)
 {
@@ -57,7 +74,7 @@ void LocationConf::setMethod(std::vector<std::string>& s)
 void LocationConf::setLocRoot(const std::string& s)
 {
 	if (FileUtils::_pathType(s) != 3) {
-		throw std::runtime_error("Error: invalid root of location at setter stage/for debug msg.");
+		throw std::runtime_error("Error: invalid root of location at setter stage: " + s);
 	}
 	this->_locRoot = s;
 }
@@ -97,7 +114,7 @@ void LocationConf::setCgiExtenion(std::vector<std::string> s)
 }
 void LocationConf::setLocIndex(std::string s)
 {
-	_cleanLocTk(s);
+	// _cleanLocTk(s);
 	this->_locIndex = s;
 }
 bool LocationConf::_autoSet() const
@@ -111,7 +128,7 @@ void LocationConf::setLocAuto(bool _flag)
 }
 void LocationConf::setReturn(std::string s)
 {
-	_cleanLocTk(s);
+	// _cleanLocTk(s);
 	this->_returnUrl = s;
 }
 void LocationConf::setPathExMap(std::map<std::string, std::string>& pathExtend)

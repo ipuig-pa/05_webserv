@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 13:34:47 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 16:35:27 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int FileUtils::_pathType(const std::string _filePath)
 		if (S_ISREG(_info.st_mode) != 0) {
 			return 2; //is regular file
 		}
-		else if (S_ISDIR(_info.st_mode) != 0) {
+		else if (_info.st_mode & S_IFDIR) { //S_ISDIR(_info.st_mode) != 0
 			return 3; //is directory
 		}
 		else {

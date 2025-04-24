@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 13:30:05 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 16:22:56 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,20 @@ int main(int ac, char **av)
 		std::string configFile = read_conf(av[1]);
 		createTokens(configFile, tokens);
 		// std::cout << configFile << '\n';
-		for (int i = 0; i < tokens.size(); ++i)
-			std::cout << tokens[i] << " -^- ";
+		for (int i = 0; i < tokens.size(); ++i) {
+			std::cout << tokens[i] << "\n";	
+		}
 		ParseConf parser;
 		parser._split(tokens);
-		// parser._createServBlock();
+		parser._createServBlock();
 		std::vector<std::string> tmp = parser.getSrvBlock();
-		// for (int i = 0; i < tmp.size(); ++i)
-		// {
-		// 	std::cout << "sever " << i << " is: " << tmp[i] << '\n';//works until _split()
+		for (int i = 0; i < tmp.size(); ++i)
+		{
+			std::cout << "sever " << i << " is: " << tmp[i] << '\n';//works until _split()
+		}
+		ServerConf srvs;
+		
+		
 		// 	std::vector<std::string> tk = parser.tokenize(tmp[i]);
 		// 	for (int j = 0; j < tk.size(); ++j)
 		// 	{
@@ -55,19 +60,19 @@ int main(int ac, char **av)
 		// 		// }		
 		// 	}
 		// }
-		std::vector<ServerConf> tmp_servs;
-		for (int g = 0; g < tmp.size(); ++g)
-		{
-			for (size_t m = 0; m < tmp[g].size(); ++m)
-			{
-				std::vector<std::string> single_tk = parser.tokenize(tmp[g]);
-				ServerConf svr;
-				std::cout << svr.getHost() << " ** ";
-				svr = parser._addCategory(single_tk);
-				// this->tmp.server.push_back(svr);
-				std::cout << svr.getHost() << " + "; //todo: have to finishe setters for this test step
-			}
-		}
+		// std::vector<ServerConf> tmp_servs;
+		// for (int g = 0; g < tmp.size(); ++g)
+		// {
+		// 	for (size_t m = 0; m < tmp[g].size(); ++m)
+		// 	{
+		// 		std::vector<std::string> single_tk = parser.tokenize(tmp[g]);
+		// 		ServerConf svr;
+		// 		std::cout << svr.getHost() << " ** ";
+		// 		svr = parser._addCategory(single_tk);
+		// 		// this->tmp.server.push_back(svr);
+		// 		std::cout << svr.getHost() << " + "; //todo: have to finishe setters for this test step
+		// 	}
+		// }
 	}
 	catch (const std::exception& e)
 	{

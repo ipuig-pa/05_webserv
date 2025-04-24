@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 14:02:33 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 15:59:36 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ class LocationConf
 	
 	public:
 	enum methodType { GET, POST, DELETE, INVALID };
+	LocationConf();
+	~LocationConf();
 	
 	//setters
 	void setLocPath(std::string s);

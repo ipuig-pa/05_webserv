@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 14:04:06 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 15:57:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,11 +128,21 @@ void ParseConf::_createServBlock()
 	for (size_t i = 0; i < _single_server.size(); ++i)
 	{
 		std::vector<std::string> tokens = tokenize(_single_server[i]);
+		// for (size_t j = 0; j < tokens.size(); ++j)
+		// {
+		// 	if (tokens[j] == "server") {
+		// 		if (tokens[j + 1] != "{") {
+		// 			throw std::runtime_error("here is debug msg from parseconf.cpp.\n");	
+		// 		}
+		// 		tokens = tokens.erase(j);
+		// 		tokens = tokens.substr(tokens.find_first_not_of(" \n\t")));
 		ServerConf servConf;
 		servConf = _addCategory(tokens);
-		// servConf = parseToServ(tokens);
 		this->_servers.push_back(servConf);
+			// }
 	}
+		// servConf = parseToServ(tokens);
+	// }
 }
 std::vector<std::string>& ParseConf::getSrvBlock()
 {
@@ -161,9 +171,9 @@ ServerConf ParseConf::_addCategory(const std::vector<std::string>& tokens)
 				_insideBlock = false;
 			}
 		}
-		else if (_cate != "{" && _cate != "}"){
-			throw std::runtime_error("Error: misplaced category: " + _cate);
-		}
+		// else if (_cate != "{" && _cate != "}"){
+		// 	throw std::runtime_error("Error: is problem happens here ? misplaced category: " + _cate);
+		// }
 	}
 	return servConf;
 }

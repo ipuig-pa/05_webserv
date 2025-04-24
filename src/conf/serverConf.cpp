@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 14:22:34 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 16:44:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,8 +186,8 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		if (loc.getLocRoot().empty()) { 
 			loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
 		}
-		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath() + "/", loc.getLocIndex()) == -1) {
-			throw std::runtime_error("Error: path in loction is invali.");
+		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath() + "/", loc.getLocIndex()) == -1) {//debug check slash
+			throw std::runtime_error("Error: path in loction is invalid: " + "tmp");
 		}
 		if (!_locReturnCheck(loc)) {
 			throw std::runtime_error("Error: invalid return parameter.");
@@ -308,7 +308,12 @@ void ServerConf::parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_
 	if (loc.getLocIndex().empty() == false) {
 	 	throw std::runtime_error("Error: 'index' in location already defined.");
 	}
-	loc.setLocIndex(loc_tks[++i]);
+	i++;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Error: missing ';' at index passed.");
+	}
+	loc_tks[i] = rmvSemicolon(loc_tks[i]);
+	loc.setLocIndex(loc_tks[i]);
 }
 
 void ServerConf::parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)

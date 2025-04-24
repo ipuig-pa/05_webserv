@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 16:27:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 15:56:40 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ void ParseConf::_split(const std::vector<std::string>& tokens)
 	{	if (tokens[i] == "server")
 		{
 			size_t right = _blockEnd(tokens, i);
-			_addToServBlock(tokens, i, right);
+			++i;//debug
+			_addToServBlock(tokens, i+1, right); //debug, here skip 'server'
 			i = right + 1;
 		}
 		else
