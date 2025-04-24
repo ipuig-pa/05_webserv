@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 16:39:36 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 11:08:41 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,6 +259,7 @@ size_t ParseConf::parseAutoIndex(const std::vector<std::string>& tokens, size_t 
 	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'autoindex'.");
 	}
+	//debug: need to sey flag, fix later
 	if (servConf.getAutoIndex() != false) {
 		throw std::runtime_error("Error: 'autoindex' already set.");
 	}

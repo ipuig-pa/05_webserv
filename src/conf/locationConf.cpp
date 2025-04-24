@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 17:29:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 12:43:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,37 @@ void LocationConf::_cleanLocTk(std::string& tk)
 
 void LocationConf::setLocPath(std::string s)
 {
-	
+	this->_locPath = s;
 }
-void LocationConf::setLocAlias(std::string s);
+// bool LocationConf::_isAllowed(methodType _m) const
+// {
+// 	if (_m < GET || _m > DELETE) {
+// 		return false;
+// 	}
+// 	return _methods[_m];
+// }
+bool LocationConf::_isSet() const
+{
+	return _methodSet;
+}
 void LocationConf::setMethod(std::vector<std::string>& s)
 {
+	this->_methods[GET] = false;
+	this->_methods[POST] = false;
+	this->_methods[DELETE] = false;
+	
 	for (size_t i = 0; i < s.size(); ++i)
 	{
-		this->_methods[i] = s[i];
-		//[...] to implement
+		if (s[i] == "GET")
+			this->_methods[GET] = true;
+		else if (s[i] == "POST")
+			this->_methods[POST] = true;
+		else if (s[i] == "DELETE")
+			this->_methods[DELETE] = true;
+		else
+			throw std::runtime_error("Error: unsupported method: " + s[i]);
 	}
+	this->_methodSet = true;
 }
 void LocationConf::setLocRoot(const std::string& s)
 {
@@ -40,26 +61,114 @@ void LocationConf::setLocRoot(const std::string& s)
 	}
 	this->_locRoot = s;
 }
+
+bool LocationConf::_cmbsSet() const
+{
+	return _cmbsFlag; //default false
+}
 // void LocationConf::setLocCMBS(std::string s);
-void LocationConf::setLocCMBS(unsigned int _size);
-void LocationConf::setCgiPath(std::string s);
-void LocationConf::setCgiExtenion(std::string s);
-void LocationConf::setLocIndex(std::string s);
-void LocationConf::setLocAuto(bool _flag);
-void LocationConf::setReturn(std::string s);
-void LocationConf::setPathExMap(std::map<std::string, std::string> pathExtend);
+void LocationConf::setLocCMBS(unsigned long long _size)
+{
+	// _cleanLocTk(s);
+	// if (!ServerConf::_allDigit(s)) {
+	// 	throw std::runtime_error("Error: client max body size value must be all numeric.");
+	// }
+	// unsigned long long tmp = std::stoll(s);
+	// if (tmp >= INT_MAX) {
+	// 	throw std::runtime_error("Error: too large number of CMBS.");
+	// }
+	this->_locCMBS = _size;
+	this->_cmbsFlag = true;
+}
+
+void LocationConf::setCgiPath(std::vector<std::string> s)
+{
+	for (size_t i = 0; i < s.size(); ++i)
+	{
+		if (s[i].find("/php") == std::string::npos) {
+			throw std::runtime_error("invalid cgi path.");
+		}
+	}
+	this->cgi_path = s;
+}
+void LocationConf::setCgiExtenion(std::vector<std::string> s)
+{
+	this->cgi_extension = s;
+}
+void LocationConf::setLocIndex(std::string s)
+{
+	_cleanLocTk(s);
+	this->_locIndex = s;
+}
+bool LocationConf::_autoSet() const
+{
+	return _autoflag;
+}
+void LocationConf::setLocAuto(bool _flag)
+{
+	this->_locAuto = _flag;
+	this->_autoflag = true;
+}
+void LocationConf::setReturn(std::string s)
+{
+	_cleanLocTk(s);
+	this->_returnUrl = s;
+}
+void LocationConf::setPathExMap(std::map<std::string, std::string>& pathExtend)
+{
+	this->_path_ext_match = pathExtend;
+}
 
 //getters
-const std::string& getLocPath() const;
-const std::string& getAlias() const;
-const std::vector<std::string>& getMethod() const;
-const std::string& getLocRoot() const;
-int getLocCMBS() const;
-const std::string& getLocIndex() const;
-const bool getLocAuto() const;
-const std::string& getReturn() const;
-// const std::string& getCgiPath() const;
-const std::vector<std::string>& getCgiPath() const;
-// const std::string& getCgiExtension() const;
-const std::vector<std::string>& getCgiExtension() const;
-const std::map<std::string, std::string>& getPathExMap() const;
+const std::string& LocationConf::getLocPath() const
+{
+	return this->_locPath;
+}
+const std::vector<LocationConf::methodType>& LocationConf::getMethod() const
+{
+	std::vector<methodType> tmp_m;
+	if (_methods[GET]) {
+		tmp_m.push_back(GET);
+	}
+	if (_methods[POST]) {
+		tmp_m.push_back(POST);
+	}
+	if (_methods[DELETE]) {
+		tmp_m.push_back(DELETE);
+	}
+	return tmp_m;
+}
+const std::string& LocationConf::getLocRoot() const
+{
+	return this->_locRoot;
+}
+int LocationConf::getLocCMBS() const
+{
+	return this->_locCMBS;
+}
+const std::string& LocationConf::getLocIndex() const
+{
+	return this->_locIndex;
+}
+const bool LocationConf::getLocAuto() const
+{
+	return this->_locAuto;
+}
+const std::string& LocationConf::getReturn() const
+{
+	return this->_returnUrl;
+}
+// const std::string& LocationConf::getCgiPath() const;
+const std::vector<std::string>& LocationConf::getCgiPath() const
+{
+	return this->cgi_path;
+}
+// const std::string& LocationConf::getCgiExtension() const;
+const std::vector<std::string>& LocationConf::getCgiExtension() const
+{
+	return this->cgi_extension;
+}
+const std::map<std::string, std::string>& LocationConf::getPathExMap() const
+{
+	return this->_path_ext_match;
+}

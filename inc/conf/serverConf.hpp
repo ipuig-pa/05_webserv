@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 17:13:03 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 12:49:20 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ public:
 	void _cleanLocTk(std::string& tk);
 
 	//setters, pass 'const std::string& s' or pass COPY???
-	void setPort(std::string& s);
+	void setPort(std::string s);
 	void setHost(std::string s);
 	void setSrvName(std::string s);
 
@@ -76,21 +76,21 @@ public:
 	const std::string& getIndex() const;
 	const std::string& getSrvName() const;
 	const std::map<int, std::string>& getErrPage() const;
-	const std::map<std::string, LocationConf>& getLocation() const;
+	// const std::map<std::string, LocationConf>& getLocation() const;
 	// std::vector<std::string>& getErrPage() const;
-	// std::vector<LocationConf>& getLocation() const;
+	const std::vector<LocationConf>& getLocation() const;
 	//[...]
 	
 	//map<string, function<void()>> parser list for location block
 	void parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseMethod(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
-	void parseLocAuto(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseLocIndex(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseAlias(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseLocCMBS(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseCgiPath(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseCgiExtension(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseReturn(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocAuto(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	
+	void parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	
 };
 
