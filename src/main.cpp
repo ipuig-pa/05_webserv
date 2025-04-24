@@ -6,23 +6,34 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 12:09:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:23:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
+#include "global.hpp"
 #include "ReadConf.hpp"
 #include "ParseConf.hpp"
 #include "ServerConf.hpp"
-#incldue "MultiServer.hpp"
+#include "MultiServer.hpp"
+
+// Signal handler function
+void signalHandler(const int signum) {
+	if (!runServer)
+		std::cerr << "Server is already stopping..." << std::endl;
+	std::cerr << "Server interrupted by signal " << signum << ". Stopping server...";
+	runServer = false;
+}
+
 
 int main(int ac, char **av)
 {
+	runServer = true;
 	// Define the path to the config file
 	std::string	config_path;
 	if (ac == 1)
 	{
-		std::cerr << "No config file is provided. " + DEFAULT_CONF + " will be used." << std::endl; //print in cerr or in LOG?!?!
+		std::cerr << "No config file is provided. " << DEFAULT_CONF << " will be used." << std::endl; //print in cerr or in LOG?!?!
 		config_path = DEFAULT_CONF;
 	}
 	else if (ac == 2)
@@ -57,7 +68,7 @@ int main(int ac, char **av)
 		std::vector<std::string> tokens;
 		createTokens(configFile, tokens);
 		// std::cout << configFile << '\n';
-		for (int i = 0; i < tokens.size(); ++i)
+		for (size_t i = 0; i < tokens.size(); ++i)
 			std::cout << tokens[i] << " -^- ";
 		parser._split(tokens);
 		// parser._createServBlock();
@@ -96,10 +107,10 @@ int main(int ac, char **av)
 
 	// Get multi server vector
 	std::vector<std::string> tmp = parser.getSrvBlock(); // TO CHANGE TO HAVE A VECTOR OF VECTORS. EACH FIRS VECTOR IS THE SERVERCONF THAT ARE RELATED TO THE SAME PORT, SO WILL SHARE THE SAME LISTENING SOCKET
-	std::vector<ServerConf> tmp_servs;
+	std::vector<ServerConf> tmp_servs;// JUST FOR TESTING PURPOSE WHEN THE CONFIG FILES GIVE A SINGLE VECTOR, BUT TO BE CHANGED TO GIVE DOUBLE VECTOR TO USE DIRECTLY
 	try
 	{
-		for (int g = 0; g < tmp.size(); ++g)
+		for (size_t g = 0; g < tmp.size(); ++g)
 		{
 			for (size_t m = 0; m < tmp[g].size(); ++m)
 			{
@@ -117,11 +128,13 @@ int main(int ac, char **av)
 		std::cerr << e.what() << '\n';
 		return 1;
 	}
-
+	// JUST FOR TESTING PURPOSE WHEN THE CONFIG FILES GIVE A SINGLE VECTOR, BUT TO BE CHANGED TO GIVE DOUBLE VECTOR TO USE DIRECTLY
+	std::vector <std::vector<ServerConf> > servs_vector;
+	servs_vector.push_back(tmp_servs);
 	// Run multiServer
 	try
 	{
-		MultiServer	server(tmp_servs);
+		MultiServer	server(servs_vector);
 		server.run();
 	}
 	catch (const std::exception& e)

@@ -6,12 +6,11 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/23 17:12:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:30:21 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
-
 
 void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
@@ -164,84 +163,94 @@ void	RequestHandler::handleFileWrite(Client &client)
 // 		// }
 }
 
+//We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUrl to point to LocationConf??)
 void	RequestHandler::handleDirectoryRequest(Client &client, HttpRequest &request, ServerConf &config)
 {
-	//*******get correct conf from ServerConf / LocationConf*****
-	std::string path = getPathFromUrl(client.getRequest().getPath(), config);
-	//Check for index files first
-	//somehow retreive location conf -> ServerConf should have some public function getLocationConf(std::string path)
-	std::vector<std::string> indexFiles = config.getIndex(); // how is it stored in config?? should I also look into LocationConf!?!
+	(void) client;
+	(void) request;
+	(void) config;
+	// //*******get correct conf from ServerConf / LocationConf*****
+	// std::string path = getPathFromUrl(client.getRequest().getPath(), config);
+	// //Check for index files first
+	// //somehow retreive location conf -> ServerConf should have some public function getLocationConf(std::string path)
+	// std::vector<std::string> indexFiles = config.getIndex(); // how is it stored in config?? should I also look into LocationConf!?!
 
-	for (size_t i = 0; i < indexFiles.size(); i++) {
-		std::string fullPath = path + "/" + indexFiles[i];
-		// Check if the index file exists and is readable
-		if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
-			// Found an index file, modify the request path and process as a file request:
-			// If path doesn't end with '/', add it
-			if (path[path.length() - 1] != '/') {
-				path += "/";
-			}
-			// Update the request path to include the index file
-			client.getRequest().setPath(path + indexFiles[i]);
-			// Process as a normal file GET request
-			handleGetRequest(client, client.getResponse(), config);
-			return;
-		}
-	}
-	// No index file found, check if directory listing is enabled
-	if (config.getAutoIndex()) { //CHECK IF THIS IS REALLY THE PARAM WE NEED TO CHECK IF DIRECTORY LISTING IS ENABLED!?!?! -> should be different depending on the location or all the RequestHandler has the same!?!?
-		handleDirectoryListing(client, request, config);
-	} else {
-		// Directory listing is disabled and no index file exists
-		client.getResponse().setStatusCode(403); // Forbidden
-	}
+	// for (size_t i = 0; i < indexFiles.size(); i++) {
+	// 	std::string fullPath = path + "/" + indexFiles[i];
+	// 	// Check if the index file exists and is readable
+	// 	if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
+	// 		// Found an index file, modify the request path and process as a file request:
+	// 		// If path doesn't end with '/', add it
+	// 		if (path[path.length() - 1] != '/') {
+	// 			path += "/";
+	// 		}
+	// 		// Update the request path to include the index file
+	// 		client.getRequest().setPath(path + indexFiles[i]);
+	// 		// Process as a normal file GET request
+	// 		handleGetRequest(client, client.getResponse(), config);
+	// 		return;
+	// 	}
+	// }
+	// // No index file found, check if directory listing is enabled
+	// if (config.getAutoIndex()) { //CHECK IF THIS IS REALLY THE PARAM WE NEED TO CHECK IF DIRECTORY LISTING IS ENABLED!?!?! -> should be different depending on the location or all the RequestHandler has the same!?!?
+	// 	handleDirectoryListing(client, request, config);
+	// } else {
+	// 	// Directory listing is disabled and no index file exists
+	// 	client.getResponse().setStatusCode(403); // Forbidden
+	// }
 }
 
 void	RequestHandler::handleDirectoryListing(Client &client, HttpRequest &request, ServerConf &config)
 {
-	std::string path = getPathFromUrl(request.getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
-	DIR	*dirp = opendir(path.c_str());
+	(void) client;
+	(void) request;
+	(void) config;
+	// std::string path = getPathFromUrl(request.getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
+	// DIR	*dirp = opendir(path.c_str());
 
-	if (!dirp)
-	{
-		client.getResponse().setStatusCode(500); //Internal RequestHandler error
-		return;
-	}
-	//Build HTML Content: check with telnet - nginx what exactly to build
-	struct dirent	*dirent = readdir(dirp);
-	while (dirent)
-	{
-		//write the HTML content: d_name etc
-		//dirent->d_name;
-		dirent = readdir(dirp);
-	}
-	if (errno) // will catch errors from readdir
-	{
-		std::cerr << "Poll error: " << strerror(errno) << std::endl;
-		//handle error
-	}
+	// if (!dirp)
+	// {
+	// 	client.getResponse().setStatusCode(500); //Internal RequestHandler error
+	// 	return;
+	// }
+	// //Build HTML Content: check with telnet - nginx what exactly to build
+	// struct dirent	*dirent = readdir(dirp);
+	// while (dirent)
+	// {
+	// 	//write the HTML content: d_name etc
+	// 	//dirent->d_name;
+	// 	dirent = readdir(dirp);
+	// }
+	// if (errno) // will catch errors from readdir
+	// {
+	// 	std::cerr << "Poll error: " << strerror(errno) << std::endl;
+	// 	//handle error
+	// }
 }
 
 std::string	RequestHandler::getPathFromUrl(const std::string &urlpath, const ServerConf &config)
 {
-	LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
+	(void) urlpath;
+	(void) config;
+	return ("");
+	// LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
 
-	if (!location)
-	{
-		return config.getRoot() + urlpath;
-	}
-	std::string locationPath = location->getLocPath();
-	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
-	//needed??
-	if (locationRoot.empty())
-		locationRoot = config.getRoot();
-	// Remove the location prefix from the URL path and append to the location's root
-	std::string relativePath = urlpath;
-	if (urlpath.find(locationPath) == 0) {
-		relativePath = urlpath.substr(locationPath.length());
-	}
-	if (!relativePath.empty() && relativePath[0] != '/') {
-		relativePath = "/" + relativePath;
-	}
-	return locationRoot + relativePath;
+	// if (!location)
+	// {
+	// 	return config.getRoot() + urlpath;
+	// }
+	// std::string locationPath = location->getLocPath();
+	// std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
+	// //needed??
+	// if (locationRoot.empty())
+	// 	locationRoot = config.getRoot();
+	// // Remove the location prefix from the URL path and append to the location's root
+	// std::string relativePath = urlpath;
+	// if (urlpath.find(locationPath) == 0) {
+	// 	relativePath = urlpath.substr(locationPath.length());
+	// }
+	// if (!relativePath.empty() && relativePath[0] != '/') {
+	// 	relativePath = "/" + relativePath;
+	// }
+	// return locationRoot + relativePath;
 }

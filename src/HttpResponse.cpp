@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/21 11:41:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:34:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,12 @@ void	HttpResponse::setBody(const std::string &body)
 	_body = body;
 	_header.set("Content-Length", std::to_string(_body.size()));
 }
+
+void	HttpResponse::setState(responseState state)
+{
+	_state = state;
+}
+
 
 std::string HttpResponse::getHeader(const std::string& name)
 {
