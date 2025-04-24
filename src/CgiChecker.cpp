@@ -6,11 +6,12 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 13:43:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 14:16:32 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CgiChecker.hpp"
+#include "../inc/CgiChecker.hpp"
+#include "../inc/conf/LocationConf.hpp"
 
 bool CgiChecker::_checkCGI(LocationConf& loc)
 {

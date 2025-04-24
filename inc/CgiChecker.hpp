@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 09:17:23 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 13:42:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 13:52:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 
 #include "webserv.hpp"
 #include "FileUtils.hpp"
-#include "LocationConf.hpp"
+// #include "conf/LocationConf.hpp"
+
+class LocationConf;
 
 class CgiChecker
 {

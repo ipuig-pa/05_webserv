@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 17:13:03 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 14:12:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 #define SERVERCONF_HPP
 
 #define MAX_BODY 2*1024*1024 //2 megebyte, random set now
-#include "webserv.hpp"
+#include "../webserv.hpp"
 #include "LocationConf.hpp"
-#include "CgiChecker.hpp"
+#include "../CgiChecker.hpp"
+class LocationConf;
 
 //setter for varible, set val to an instance of server
 class ServerConf
@@ -57,7 +58,7 @@ public:
 	void _cleanLocTk(std::string& tk);
 
 	//setters, pass 'const std::string& s' or pass COPY???
-	void setPort(std::string& s);
+	void setPort(std::string s);
 	void setHost(std::string s);
 	void setSrvName(std::string s);
 
@@ -68,7 +69,7 @@ public:
 	void setErr(std::vector<std::string>& errTokens); //return std::map<> pair??
 	void _addLocation(std::string& _path, std::vector<std::string>& loc_tokens); //todo: setter for var in this class
 	//getters
-	const int& getPort() const;
+	const int getPort() const;
 	int getCMBS() const;
 	const bool getAutoIndex() const;
 	const std::string& getRoot() const;
@@ -76,21 +77,21 @@ public:
 	const std::string& getIndex() const;
 	const std::string& getSrvName() const;
 	const std::map<int, std::string>& getErrPage() const;
-	const std::map<std::string, LocationConf>& getLocation() const;
+	// const std::map<std::string, LocationConf>& getLocation() const;
 	// std::vector<std::string>& getErrPage() const;
-	// std::vector<LocationConf>& getLocation() const;
+	const std::vector<LocationConf>& getLocation() const;
 	//[...]
 	
 	//map<string, function<void()>> parser list for location block
 	void parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseMethod(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
-	void parseLocAuto(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseLocIndex(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseAlias(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseLocCMBS(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseCgiPath(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseCgiExtension(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
-	void parseReturn(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocAuto(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	
+	void parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	
 };
 

@@ -6,11 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/19 09:05:22 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 13:38:23 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ReadConf.hpp"
+#include "../../inc/conf/ReadConf.hpp"
 
 std::string read_conf(const std::string& confFile)
 {
@@ -39,10 +39,10 @@ void rmHash(std::string& single_line)
 // std::string rmSpace(std::string& single_line)
 void rmSpace(std::string& single_line)
 {
-	size_t pos = single_line.find_first_not_of(' \t\r\n'); //if cannt find non-space, rt: npos
+	size_t pos = single_line.find_first_not_of(" \t\r\n"); //if cannt find non-space, rt: npos
 	if (pos != std::string::npos)
 	{
-		size_t end = single_line.find_last_not_of(' \t\r\n');
+		size_t end = single_line.find_last_not_of(" \t\r\n");
 		int len = end - pos + 1;
 		single_line = single_line.substr(pos, len);
 	}

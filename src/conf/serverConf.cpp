@@ -6,11 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 17:26:12 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 16:44:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ServerConf.hpp"
+#include "../../inc/conf/ServerConf.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;
@@ -43,7 +43,7 @@ std::string ServerConf::rmvSemicolon(const std::string& token)
 	return token;
 }
 //TODO: im always kind hesitate to decide pass by ref or copy, so may check and change later
-void ServerConf::setPort(std::string& s)
+void ServerConf::setPort(std::string s)
 {
 	if (!_hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
@@ -88,6 +88,13 @@ void ServerConf::setIndex(std::string s)
 	}
 	s = rmvSemicolon(s);
 	this->_index = s;
+}
+void ServerConf::_cleanLocTk(std::string& tk)
+{
+	if (!_hasSemicolon(tk)) {
+		throw std::runtime_error("Error: location: invalid 'root' token.");
+	}
+	tk = rmvSemicolon(tk);
 }
 /**
 valid range : 100-599
@@ -179,8 +186,8 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		if (loc.getLocRoot().empty()) { 
 			loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
 		}
-		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath() + "/", loc.getLocIndex()) == -1) {
-			throw std::runtime_error("Error: path in loction is invali.");
+		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath() + "/", loc.getLocIndex()) == -1) {//debug check slash
+			throw std::runtime_error("Error: path in loction is invalid: " + "tmp");
 		}
 		if (!_locReturnCheck(loc)) {
 			throw std::runtime_error("Error: invalid return parameter.");
@@ -194,12 +201,11 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 	LocationConf locBlock;
 	locBlock.setLocPath(_path);
 	size_t i = 0;
-	std::map<std::string, std::function<void()>> _locHandler = {
+	std::map<std::string, std::function<void()> > _locHandler = {
 		{"root", [&](){ parseLocRoot(locBlock, loc_tokens, i); }},
 		{"allow_methods", [&](){ parseMethod(locBlock, loc_tokens, i); }},
 		{"client_max_body_size", [&](){ parseLocCMBS(locBlock, loc_tokens, i); }},
 		{"autoindex", [&](){ parseLocAuto(locBlock, loc_tokens, i); }},
-		{"alias", [&](){ parseAlias(locBlock, loc_tokens, i); }},
 		{"index", [&](){ parseLocIndex(locBlock, loc_tokens, i); }},
 		{"CGI_Path", [&](){ parseCgiPath(locBlock, loc_tokens, i); }},
 		{"CGI_Extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
@@ -240,14 +246,14 @@ void ServerConf::parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_t
 		loc.setLocRoot(this->_root_dir + loc_tks[i]);
 	}
 }
+
 void ServerConf::parseMethod(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()){
 		throw std::runtime_error("Error: location: no parameter after 'methods'.");
 	}
-	//check: or use a flag to check??
-	if (loc.getMethod().empty() == false) {
-	 	throw std::runtime_error("Error: 'method' in location already exist.");
+	if (loc._isSet()) {
+	 	throw std::runtime_error("Error: 'method' in location already defined.");
 	}
 	std::vector<std::string> tmp;
 	while (++i < loc_tks.size())
@@ -257,36 +263,143 @@ void ServerConf::parseMethod(LocationConf& loc, std::vector<std::string>& loc_tk
 			tmp.push_back(loc_tks[i]);
 			break ;//end of method category (method POST DELETE;)
 		}
-		tmp.push_back(loc_tks[i]);
+		else {
+			tmp.push_back(loc_tks[i]);
+			if (i + 1 >= loc_tks.size()){
+				throw std::runtime_error("Error: methods parameter invalid.");
+			}
+		}
 	}
 	loc.setMethod(tmp);
 }
-void ServerConf::parseLocAuto(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
+void ServerConf::parseLocAuto(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()) {
+		throw std::runtime_error("Error: no parameter after 'autoindex'.");
+	}
+	if (loc._autoSet()) {
+		throw std::runtime_error("Error: 'autoindex' already set.");
+	}
+	if (loc.getLocPath() == "/cgi") {
+		throw std::runtime_error("Error: CGI called, no autoindex.");
+	}
+	++i;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Error: invalid parameter format for autoindex.");
+	}
+	std::string tmp_auto = rmvSemicolon(loc_tks[i]);
+	bool _flag = false;
+	if (tmp_auto == "on" || tmp_auto == "ON") {
+		_flag = true;
+	}
+	else if (tmp_auto == "off" || tmp_auto == "OFF") {
+		_flag = false;
+	}
+	else {
+		throw std::runtime_error("Error: invalid value for autoindex.");
+	}
+	loc.setLocAuto(_flag);
 }
-void ServerConf::parseLocIndex(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
+void ServerConf::parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()){
+		throw std::runtime_error("Error: location: no parameter after 'index'.");
+	}
+	if (loc.getLocIndex().empty() == false) {
+	 	throw std::runtime_error("Error: 'index' in location already defined.");
+	}
+	i++;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Error: missing ';' at index passed.");
+	}
+	loc_tks[i] = rmvSemicolon(loc_tks[i]);
+	loc.setLocIndex(loc_tks[i]);
 }
-void ServerConf::parseAlias(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
-}
-void ServerConf::parseLocCMBS(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
-}
-void ServerConf::parseCgiPath(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
-}
-void ServerConf::parseCgiExtension(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
-}
-void ServerConf::parseReturn(LocationConf& loc, const std::vector<std::string>& loc_tks, size_t& i) {
-	
-}
-	
 
+void ServerConf::parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()) {
+		throw std::runtime_error("Error: no parameter after 'client_max_body_size'.");
+	}
+	if (loc._cmbsSet() == true) {
+		throw std::runtime_error("Error: 'client xxx' in location already defined.");
+	}
+	++i;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Error: invalid parameter format for autoindex.");
+	}
+	loc_tks[i] = rmvSemicolon(loc_tks[i]);
+	if (!_allDigit(loc_tks[i])) {
+		throw std::runtime_error("Error: client max body size value must be all numeric.");
+	}
+	unsigned long long tmp = std::stoll(loc_tks[i]);
+	if (tmp >= INT_MAX) {
+		throw std::runtime_error("Error: too large number of CMBS.");
+	}
+	loc.setLocCMBS(tmp);
+}
+void ServerConf::parseCgiPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()) {
+		throw std::runtime_error("Error: no parameter after 'cgi_path'.");
+	}
+	std::vector<std::string> _cgiPath;
+	while (++i < loc_tks.size())
+	{
+		if (_hasSemicolon(loc_tks[i])) {
+			rmvSemicolon(loc_tks[i]);
+			_cgiPath.push_back(loc_tks[i]);
+			break ;
+		}
+		else {
+			_cgiPath.push_back(loc_tks[i]);
+			if (i + 1 >= loc_tks.size()){
+				throw std::runtime_error("Error: cgipath parameter invalid.");
+			}
+		}
+	}
+	loc.setCgiPath(_cgiPath);
+}
+void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()) {
+		throw std::runtime_error("Error: no parameter after 'cgi_extension'.");
+	}
+	std::vector<std::string> _cgiExtend;
+	while (++i < loc_tks.size())
+	{
+		if (_hasSemicolon(loc_tks[i])) {
+			rmvSemicolon(loc_tks[i]);
+			_cgiExtend.push_back(loc_tks[i]);
+			break ;
+		}
+		else {
+			_cgiExtend.push_back(loc_tks[i]);
+			if (i + 1 >= loc_tks.size()){
+				throw std::runtime_error("Error: cgi extension parameter invalid.");
+			}
+		}
+	}
+	loc.setCgiPath(_cgiExtend);
+}
+void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 >= loc_tks.size()) {
+		throw std::runtime_error("Error: no parameter after 'return'.");
+	}
+	if (loc.getReturn().empty() == false) {
+		throw std::runtime_error("Error: 'return' value already set.");
+	}
+	if (loc.getLocPath() == "/cgi") {
+		throw std::runtime_error("Error: CGI called.");
+	}
+	++i;
+	loc.setReturn(loc_tks[i]);
+}
 
 //getters
-const int& ServerConf::getPort() const {
+const int ServerConf::getPort() const
+{
 	return this->_port;
 }
 int ServerConf::getCMBS() const {
@@ -313,6 +426,6 @@ const std::map<int, std::string>& ServerConf::getErrPage() const {
 // const std::map<std::string, LocationConf>& ServerConf::getLocation() const {
 // 	return this->_location;
 // }
-const std::vector<std::string>& ServerConf::getLocation() const {
+const std::vector<LocationConf>& ServerConf::getLocation() const {
 	return this->_location;
 }
