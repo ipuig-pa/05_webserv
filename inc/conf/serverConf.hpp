@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 12:49:20 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 14:12:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 #define SERVERCONF_HPP
 
 #define MAX_BODY 2*1024*1024 //2 megebyte, random set now
-#include "webserv.hpp"
+#include "../webserv.hpp"
 #include "LocationConf.hpp"
-#include "CgiChecker.hpp"
+#include "../CgiChecker.hpp"
+class LocationConf;
 
 //setter for varible, set val to an instance of server
 class ServerConf
@@ -68,7 +69,7 @@ public:
 	void setErr(std::vector<std::string>& errTokens); //return std::map<> pair??
 	void _addLocation(std::string& _path, std::vector<std::string>& loc_tokens); //todo: setter for var in this class
 	//getters
-	const int& getPort() const;
+	const int getPort() const;
 	int getCMBS() const;
 	const bool getAutoIndex() const;
 	const std::string& getRoot() const;

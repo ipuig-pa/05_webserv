@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 08:02:32 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 13:36:52 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
 #ifndef PARSECONF_HPP
 #define PARSECONF_HPP
 
-#include "webserv.hpp"
+#include "../webserv.hpp"
 #include "ReadConf.hpp"
-#include "FileUtils.hpp"
+#include "../FileUtils.hpp"
 #include "ServerConf.hpp"
 
 class ParseConf

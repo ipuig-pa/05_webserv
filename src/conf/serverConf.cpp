@@ -6,11 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 12:52:16 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 14:22:34 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ServerConf.hpp"
+#include "../../inc/conf/ServerConf.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;
@@ -201,7 +201,7 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 	LocationConf locBlock;
 	locBlock.setLocPath(_path);
 	size_t i = 0;
-	std::map<std::string, std::function<void()>> _locHandler = {
+	std::map<std::string, std::function<void()> > _locHandler = {
 		{"root", [&](){ parseLocRoot(locBlock, loc_tokens, i); }},
 		{"allow_methods", [&](){ parseMethod(locBlock, loc_tokens, i); }},
 		{"client_max_body_size", [&](){ parseLocCMBS(locBlock, loc_tokens, i); }},
@@ -393,7 +393,8 @@ void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tk
 }
 
 //getters
-const int& ServerConf::getPort() const {
+const int ServerConf::getPort() const
+{
 	return this->_port;
 }
 int ServerConf::getCMBS() const {

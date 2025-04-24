@@ -6,11 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 11:08:41 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 14:04:06 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParseConf.hpp"
+#include "../../inc/conf/ParseConf.hpp"
 
 //parser for config, read, tokenize, and store the data
 ParseConf::ParseConf() : server_count(0) {
@@ -20,18 +20,18 @@ ParseConf::~ParseConf() {}
 
 //read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
 // -> create serverBlock and actual instance of serverConf
-#include "ReadConf.hpp"
-int ParseConf::testMain(const std::string& fileName)
-{
-	//add path check logic here for server block
-	std::vector<std::string> tokens;
-	std::string lines = read_conf(fileName);
-	createTokens(lines, tokens);
-	_split(tokens);
-	_createServBlock();
-	//inside location{}, path_valid check needed
-	return (0);
-}
+// #include "ReadConf.hpp"
+// int ParseConf::testMain(const std::string& fileName)
+// {
+// 	//add path check logic here for server block
+// 	std::vector<std::string> tokens;
+// 	std::string lines = read_conf(fileName);
+// 	createTokens(lines, tokens);
+// 	_split(tokens);
+// 	_createServBlock();
+// 	//inside location{}, path_valid check needed
+// 	return (0);
+// }
 
 // bool ParseConf::_allDigit(const std::string& s)//return true if all digit
 // {

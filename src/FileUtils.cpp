@@ -6,11 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/22 08:46:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 13:34:47 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "FileUtils.hpp"
+#include "../inc/FileUtils.hpp"
 
 FileUtils::FileUtils() {}
 FileUtils::FileUtils(const std::string _path) : _pathofFile(_path) {}

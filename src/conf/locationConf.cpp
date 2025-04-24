@@ -6,11 +6,11 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 12:43:14 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/24 14:02:38 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "LocationConf.hpp"
+#include "../../inc/conf/LocationConf.hpp"
 
 void LocationConf::_cleanLocTk(std::string& tk)
 {
@@ -124,7 +124,7 @@ const std::string& LocationConf::getLocPath() const
 {
 	return this->_locPath;
 }
-const std::vector<LocationConf::methodType>& LocationConf::getMethod() const
+std::vector<LocationConf::methodType> LocationConf::getMethod() const
 {
 	std::vector<methodType> tmp_m;
 	if (_methods[GET]) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 16:54:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/24 13:22:09 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include "HttpRequest.hpp"
 # include "HttpResponse.hpp"
 # include "Header.hpp"
-# include "ServerConf.hpp"
+# include "conf/ServerConf.hpp"
 
 /**
  * accept (new) client connection,
