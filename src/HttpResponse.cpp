@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 10:34:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/25 16:05:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,14 @@ void	HttpResponse::setStatusCode(int code)
 	_status = Status(code);
 	if (code == 204 || code == 304)
 		_body_presence = false;
+	else
+		_body_presence = true;
+	//if (code != 200) //or other 200 and something???
+	// // Get appropriate error body based on status code
+	// std::string errorBody = errorPageHandler.getErrorPage(response.getStatusCode(), serverConfig);
+	// // Set the body and update headers
+	// response.setBody(errorBody);
+	// response.addHeaderField("Content-Type", "text/html");
 }
 
 //correctly implemented!?!?

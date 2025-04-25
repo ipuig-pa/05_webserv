@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 10:17:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/25 15:52:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ int	MultiServer::run()
 				continue;
 			//get fd
 			int fd = _poll[i].fd;
-			// if it is a listening socket and it is ready, accept new clients (keep listening socket always in [0])
+			// if it is a listening socket and it is ready, accept new clients
 			std::map<int, Socket*>::iterator it_s;
 			it_s = _sockets.find(fd);
 			if (it_s != _sockets.end())
