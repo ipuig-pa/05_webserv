@@ -6,19 +6,25 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/24 10:30:21 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/25 10:30:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+//INCLUDE HEAD REQUEST!? All general-purpose servers MUST support the methods GET and HEAD (RFC 9110)
 
 void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	// std::string path = config.getPathFromUrl(client.getRequest().getPath());
 
-	if (access(path.c_str(), F_OK | R_OK) != 0) {
-		response.setStatusCode(404);
+	if (access(path.c_str(), F_OK) != 0) {
+		response.setStatusCode(404); // Not found
+		return;
+	}
+	if (access(path.c_str(), R_OK) != 0) {
+		response.setStatusCode(403); // Forbidden
 		return;
 	}
 	struct stat file_stat;
@@ -72,9 +78,33 @@ void	RequestHandler::handlePostRequest(Client &client, HttpResponse &response, S
 
 void	RequestHandler::handleDeleteRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
-	(void)client;
-	(void)config;
-	(void)response;
+	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
+	// std::string path = config.getPathFromUrl(client.getRequest().getPath());
+
+	if (access(path.c_str(), F_OK) != 0) {
+		response.setStatusCode(404); //Not found
+		return;
+	}
+	struct stat file_stat;
+	stat(path.c_str(), &file_stat);
+	if ((access(path.c_str(), W_OK) != 0) || S_ISDIR(file_stat.st_mode)) {
+		response.setStatusCode(403); //Forbidden
+		return;
+	}
+	try
+	{
+		if (std::remove(file_path.c_str()) == 0) {
+			response.setStatusCode(204); // Success - No Content
+			return ;
+		} else {
+			response.setStatusCode(500); //internal server error
+			return ;
+		}
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 }
 
 void	RequestHandler::handleInvalidRequest(Client &client, HttpResponse &response, ServerConf &config)
@@ -95,8 +125,8 @@ void	RequestHandler::processRequest(Client &client)
 		&RequestHandler::handleInvalidRequest};
 
 	client.setResponse(response);
+	//check first if the client request method is in the allowed methods in the current config file 
 	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), *(client.getConf()));
-	// Switch to interested in writing -> CHECK!!! Need the client class implemented!
 }
 
 void	RequestHandler::handleClientRead(Client &client)
@@ -210,7 +240,7 @@ void	RequestHandler::handleDirectoryListing(Client &client, HttpRequest &request
 
 	// if (!dirp)
 	// {
-	// 	client.getResponse().setStatusCode(500); //Internal RequestHandler error
+	// 	client.getResponse().setStatusCode(500); //Internal Server error
 	// 	return;
 	// }
 	// //Build HTML Content: check with telnet - nginx what exactly to build

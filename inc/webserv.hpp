@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 13:23:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/25 09:38:32 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <string>
 #include <cstring> //inc strlen, strcpy, strcmp, strcat
 #include <stdexcept> //for exceptions
+#include <cstdio> // for remove
 
 #include <sys/socket.h> //socket(), bind/listen/accept/send/recv()
 #include <fcntl.h> //for fcntl() (non-blocking i/o)
