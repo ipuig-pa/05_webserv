@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 15:59:36 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 11:45:57 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "../webserv.hpp"
 #include "ServerConf.hpp"
 
+//idea tmp.getlocation()
 
 //like a sub-config, define behaviour for specific URL
 //not all attribute required, just list all for compiling with more .conf file
@@ -43,13 +44,12 @@ class LocationConf
 	int _returnCode;
 	
 	public:
-	enum methodType { GET, POST, DELETE, INVALID };
+	enum mType { GET, POST, DELETE, INVALID };
 	LocationConf();
 	~LocationConf();
 	
 	//setters
 	void setLocPath(std::string s);
-	void setLocAlias(std::string s);
 	// void setMethod(std::string s);
 	// bool _isAllowed(methodType _m) const;
 	bool _isSet() const;
@@ -68,8 +68,7 @@ class LocationConf
 	
 	//getters
 	const std::string& getLocPath() const;
-	const std::string& getAlias() const;
-	std::vector<methodType> getMethod() const; //return a copy
+	std::vector<mType> getMethod() const; //return a copy
 	const std::string& getLocRoot() const;
 	int getLocCMBS() const;
 	const std::string& getLocIndex() const;

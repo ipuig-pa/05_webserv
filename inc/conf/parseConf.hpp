@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 13:36:52 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 11:31:43 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,10 @@ private:
 public:
 	ParseConf();
 	~ParseConf();
-	
-	int testMain(const std::string& fileName); //main entry for whole read-parse-create process
-
+	//int testMain(const std::string& fileName); //main entry for whole read-parse-create process
 	//getter for test private attribute
 	std::vector<std::string>& getSrvBlock();
+	std::vector<ServerConf>& getServers();
 	
 	void _split(const std::vector<std::string>& tokens); //if multi 'server{}' found, split it
 	void _addToServBlock(const std::vector<std::string>& tokens, size_t left, size_t right);

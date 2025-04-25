@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 16:44:14 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 12:00:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ ServerConf::ServerConf() {
 	_server_name = "";
 	_root_dir = "";
 	_host = "";
+	
 	_max_body_size = 0;
 	_srv_autoindex = false;
 }
@@ -186,8 +187,8 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		if (loc.getLocRoot().empty()) { 
 			loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
 		}
-		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath() + "/", loc.getLocIndex()) == -1) {//debug check slash
-			throw std::runtime_error("Error: path in loction is invalid: " + "tmp");
+		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
+			throw std::runtime_error("Error: path in loction is invalid: ");
 		}
 		if (!_locReturnCheck(loc)) {
 			throw std::runtime_error("Error: invalid return parameter.");
@@ -207,8 +208,8 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 		{"client_max_body_size", [&](){ parseLocCMBS(locBlock, loc_tokens, i); }},
 		{"autoindex", [&](){ parseLocAuto(locBlock, loc_tokens, i); }},
 		{"index", [&](){ parseLocIndex(locBlock, loc_tokens, i); }},
-		{"CGI_Path", [&](){ parseCgiPath(locBlock, loc_tokens, i); }},
-		{"CGI_Extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
+		{"cgi_path", [&](){ parseCgiPath(locBlock, loc_tokens, i); }},
+		{"cgi_extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
 		{"return", [&](){ parseReturn(locBlock, loc_tokens, i); }}
 	};
 	while (i < loc_tokens.size()) {
