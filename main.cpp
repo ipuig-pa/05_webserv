@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 16:22:56 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 12:06:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,28 @@ int main(int ac, char **av)
 		{
 			std::cout << "sever " << i << " is: " << tmp[i] << '\n';//works until _split()
 		}
-		ServerConf srvs;
-		
-		
+		std::vector<ServerConf> srv = parser.getServers();
+		for (size_t i = 0; i < srv.size(); ++i)
+		{
+			std::cout << "Port: " << srv[i].getPort() << "\n";
+			std::cout << "Root: " << srv[i].getRoot() << "\n";
+			std::cout << "Index: " << srv[i].getIndex() << "\n";
+			std::cout << "AutoIndex: " << (srv[i].getAutoIndex() ? "on" : "off") << "\n";
+			std::vector<LocationConf> locs = srv[i].getLocation();
+			for (size_t j = 0; j < locs.size(); ++j)
+			{
+				std::cout << "this is location block\n";
+				std::cout << j  << " index Loc Path: " << locs[j].getLocPath() << "\n";
+				std::cout << j  << " index Loc root: " << locs[j].getLocRoot() << "\n";
+				std::vector<LocationConf::mType> locM = locs[j].getMethod();
+				for (size_t k = 0; k < locM.size(); ++k) {
+					std::cout << "this is method from loc: " << j << locM[k] << '\n';
+				}
+				// for (size_t p = 0; p < locs[j].getCgiPath().size(); ++p) {	
+				// 	std::cout << j  << "index CGI path: " << locs[j].getCgiExtension()[p] << "\n";
+				// }
+			}	
+		}
 		// 	std::vector<std::string> tk = parser.tokenize(tmp[i]);
 		// 	for (int j = 0; j < tk.size(); ++j)
 		// 	{

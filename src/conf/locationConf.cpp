@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 16:26:10 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 11:46:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,9 +141,9 @@ const std::string& LocationConf::getLocPath() const
 {
 	return this->_locPath;
 }
-std::vector<LocationConf::methodType> LocationConf::getMethod() const
+std::vector<LocationConf::mType> LocationConf::getMethod() const
 {
-	std::vector<methodType> tmp_m;
+	std::vector<mType> tmp_m;
 	if (_methods[GET]) {
 		tmp_m.push_back(GET);
 	}

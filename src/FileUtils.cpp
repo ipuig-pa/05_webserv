@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 16:35:27 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 11:27:05 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,27 @@ int FileUtils::_pathValid(const std::string _filePath, int _permission)
 	return _validity; //fail on -1, success on 0
 }
 
-int FileUtils::_blockPathValid(const std::string _path, const std::string _index)
+int FileUtils::_blockPathValid(std::string _path, std::string _index)
 {
+	if (!_index.empty() && _index[0] != '/' && _path.back() != '/') {
+		_index = "/" + _index;
+	}
 	std::string _fullPath = _path + _index;
+	// std::cout << "this is path:" << _path << "\n";
+	// std::cout << "this is index: " << _index << "\n";
+	// std::cout << "this is full " << _fullPath << '\n';
+	if (_fullPath.back() == '/') {
+		_fullPath.pop_back();
+		// std::cout << "this is new full " << _fullPath << '\n';
+	}
 	if (_pathType(_index) == 2 && _pathValid(_index, R_OK) == 0)
-	{
+	{	
+		// std::cout << "check which branch 1 am: branch index\n";
 		return 0;
 	}
-	if (_pathType(_fullPath) == 2 && _pathValid(_fullPath, R_OK) == 0)
+	else if (_pathType(_fullPath) == 2 && _pathValid(_fullPath, R_OK) == 0)
 	{
+		// std::cout << "check which branch 2 am: branch full\n";
 		return 0;
 	}
 	return -1;

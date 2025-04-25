@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 14:12:53 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 10:41:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ private:
 	std::map<int, std::string> _error_page; //err_code, url
 	bool _srv_autoindex; //default as false in construtor
 	// std::map<std::string, LocationConf> _locations;
-	std::vector<LocationConf> _location; //a set of location_blocks in server_configuration
+	std::vector<LocationConf> _location; //a set of location_blocks in server_configuration //todo check how to read specific loc
 	
 	// std::vector<std::string> _error_page;
 	// [...] other var to add later

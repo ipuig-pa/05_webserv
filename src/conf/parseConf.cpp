@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 15:57:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 11:32:36 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,10 @@ std::vector<std::string>& ParseConf::getSrvBlock()
 {
 	return _single_server;
 }
-
+std::vector<ServerConf>& ParseConf::getServers()
+{
+	return _servers;
+}
 //listen; server_name; host; root; CMBS; index; error_page; location; autoindex
 //use func pointer directing to sub-category
 //tok

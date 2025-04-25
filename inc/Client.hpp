@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 13:22:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 10:49:26 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ private:
 	std::string		_response_buffer;
 	size_t			_bytes_sent;
 	bool			_empty_buffer;
-	ServerConf*		_currentConfig;
+	ServerConf*		_currentConfig; //idea: maybe create a upper class
 
 	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
