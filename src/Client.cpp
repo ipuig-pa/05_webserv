@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 16:55:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/24 10:36:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ bool	Client::getEmptyBuffer(void)
 ServerConf	*Client::getConf(void)
 {
 	return	(_currentConfig);
+}
+
+int	Client::getFileFd(void)
+{
+	return (_file_fd);
 }
 
 void	Client::setEmptyBuffer(bool value)
