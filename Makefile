@@ -1,12 +1,13 @@
 NAME = webserv
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc -Iinc/conf
 
 SRC_DIR = src
 OBJ_DIR = obj
 
-VPATH = $(SRC_DIR):\
+VPATH =	$(SRC_DIR):\
+		$(SRC_DIR)/conf
 
 SOURCES =	ReadConf.cpp \
 			ParseConf.cpp \
