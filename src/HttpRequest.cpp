@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 16:16:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 13:49:45 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@
 				Host: example.com
 				Content-Type: text/html
 				Content-Length: 256
+				cookies: xxxxxxx
+	\r\n
 	3️⃣ msg body:
 */
 
 //FOR TESTING PURPOSE:
 HttpRequest::HttpRequest()
-	: _method(GET), _body(nullptr), _path("/src/")
-{
-}
+	: _method(GET), _body(nullptr), _path("/src/"), _finished(false) {}
 
 int	HttpRequest::getMethod(void) const
 {

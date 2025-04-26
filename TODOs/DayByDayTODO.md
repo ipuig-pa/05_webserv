@@ -1,3 +1,7 @@
+//IDEA on 26th April
+- build an abstract class inherit locaConf and servConf
+- parsing reference or coyp, check later - avoid memory issues
+
 **Achieve Step By Step Checklist**
 
 PARSER to read confif file:
