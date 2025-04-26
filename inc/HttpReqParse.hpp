@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 14:34:27 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 15:38:50 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ public:
 	
 	//setter
 	// bool _setFinish(bool _flag);
-	void setMethd(std::string& s); //set as methodType type
-	void setUrl(std::string& s);
-	void setVersion(std::string& s); //return version like '/1.1', check validity
+	// void setMethd(std::string& s); //set as methodType type
+	// void setUrl(std::string& s);
+	// void setVersion(std::string& s); //return version like '/1.1', check validity
 	
 	//getter
 	bool _checkFinish();

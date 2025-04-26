@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 14:27:56 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 16:08:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ class HttpRequest
 private:
 	Header		_header;
 	methodType	_method;
-	std::string	_body;
 	std::string	_path;
-	bool _finished;
 	std::string _version;
+	std::string	_body;
+	bool _finishFlag;
 
 	//attirbute (server name, method, path, header [...])
 	//public or private??
@@ -52,10 +52,10 @@ public:
 	//setter
 	void setMethd(std::string& s); //set as methodType type
 	void setPath(const std::string &url);
-	void setVersion(std::string& s); //return version like '/1.1', str1.compare(str2) == 0
+	void setVersion(const std::string& s); //return version like '/1.1', str1.compare(str2) == 0
 	void setHeaderField(const std::string& name, const std::string& value);
 	void setBody(const std::string &body);
-	bool _setFinish(bool _flag); //flag for finsihing parsing or not
+	void _setFinish(bool _flag); //flag for finsihing parsing or not
 	
 	//getters	
 	int	getMethod(void) const;

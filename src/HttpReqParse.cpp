@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 15:33:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 15:51:26 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ bool HttpReqParse::httpParser(const std::string& _reqLines, HttpRequest& _req)
 		}
 		else if (_stage == HEADERS) {
 			if (!_parseHeader(_req)) {
-				_stage = ERROR;
+				//_stage = ERROR; the stage is set inside singleline() of (parseheader())
 				return false;
 			}
 		}
 		else if (_stage == BODY) {
 			if (!_parseBody(_req)) {
-				_stage = ERROR; //can still process even erro in body?? bc body is just optional...??
+				//_stage = ERROR; //can still process even erro in body?? bc body is just optional...??
 				return false;
 			}
 		}
@@ -54,7 +54,6 @@ bool HttpReqParse::_parseReqLine(HttpRequest& _request)
 	size_t _end = line_buf.find("\r\n");
 	if (_end == std::string::npos) {
 		std::cerr << "Error: invalid request line. can't find '\\r\\n'";
-		_stage = ERROR;
 		return false;
 	}
 	std::string cur_line = line_buf.substr(0, _end);
@@ -68,6 +67,10 @@ bool HttpReqParse::_parseReqLine(HttpRequest& _request)
 	}
 	_request.setMethd(method);
 	_request.setPath(url);
+	std::string tmp_v = "HTTP/1.1";
+	if (tmp_v.compare(ver) != 0) {
+		return (std::cerr << "Error: invalid HTTP version", false);
+	}
 	_request.setVersion(ver);
 	return true;
 }
