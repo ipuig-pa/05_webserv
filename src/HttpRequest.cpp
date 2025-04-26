@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 16:16:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 16:08:41 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,27 @@
 				Host: example.com
 				Content-Type: text/html
 				Content-Length: 256
+				cookies: xxxxxxx
+	\r\n
 	3️⃣ msg body:
 */
 
 //FOR TESTING PURPOSE:
-HttpRequest::HttpRequest()
-	: _method(GET), _body(nullptr), _path("/src/")
+HttpRequest::HttpRequest() : _method(GET), _body(nullptr), _path("/src/"), _finished(false) {}
+
+void HttpRequest::setMethd(std::string& s)
 {
+	if (s == "GET") {
+		this->_method = GET;
+	}
+	else if (s == "POST") {
+		this->_method = POST;
+	}
+	else if (s == "DELETE") {
+		this->_method = DELETE;
+	}
+	else
+		this->_method = INVALID;
 }
 
 int	HttpRequest::getMethod(void) const
@@ -46,9 +60,30 @@ int	HttpRequest::getMethod(void) const
 	return (_method);
 }
 
+void HttpRequest::setPath(const std::string &url)
+{
+	this->_path = url; //the validity check to be add in creating interface
+}
+
 std::string	&HttpRequest::getPath(void)
 {
 	return _path;
+}
+
+void HttpRequest::setVersion(const std::string& s)
+{
+	this->_version = s;
+}
+
+std::string HttpRequest::getVersion()
+{
+	return _version;
+}
+
+//take from http response
+void HttpRequest::setHeaderField(const std::string& name, const std::string& value)
+{
+	this->_header.set(name, value);
 }
 
 std::string HttpRequest::getHeader(const std::string& name)
@@ -56,7 +91,36 @@ std::string HttpRequest::getHeader(const std::string& name)
 	return _header.get(name);
 }
 
-void	HttpRequest::setPath(const std::string &path)
+void HttpRequest::setBody(const std::string& body)
 {
-	_path = path;
+	this->_body = body;
+}
+
+std::string& HttpRequest::getBody()
+{
+	return _body;
+}
+
+void HttpRequest::_setFinish(bool _flag)
+{
+	this->_finishFlag = _flag;
+}
+
+bool HttpRequest::_isFinish()
+{
+	return _finishFlag;
+}
+
+/** IMPORTANT:
+ * everytime a NEW Request comes, no need to do HttpRequest newRequest;
+ * just _request.reset(), reuse the SAME OBJECT!!
+ */
+void HttpRequest::_reset()
+{
+	_header = Header(); //call default cons
+	_method = INVALID;
+	_path.clear();
+	_version.clear();
+	_body.clear();
+	_finishFlag = false;
 }
