@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 12:00:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 11:17:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../inc/conf/ServerConf.hpp"
+#include "ServerConf.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;
@@ -21,7 +21,7 @@ ServerConf::ServerConf() {
 	_max_body_size = 0;
 	_srv_autoindex = false;
 }
-ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
+// ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
 ServerConf::~ServerConf() {}
 
 bool ServerConf::_allDigit(const std::string& s)//return true if all digit
@@ -162,12 +162,15 @@ void ServerConf::setCMBS(std::string s)
  * 		- root: start with '/', or root var is empty //done
  */
 //after parsing, check1: cgi, if not CGI, check static
+
 bool ServerConf::_locReturnCheck(LocationConf& loc)
 {
 	//return value be std::vector or reture_code + return_html??
 	//implement later
+	(void) loc;
 	return true;
 }
+
 void ServerConf::_wrapLocChecker(LocationConf& loc)
 {
 	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
@@ -399,14 +402,14 @@ void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tk
 }
 
 //getters
-const int ServerConf::getPort() const
+int ServerConf::getPort() const
 {
 	return this->_port;
 }
 int ServerConf::getCMBS() const {
 	return this->_max_body_size;
 }
-const bool ServerConf::getAutoIndex() const {
+bool ServerConf::getAutoIndex() const {
 	return this->_srv_autoindex;
 }
 const std::string& ServerConf::getRoot() const {
@@ -429,4 +432,40 @@ const std::map<int, std::string>& ServerConf::getErrPage() const {
 // }
 const std::vector<LocationConf>& ServerConf::getLocation() const {
 	return this->_location;
+}
+
+LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
+{
+	std::map<std::string, LocationConf>::iterator it;
+	LocationConf	*longest_match = nullptr;
+	size_t			match;
+
+	for(it = _locations.begin(); it != _locations.end(); ++it)
+	{
+		if ((it->first).compare(uripath) == 0)
+			return (&it->second);
+	}
+	match = 0;
+	for(it = _locations.begin(); it != _locations.end(); ++it)
+	{
+		if (!(it->first).empty() && (it->first).back() == '/' && uripath.find(it->first) == 0)
+		{
+			if ((it->first).size() > match)
+			{
+				match = (it->first).size();
+				longest_match = &it->second;
+			}
+		}
+	}
+	if (longest_match)
+		return (longest_match);
+	return (nullptr);
+}
+
+std::string	ServerConf::getErrPageCode(int status_code)
+{
+	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
+	if (it != _error_page.end())
+		return it->second;
+	return "";
 }

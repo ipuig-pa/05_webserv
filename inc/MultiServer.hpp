@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/24 10:16:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 11:32:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "webserv.hpp"
 #include "global.hpp"
 #include "Client.hpp"
-#include "conf/serverConf.hpp"
+#include "ServerConf.hpp"
 #include "Socket.hpp"
 #include "RequestHandler.hpp"
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 10:41:30 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 11:32:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ private:
 	std::string _index;
 	std::map<int, std::string> _error_page; //err_code, url
 	bool _srv_autoindex; //default as false in construtor
-	// std::map<std::string, LocationConf> _locations;
+	std::map<std::string, LocationConf> _locations;
 	std::vector<LocationConf> _location; //a set of location_blocks in server_configuration //todo check how to read specific loc
 	
 	// std::vector<std::string> _error_page;
@@ -69,9 +69,9 @@ public:
 	void setErr(std::vector<std::string>& errTokens); //return std::map<> pair??
 	void _addLocation(std::string& _path, std::vector<std::string>& loc_tokens); //todo: setter for var in this class
 	//getters
-	const int getPort() const;
+	int getPort() const;
 	int getCMBS() const;
-	const bool getAutoIndex() const;
+	bool getAutoIndex() const;
 	const std::string& getRoot() const;
 	const std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
 	const std::string& getIndex() const;
@@ -93,6 +93,8 @@ public:
 	void parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	
+	LocationConf	*getMatchingLocation(std::string uripath);
+	std::string		getErrPageCode(int status_code);
 };
 
 /**

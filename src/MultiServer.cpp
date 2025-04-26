@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 15:52:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 12:10:28 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	MultiServer::init_sockets(std::vector<std::vector<ServerConf> > serv_config
 {
 	for(size_t i = 0; i < serv_config.size(); i++)
 	{
-		Socket *listen_socket = new Socket(serv_config[i][0]);
+		Socket *listen_socket = new Socket(serv_config[i]);
 		int	listen_fd = listen_socket->getFd();
 		fcntl(listen_fd, F_SETFL, O_NONBLOCK);
 		struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};

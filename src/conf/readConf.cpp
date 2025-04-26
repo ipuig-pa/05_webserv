@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ReadConf.cpp                                       :+:      :+:    :+:   */
+/*   readConf.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 13:38:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 16:11:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../inc/conf/ReadConf.hpp"
+#include "ReadConf.hpp"
 
 std::string read_conf(const std::string& confFile)
 {

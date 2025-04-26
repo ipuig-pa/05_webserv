@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/25 10:30:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 11:35:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	RequestHandler::handleDeleteRequest(Client &client, HttpResponse &response,
 	}
 	try
 	{
-		if (std::remove(file_path.c_str()) == 0) {
+		if (std::remove(path.c_str()) == 0) {
 			response.setStatusCode(204); // Success - No Content
 			return ;
 		} else {
@@ -258,29 +258,29 @@ void	RequestHandler::handleDirectoryListing(Client &client, HttpRequest &request
 	// }
 }
 
-std::string	RequestHandler::getPathFromUrl(const std::string &urlpath, const ServerConf &config)
+std::string	RequestHandler::getPathFromUrl(const std::string &uripath, ServerConf &config)
 {
-	(void) urlpath;
-	(void) config;
+	// (void) uripath;
+	// (void) config;
 	return ("");
-	// LocationConf *location = config.getMatchingLocation(urlpath); //implement getMatching location in serverConf class!!!!
+	LocationConf *location = config.getMatchingLocation(uripath); //implement getMatching location in serverConf class!!!!
 
-	// if (!location)
-	// {
-	// 	return config.getRoot() + urlpath;
-	// }
-	// std::string locationPath = location->getLocPath();
-	// std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
-	// //needed??
-	// if (locationRoot.empty())
-	// 	locationRoot = config.getRoot();
-	// // Remove the location prefix from the URL path and append to the location's root
-	// std::string relativePath = urlpath;
-	// if (urlpath.find(locationPath) == 0) {
-	// 	relativePath = urlpath.substr(locationPath.length());
-	// }
-	// if (!relativePath.empty() && relativePath[0] != '/') {
-	// 	relativePath = "/" + relativePath;
-	// }
-	// return locationRoot + relativePath;
+	if (!location)
+	{
+		return config.getRoot() + uripath;
+	}
+	std::string locationPath = location->getLocPath();
+	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
+	//needed??
+	if (locationRoot.empty())
+		locationRoot = config.getRoot();
+	// Remove the location prefix from the URL path and append to the location's root
+	std::string relativePath = uripath;
+	if (uripath.find(locationPath) == 0) {
+		relativePath = uripath.substr(locationPath.length());
+	}
+	if (!relativePath.empty() && relativePath[0] != '/') {
+		relativePath = "/" + relativePath;
+	}
+	return locationRoot + relativePath;
 }
