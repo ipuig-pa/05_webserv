@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 13:49:45 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 14:27:43 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,28 @@
 */
 
 //FOR TESTING PURPOSE:
-HttpRequest::HttpRequest()
-	: _method(GET), _body(nullptr), _path("/src/"), _finished(false) {}
+HttpRequest::HttpRequest() : _method(GET), _body(nullptr), _path("/src/"), _finished(false) {}
+
+void HttpRequest::setMethd(std::string& s)
+{
+	if (s == "GET") {
+		this->_method = GET;
+	}
+	else if (s == "POST") {
+		this->_method = POST;
+	}
+	else if (s == "DELETE") {
+		this->_method = DELETE;
+	}
+	else
+		this->_method = INVALID;
+}
 
 int	HttpRequest::getMethod(void) const
 {
 	return (_method);
 }
+
 
 std::string	&HttpRequest::getPath(void)
 {

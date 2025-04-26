@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 13:47:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 14:27:56 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ public:
 	//todo: create interface with the common function used, for now just put it this way, will refine later
 	//setter
 	void setMethd(std::string& s); //set as methodType type
-	void setPath(const std::string &path);
+	void setPath(const std::string &url);
 	void setVersion(std::string& s); //return version like '/1.1', str1.compare(str2) == 0
 	void setHeaderField(const std::string& name, const std::string& value);
 	void setBody(const std::string &body);
