@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 10:36:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 16:18:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,14 @@
 // 	//create a new socket?!?!
 // }
 
-Client::Client(int socket, ServerConf *default_conf)
+Client::Client(int socket, ServerConf &default_conf)
 	:_socket(socket), _state(NEW_REQUEST), _file_fd(-1), _bytes_sent(0), _empty_buffer(true), _currentConfig(default_conf)
+{
+	//_request ->change _currentConfig according to request header (find )
+	//_response
+}
+
+Client::~Client()
 {
 	//_request ->change _currentConfig according to request header (find )
 	//_response
@@ -44,7 +50,7 @@ bool	Client::getEmptyBuffer(void)
 	return (_empty_buffer);
 }
 
-ServerConf	*Client::getConf(void)
+ServerConf	&Client::getConf(void)
 {
 	return	(_currentConfig);
 }
@@ -121,7 +127,7 @@ bool	Client::sendResponseChunk(void)
 	//else set it as already sent
 }
 
-void	Client::setConfig(ServerConf *conf)
+void	Client::setConfig(ServerConf &conf)
 {
 	_currentConfig = conf;
 }

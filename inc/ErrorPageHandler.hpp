@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 10:36:22 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/25 13:02:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:43:32 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@
 class ErrorPageHandler
 {
 private:
-	ServerConf	*_serv_conf;//be a pointer to a parent class that has both Server and LocationConf inside?
-	LocationConf *_loc_conf;
+	ServerConf	&_serv_conf;//be a pointer to a parent class that has both Server and LocationConf inside?
+	LocationConf &_loc_conf;
 
 public:
-	ErrorPageHandler(ServerConf *serv_conf, LocationConf *loc_conf);
+	ErrorPageHandler(ServerConf &serv_conf, LocationConf &loc_conf);
 	generateErrorBody(int status_code);
 
 }

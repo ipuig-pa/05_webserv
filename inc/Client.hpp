@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 10:49:26 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 16:18:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ private:
 	std::string		_response_buffer;
 	size_t			_bytes_sent;
 	bool			_empty_buffer;
-	ServerConf*		_currentConfig; //idea: maybe create a upper class
+	ServerConf		&_currentConfig; //idea: maybe create a upper class
 
 	int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	std::string _data; //data for & from client
@@ -53,7 +53,7 @@ private:
 
 public:
 	// Client();
-	Client(int fd, ServerConf *default_conf); //to init attributes in class
+	Client(int fd, ServerConf &default_conf); //to init attributes in class
 	~Client();
 
 	HttpRequest		&getRequest(void);
@@ -62,14 +62,14 @@ public:
 	clientState		getState(void);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
-	ServerConf		*getConf(void);
+	ServerConf		&getConf(void);
 
 	void			setState(clientState state);
 	void			setResponse(HttpResponse response);
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
-	void			setConfig(ServerConf *conf);
+	void			setConfig(ServerConf &conf);
 
 	bool			sendResponseChunk(void);
 };

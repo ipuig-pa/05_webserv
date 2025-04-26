@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 11:17:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 16:15:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -436,24 +436,23 @@ const std::vector<LocationConf>& ServerConf::getLocation() const {
 
 LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 {
-	std::map<std::string, LocationConf>::iterator it;
 	LocationConf	*longest_match = nullptr;
 	size_t			match;
 
-	for(it = _locations.begin(); it != _locations.end(); ++it)
+	for(size_t i = 0; i < _location.size(); ++i)
 	{
-		if ((it->first).compare(uripath) == 0)
-			return (&it->second);
+		if ((_location[i]).getLocPath().compare(uripath) == 0)
+			return (&_location[i]);
 	}
 	match = 0;
-	for(it = _locations.begin(); it != _locations.end(); ++it)
+	for(size_t i = 0; i < _location.size(); ++i)
 	{
-		if (!(it->first).empty() && (it->first).back() == '/' && uripath.find(it->first) == 0)
+		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().back() == '/' && uripath.find(_location[i].getLocPath()) == 0)
 		{
-			if ((it->first).size() > match)
+			if (_location[i].getLocPath().size() > match)
 			{
-				match = (it->first).size();
-				longest_match = &it->second;
+				match = _location[i].getLocPath().size();
+				longest_match = &_location[i];
 			}
 		}
 	}

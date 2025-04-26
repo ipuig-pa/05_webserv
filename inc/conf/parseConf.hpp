@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ParseConf.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 11:31:43 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 13:20:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class ParseConf
 private:
 	std::vector<ServerConf> _servers; //vector of servers, has mutil 'server{}' with all para
 	std::vector<std::string> _single_server; //tokenized, vector of config for ONE sever
-	int server_count;
+	int server_count; //make it size_t instead?!?!? (better to compare with size in for loops)
 	//type alias for categoryhandler
 	//'CategoryHandler' is the name for a PTR to a member funcion of this class
 	// bool _insideBlock;

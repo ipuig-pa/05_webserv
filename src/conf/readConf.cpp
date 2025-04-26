@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   readConf.cpp                                       :+:      :+:    :+:   */
+/*   ReadConf.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 16:11:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 14:58:14 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ std::string read_conf(const std::string& confFile)
 	std::stringstream tmp;
 	tmp << config.rdbuf(); //read whole config file into 'tmp'; << stream insertion operator
 	std::string lines = tmp.str(); //extract str from 'tmp'
+	
 	return lines;
 }
 

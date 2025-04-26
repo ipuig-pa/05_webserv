@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parseConf.cpp                                      :+:      :+:    :+:   */
+/*   ParseConf.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 16:32:39 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:00:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ParseConf::ParseConf() : server_count(0) {
 	// _initHandler(); or put this in mainparse???
 }
-ParseConf::~ParseConf() {}
+ParseConf::~ParseConf(){}
 
 //read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
 // -> create serverBlock and actual instance of serverConf
@@ -121,7 +121,7 @@ std::vector<std::string> ParseConf::tokenize(const std::string& srv_block)
 //create instance of ServeConf 'servConf'
 void ParseConf::_createServBlock()
 {
-	if (_single_server.size() != static_cast<size_t>(server_count)) //the number of svr_block != srv_count, throw error, is this check necessary???
+	if (_single_server.size() != static_cast<size_t>(server_count)) //use size_t directly? //the number of svr_block != srv_count, throw error, is this check necessary???
 		throw std::runtime_error("Error: size not match.");
 	if (_handlers.empty())
 		_initHandler();

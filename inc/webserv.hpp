@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 09:38:32 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 12:42:35 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,6 @@
 #include <algorithm>
 #include <functional> //use of map<string, function> pair in loction class
 
-#define DEFAULT_CONF "./default.conf"
+#define DEFAULT_CONF "config/default.conf"
 
 #endif

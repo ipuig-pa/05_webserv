@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 12:09:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:48:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
  * listen to upcoming connection (non-blocking)
 */
 
-Socket::Socket(std::vector<ServerConf> config)
+Socket::Socket(std::vector<ServerConf> &config)
 	:_socket_fd(-1), _port(config[0].getPort()), _conf(config)
 {
 	//creating socket on IP "???" and port "_port"
@@ -46,6 +46,11 @@ Socket::Socket(std::vector<ServerConf> config)
 	}
 }
 
+Socket::~Socket()
+{
+	close(_socket_fd);
+}
+
 void	Socket::setaddress(const ServerConf& config)
 {
 	(void) config;
@@ -71,17 +76,17 @@ struct sockaddr_in	Socket::getAddress()
 	return _address;
 }
 
-ServerConf	*Socket::getDefaultConf()
+ServerConf	&Socket::getDefaultConf()
 {
-	return (&_conf[0]);
+	return (_conf[0]);
 }
 
-ServerConf	*Socket::getConf(std::string name)
+ServerConf	&Socket::getConf(std::string name)
 {
 	for(size_t i=0; i < _conf.size(); i++)
 	{
-		if ((_conf[i].getHost()).compare(name) == 0)
-			return (&_conf[i]);
+		if ((_conf[i].getSrvName()).compare(name) == 0)
+			return (_conf[i]);
 	}
 	return (this->getDefaultConf());
 }

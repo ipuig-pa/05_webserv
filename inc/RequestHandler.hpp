@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 11:35:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:35:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ private:
 	std::string	getPathFromUrl(const std::string &uripath, ServerConf &config);
 
 public:
+	RequestHandler();
+	~RequestHandler();
+
 	void		handleClientRead(Client &client);
 	void		processRequest(Client &client);
 	void		handleClientWrite(Client &client);

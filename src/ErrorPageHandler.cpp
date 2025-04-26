@@ -6,13 +6,13 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 11:08:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:43:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ErrorPageHandler.hpp"
 
-ErrorPageHandler::ErrorPageHandler(ServerConf *serv_conf, LocationConf *loc_conf)
+ErrorPageHandler::ErrorPageHandler(ServerConf &serv_conf, LocationConf &loc_conf)
 	:_serv_conf(serv_conf), _loc_conf(loc_conf)
 {
 }

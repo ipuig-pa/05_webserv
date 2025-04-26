@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 11:32:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 15:56:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ private:
 	std::string _index;
 	std::map<int, std::string> _error_page; //err_code, url
 	bool _srv_autoindex; //default as false in construtor
-	std::map<std::string, LocationConf> _locations;
+	// std::map<std::string, LocationConf> _locations;
 	std::vector<LocationConf> _location; //a set of location_blocks in server_configuration //todo check how to read specific loc
-	
+
 	// std::vector<std::string> _error_page;
 	// [...] other var to add later
 	

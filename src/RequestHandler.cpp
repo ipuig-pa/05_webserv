@@ -6,13 +6,17 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 11:35:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 16:19:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
 //INCLUDE HEAD REQUEST!? All general-purpose servers MUST support the methods GET and HEAD (RFC 9110)
+
+RequestHandler::RequestHandler(){}
+
+RequestHandler::~RequestHandler(){}
 
 void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
@@ -126,7 +130,7 @@ void	RequestHandler::processRequest(Client &client)
 
 	client.setResponse(response);
 	//check first if the client request method is in the allowed methods in the current config file 
-	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), *(client.getConf()));
+	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), (client.getConf()));
 }
 
 void	RequestHandler::handleClientRead(Client &client)

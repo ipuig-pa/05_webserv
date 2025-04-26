@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 12:10:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 16:15:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,24 @@ MultiServer::MultiServer(std::vector<std::vector<ServerConf> > serv_config)
 
 MultiServer::~MultiServer()
 {
-	//close and delete Sockers!?!
+	struct stat sb;
+	std::map<int, Socket*>::iterator it_s;
+	std::map<int, Client*>::iterator it_c;
+
+	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
+	{
+		delete (it_s->second);
+	}
+
+	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
+	{
+		delete (it_c->second);
+	}
+	for(size_t i = 0; i < _poll.size(); ++i)
+	{
+		if (fstat(_poll[i].fd, &sb) != -1)
+			close(_poll[i].fd);
+	}
 }
 
 void	MultiServer::init_sockets(std::vector<std::vector<ServerConf> > serv_config)
