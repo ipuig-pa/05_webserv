@@ -1,7 +1,7 @@
 NAME = webserv
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc -Iinc/conf
+CFLAGS = -Wall -Wextra -Werror -std=c++17 -Iinc -Iinc/conf
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -15,11 +15,14 @@ SOURCES =	ReadConf.cpp \
 			LocationConf.cpp \
 			MultiServer.cpp \
 			Client.cpp \
+			Socket.cpp \
 			RequestHandler.cpp \
 			HttpRequest.cpp \
 			HttpResponse.cpp \
 			Header.cpp \
 			Status.cpp \
+			CgiChecker.cpp \
+			FileUtils.cpp \
 			main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)

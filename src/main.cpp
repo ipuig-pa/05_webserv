@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 16:06:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 12:30:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "ParseConf.hpp"
 #include "ServerConf.hpp"
 #include "MultiServer.hpp"
+
+std::atomic<bool> runServer = true;
 
 // Signal handler function
 void signalHandler(const int signum) {
@@ -28,8 +30,6 @@ void signalHandler(const int signum) {
 
 int main(int ac, char **av)
 {
-	runServer = true;
-
 	// Signal handling
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
@@ -62,6 +62,7 @@ int main(int ac, char **av)
 		return 1;
 	}
 
+	std::cout<<"config file readed"<<std::endl;
 	// Lexing and parsing config file
 	ParseConf parser;
 	try
@@ -105,6 +106,7 @@ int main(int ac, char **av)
 		std::cerr << e.what() << '\n';
 		return 1;
 	}
+	std::cout<<"config file parsed"<<std::endl;
 
 	// Get multi server vector
 	std::vector<std::string> tmp = parser.getSrvBlock(); // TO CHANGE TO HAVE A VECTOR OF VECTORS. EACH FIRS VECTOR IS THE SERVERCONF THAT ARE RELATED TO THE SAME PORT, SO WILL SHARE THE SAME LISTENING SOCKET
@@ -130,7 +132,9 @@ int main(int ac, char **av)
 		return 1;
 	}
 
+
 	// JUST FOR TESTING PURPOSE WHEN THE CONFIG FILES GIVE A SINGLE VECTOR, BUT TO BE CHANGED TO GIVE DOUBLE VECTOR TO USE DIRECTLY
+	std::cout<<"server created"<<std::endl;
 	std::vector <std::vector<ServerConf> > servs_vector;
 	servs_vector.push_back(tmp_servs);
 

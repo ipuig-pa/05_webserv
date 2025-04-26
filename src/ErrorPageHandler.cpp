@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 10:23:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 11:08:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,10 @@ std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 }
 
 //to move to ServerConf and LocationConf, or to parent abstract class AConf
-std::string	getErrPage(int status_code)
-{
-	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
-	if (it != _error_page.end())
-		return it->second;
-	return "";
-}
+// std::string	getErrPage(int status_code)
+// {
+// 	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
+// 	if (it != _error_page.end())
+// 		return it->second;
+// 	return "";
+// }

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/24 10:15:36 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/24 10:16:26 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 12:13:41 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,6 @@
 
 #include <atomic>
 
-std::atomic<bool> runServer;
+extern std::atomic<bool> runServer;
 
 #endif

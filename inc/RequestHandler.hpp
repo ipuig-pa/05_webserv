@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/23 16:56:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 11:35:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ private:
 	void		handleInvalidRequest(Client &client, HttpResponse &response, ServerConf &config);
 	void		handleDirectoryRequest(Client &client, HttpRequest &request, ServerConf &config);
 	void		handleDirectoryListing(Client &client, HttpRequest &request, ServerConf &config);
-	std::string	getPathFromUrl(const std::string &urlpath, const ServerConf &config);
+	std::string	getPathFromUrl(const std::string &uripath, ServerConf &config);
 
 public:
 	void		handleClientRead(Client &client);

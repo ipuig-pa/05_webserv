@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParseConf.cpp                                      :+:      :+:    :+:   */
+/*   parseConf.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 11:32:36 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/25 16:32:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../inc/conf/ParseConf.hpp"
+#include "ParseConf.hpp"
 
 //parser for config, read, tokenize, and store the data
 ParseConf::ParseConf() : server_count(0) {
@@ -121,7 +121,7 @@ std::vector<std::string> ParseConf::tokenize(const std::string& srv_block)
 //create instance of ServeConf 'servConf'
 void ParseConf::_createServBlock()
 {
-	if (_single_server.size() != server_count) //the number of svr_block != srv_count, throw error, is this check necessary???
+	if (_single_server.size() != static_cast<size_t>(server_count)) //the number of svr_block != srv_count, throw error, is this check necessary???
 		throw std::runtime_error("Error: size not match.");
 	if (_handlers.empty())
 		_initHandler();
@@ -159,7 +159,7 @@ ServerConf ParseConf::_addCategory(const std::vector<std::string>& tokens)
 {
 	ServerConf servConf;
 	bool _insideBlock = true;
-	bool default_auto = false;
+	// bool default_auto = false; is it used?!
 	for (size_t pos = 0; pos < tokens.size(); ++pos)
 	{
 		std::string _cate = tokens[pos];

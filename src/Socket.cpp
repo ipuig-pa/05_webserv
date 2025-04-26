@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/23 15:37:17 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/26 12:09:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 */
 
 Socket::Socket(std::vector<ServerConf> config)
-	:_socket_fd(-1), _port(confFile.getPort()), _conf(config)
+	:_socket_fd(-1), _port(config[0].getPort()), _conf(config)
 {
 	//creating socket on IP "???" and port "_port"
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -29,29 +29,31 @@ Socket::Socket(std::vector<ServerConf> config)
 
 	// Set socket options
 	int opt = 1;
-	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	//set up the address structure to use
-	setaddress(config[0]);
+	Socket::setaddress(config[0]);
 	// Bind socket to the address and port
-	if (bind(listen_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+	if (bind(_socket_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 		// Handle listen error -> throw exception / runtime error!?!?!?
-		close(listen_fd);
-		return -1;
+		close(_socket_fd);
+		return ;
 	}
 	// Start listening
-	if (listen(listen_fd, SOMAXCONN) < 0) {
+	if (listen(_socket_fd, SOMAXCONN) < 0) {
 		// Handle listen error -> throw exception / runtime error!?!?!?
-		close(listen_fd);
-		return -1;
+		close(_socket_fd);
+		return ;
 	}
 }
 
-Socket::setaddress(const ServerConf& config)
+void	Socket::setaddress(const ServerConf& config)
 {
+	(void) config;
 	memset(&_address, 0, sizeof(_address));
-	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = htonl(config.getHostIP());// Convert IP to network byte order
-	address.sin_port = htons(_port);// Convert port to network byte order
+	_address.sin_family = AF_INET;
+	//CREATE THE FUNCTION TO Convert HOST IP to uint32_t!!!!
+	// _address.sin_addr.s_addr = htonl(config.getHost());// Convert IP to network byte order 
+	_address.sin_port = htons(_port);// Convert port to network byte order
 }
 
 int	Socket::getFd()
@@ -71,15 +73,15 @@ struct sockaddr_in	Socket::getAddress()
 
 ServerConf	*Socket::getDefaultConf()
 {
-	return _conf[0];
+	return (&_conf[0]);
 }
 
 ServerConf	*Socket::getConf(std::string name)
 {
 	for(size_t i=0; i < _conf.size(); i++)
 	{
-		if ((_conf[i]->getHost()).compare(name) == 0)
-			return (_conf[i])
+		if ((_conf[i].getHost()).compare(name) == 0)
+			return (&_conf[i]);
 	}
 	return (this->getDefaultConf());
 }

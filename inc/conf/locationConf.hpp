@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LocationConf.hpp                                   :+:      :+:    :+:   */
+/*   locationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 11:45:57 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 11:31:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ class LocationConf
 	//other optional, may not use
 	std::string _returnUrl; //redirect: return url: 301 https://... or return error code
 	int _returnCode;
+	std::map<int, std::string> _error_page; //err_code, url
 	
 	public:
 	enum mType { GET, POST, DELETE, INVALID };
@@ -72,7 +73,7 @@ class LocationConf
 	const std::string& getLocRoot() const;
 	int getLocCMBS() const;
 	const std::string& getLocIndex() const;
-	const bool getLocAuto() const;
+	bool getLocAuto() const;
 	const std::string& getReturn() const;
 	// const std::string& getCgiPath() const;
 	const std::vector<std::string>& getCgiPath() const;
@@ -83,6 +84,7 @@ class LocationConf
 	//clean
 	void _cleanLocTk(std::string& tk);
 
+	std::string		getErrPageCode(int status_code);
 };	
 
 /**

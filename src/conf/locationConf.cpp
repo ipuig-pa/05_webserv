@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LocationConf.cpp                                   :+:      :+:    :+:   */
+/*   locationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 11:46:42 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/26 11:30:49 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../inc/conf/LocationConf.hpp"
+#include "LocationConf.hpp"
 
 LocationConf::LocationConf()
 {
@@ -167,7 +167,7 @@ const std::string& LocationConf::getLocIndex() const
 {
 	return this->_locIndex;
 }
-const bool LocationConf::getLocAuto() const
+bool LocationConf::getLocAuto() const
 {
 	return this->_locAuto;
 }
@@ -188,4 +188,12 @@ const std::vector<std::string>& LocationConf::getCgiExtension() const
 const std::map<std::string, std::string>& LocationConf::getPathExMap() const
 {
 	return this->_path_ext_match;
+}
+
+std::string	LocationConf::getErrPageCode(int status_code)
+{
+	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
+	if (it != _error_page.end())
+		return it->second;
+	return "";
 }
