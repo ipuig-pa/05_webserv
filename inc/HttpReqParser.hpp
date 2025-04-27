@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 10:49:04 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 12:57:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ private:
 	reqStage _stage;
 	size_t _hasBody;
 	std::string _line_buf;
-	HttpRequest _httpReq;
+	HttpRequest &_httpReq;
 
 	bool _parseHeader(HttpRequest& request);
 	bool _parseBody(HttpRequest& request);
@@ -37,7 +37,7 @@ private:
 	bool _singleHeaderLine(HttpRequest& request, const std::string& curLine);
 
 public:
-	HttpReqParser();
+	HttpReqParser(HttpRequest &request);
 	~HttpReqParser();
 	
 	void reset();

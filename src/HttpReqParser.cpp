@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 10:51:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 13:10:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpReqParser.hpp"
 
-HttpReqParser::HttpReqParser()
-	: _stage(REQ_LINE)
+HttpReqParser::HttpReqParser(HttpRequest &request)
+	: _stage(REQ_LINE), _hasBody(0), _line_buf(""), _httpReq(request)
 {
 }
 HttpReqParser::~HttpReqParser() {}

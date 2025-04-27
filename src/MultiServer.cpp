@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:27:07 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 13:09:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> &serv_config
 		// _sockets.emplace(listen_fd, listen_socket); (In C++11)
 		_sockets.insert(std::pair<int,Socket*>(listen_fd, listen_socket));
 
-		// std::cout << "creating socket num: " << listen_socket->getFd() << ", on: " << listen_socket->getDefaultConf().getHost() << ":" << listen_socket->getPort() << std::endl;
+		std::cout << "creating socket num: " << listen_socket->getFd() << ", on: " << listen_socket->getDefaultConf().getHost() << ":" << listen_socket->getPort() << std::endl;
 	}
 }
 
@@ -74,33 +74,21 @@ std::map<int, Client*>	&MultiServer::getClients(void)
 //METHODS
 void	MultiServer::acceptNewConnection(Socket *listen_socket)
 {
-	// std::cout << "accepting new connection on socket num: " << listen_socket->getFd() << ", on: " << listen_socket->getDefaultConf().getHost() << ":" << listen_socket->getPort() << std::endl;
-
 	sockaddr_in	client_addr;
 	socklen_t addr_len = sizeof(client_addr);
 
+	std::cout << "accepting new connection on listening socket: " << listen_socket->getFd() << ", on port: " << listen_socket->getPort() << std::endl;
 	int client_socket = accept(listen_socket->getFd(), reinterpret_cast<sockaddr*>(&client_addr), &addr_len);
 	if (client_socket == -1)
 	{
 		//handle error
 	}
-
-	// std::cout << client_socket << listen_socket->getDefaultConf().getHost() << std::endl;
-
 	Client *client = new Client(client_socket, listen_socket->getDefaultConf());
-
-
-	// std::cout << "new client created" << std::endl;
-
-
 	client->setConfig(listen_socket->getConf(client->getRequest().getHeader("Host")));
 	_clients.insert(std::pair<int, Client*>(client_socket, client));
 	fcntl(client_socket, F_SETFL, O_NONBLOCK);
 	struct pollfd cli_sock_fd = {client_socket, POLLIN, 0};
 	_poll.push_back(cli_sock_fd);
-
-
-	// std::cout << "new in poll" << std::endl;
 }
 
 // void	MultiServer::handleConnectionClosed(???)
@@ -127,8 +115,7 @@ int	MultiServer::run()
 	//change while(1) to while(Multiserver running) or similar -> how to check while Multiserver running?! -> include all this function inside a MultiServer Method call RUN?!!?!?
 	while (runServer)
 	{
-		// std::cout << "server running..." << std::endl;
-
+		std::cout << "server running..." << std::endl;
 
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
 		int ready = poll(_poll.data(), _poll.size(), -1);
