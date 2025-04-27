@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 16:18:26 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 12:24:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ private:
 	bool			_empty_buffer;
 	ServerConf		&_currentConfig; //idea: maybe create a upper class
 
-	int clientFd; // choose between this or Socket object, otherwise it is redundant!
-	std::string _data; //data for & from client
-	bool wrtFlag;
+	// int clientFd; // choose between this or Socket object, otherwise it is redundant!
+	// std::string _data; //data for & from client
+	// bool wrtFlag;
 
 public:
 	// Client();

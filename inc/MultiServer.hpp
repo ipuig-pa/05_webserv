@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 11:32:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 11:54:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@
 class MultiServer
 {
 private:
-	std::vector<std::vector<ServerConf> >	_serv_config; // int							_listen_socket; //maybe this should be just the fd of the socket class if server inherits from socket!?!?
+	std::vector<std::vector<ServerConf>>	_serv_config; // int							_listen_socket; //maybe this should be just the fd of the socket class if server inherits from socket!?!?
 	std::vector<struct pollfd>				_poll;
 	std::map<int, Socket*>					_sockets; //maps each socket fd to the object socket
 	std::map<int, Client*>					_clients;//int should be the fd of the client socket
 
-	void	init_sockets(std::vector<std::vector<ServerConf> > serv_config);
+	void	init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
 	void	acceptNewConnection(Socket *listen_socket);
 
 public:

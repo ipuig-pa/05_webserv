@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpReqParse.hpp                                   :+:      :+:    :+:   */
+/*   HttpReqParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 15:38:50 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/27 10:49:04 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,26 @@ enum reqStage {
 	FINISH,
 	ERROR	
 };
-class HttpReqParse
+class HttpReqParser
 {
 private:
 	reqStage _stage;
 	size_t _hasBody;
-	std::string line_buf;
+	std::string _line_buf;
 	HttpRequest _httpReq;
 
+	bool _parseHeader(HttpRequest& request);
+	bool _parseBody(HttpRequest& request);
+	bool _parseReqLine(HttpRequest& request);
+	bool _singleHeaderLine(HttpRequest& request, const std::string& curLine);
+
 public:
-	HttpReqParse();
-	~HttpReqParse();
+	HttpReqParser();
+	~HttpReqParser();
 	
 	void reset();
-	bool httpParser(const std::string& _reqLines, HttpRequest& _req);
-	bool _parseReqLine(HttpRequest& _request);
-	bool _singleHeadrLine(HttpRequest& _request, const std::string& curLine);
-	bool _parseHeader(HttpRequest& _request);
-	bool _parseBody(HttpRequest& _request);
-	
+	bool httpParser(const std::string& reqLines, HttpRequest& req);
+
 	//setter
 	// bool _setFinish(bool _flag);
 	// void setMethd(std::string& s); //set as methodType type
@@ -49,7 +50,7 @@ public:
 	// void setVersion(std::string& s); //return version like '/1.1', check validity
 	
 	//getter
-	bool _checkFinish();
+	bool checkFinish();
 	HttpRequest getHttpRequest() const;
 };
 
