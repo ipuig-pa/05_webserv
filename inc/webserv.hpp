@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 12:42:35 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 13:30:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <cstring> //inc strlen, strcpy, strcmp, strcat
 #include <stdexcept> //for exceptions
 #include <cstdio> // for remove
+#include <cstdlib> //for setenv(), unsetenv()
 
 #include <sys/socket.h> //socket(), bind/listen/accept/send/recv()
 #include <fcntl.h> //for fcntl() (non-blocking i/o)
