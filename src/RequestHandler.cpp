@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 16:19:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 13:22:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,13 @@ RequestHandler::~RequestHandler(){}
 
 void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response, ServerConf &config)
 {
+	std::cout << "handling get request" << std::endl;
+
 	std::string path = getPathFromUrl(client.getRequest().getPath(), config); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	// std::string path = config.getPathFromUrl(client.getRequest().getPath());
 
+	std::cout << path << std::endl;
+	
 	if (access(path.c_str(), F_OK) != 0) {
 		response.setStatusCode(404); // Not found
 		return;
@@ -120,27 +124,49 @@ void	RequestHandler::handleInvalidRequest(Client &client, HttpResponse &response
 
 void	RequestHandler::processRequest(Client &client)
 {
-	HttpResponse	response;
-	
 	void	(RequestHandler::*handleMethod[])(Client &, HttpResponse &, ServerConf &) = {
 		&RequestHandler::handleGetRequest, 
 		&RequestHandler::handlePostRequest, 
 		&RequestHandler::handleDeleteRequest, 
 		&RequestHandler::handleInvalidRequest};
 
-	client.setResponse(response);
+	std::cout << "processing client request, with method: " << client.getRequest().getMethod() << std::endl;
+
 	//check first if the client request method is in the allowed methods in the current config file 
 	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), (client.getConf()));
+	runServer = false;
 }
 
 void	RequestHandler::handleClientRead(Client &client)
 {
-	(void)client;
-// 	if (client.getState == NEW_REQUEST)
-// 		parseRequest(); //inside parseRequest, change the client state to ReadingRequest, and somehow keep track when it is completed
-// 		//Check when it is completed (buffered and parsing!?)
-// 	else if (client.getState == PROCESSING)
-// 		processRequest(client);
+	// (void) client; // FOR TESTING
+	std::cout << "reading client request" << std::endl;
+	// processRequest(client);
+
+	HttpReqParser parser(client.getRequest());
+	if (client.getState == NEW_REQUEST)
+	{
+	char buffer[4096]; //Adjust buffer size
+	ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
+	if (bytesRead > 0)
+	{
+		parser.httpParser(buffer);
+		return (false);
+	}
+	else if (bytesRead == 0)
+	{
+		client.getResponse().setState(READ);
+		close(client.getFileFd());
+		client.setFileFd(-1);
+		return(true);
+	}
+		client.setState = READING_REQUEST;
+		if (parser.)
+			client.setState = PROCESSING; //inside parseRequest, change the client state to ReadingRequest, and somehow keep track when it is completed
+		//Check when it is completed (buffered and parsing!?)
+	}
+	else if (client.getState == PROCESSING)
+		processRequest(client);
 }
 
 

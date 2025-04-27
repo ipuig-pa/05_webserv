@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 16:08:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/27 12:55:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include "webserv.hpp"
 # include "Header.hpp"
-# include "HttpReqParse.hpp"
+// # include "HttpReqParser.hpp"
 
 /** TEMPLATE:
  * GET /index.html HTTP/1.1
@@ -40,7 +40,7 @@ private:
 	std::string	_path;
 	std::string _version;
 	std::string	_body;
-	bool _finishFlag;
+	bool		_finished;
 
 	//attirbute (server name, method, path, header [...])
 	//public or private??
@@ -55,19 +55,19 @@ public:
 	void setVersion(const std::string& s); //return version like '/1.1', str1.compare(str2) == 0
 	void setHeaderField(const std::string& name, const std::string& value);
 	void setBody(const std::string &body);
-	void _setFinish(bool _flag); //flag for finsihing parsing or not
+	void setFinished(bool flag); //flag for finsihing parsing or not
 	
 	//getters	
-	int	getMethod(void) const;
-	std::string	&getPath(void); //url
-	std::string getVersion();
-	std::string	getHeader(const std::string& name);//needed?!!? -yes, this will check is there has a body or not
-	std::string& getBody();
-	bool _isFinish();
+	int				getMethod(void) const;
+	std::string		&getPath(void); //url
+	std::string		getVersion();
+	std::string		getHeader(const std::string& name);//needed?!!? -yes, this will check is there has a body or not
+	std::string&	getBody();
 	// methodType& getMethd();
 
+	bool			isFinished();
 	//reset status
-	void _reset();
+	void			reset();
 };
 
 #endif

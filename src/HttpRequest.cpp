@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 16:08:41 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/27 12:33:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,16 @@
 */
 
 //FOR TESTING PURPOSE:
-HttpRequest::HttpRequest() : _method(GET), _body(nullptr), _path("/src/"), _finished(false) {}
+HttpRequest::HttpRequest()
+	: _header(), _method(GET), _path("/src/"), _version("HTTP1.1"), _body(""), _finished(false)
+{
+	std::cout << "request default constructor called" << std::endl;
+}
+
+HttpRequest::~HttpRequest()
+{
+}
+
 
 void HttpRequest::setMethd(std::string& s)
 {
@@ -101,26 +110,26 @@ std::string& HttpRequest::getBody()
 	return _body;
 }
 
-void HttpRequest::_setFinish(bool _flag)
+void HttpRequest::setFinished(bool flag)
 {
-	this->_finishFlag = _flag;
+	this->_finished = flag;
 }
 
-bool HttpRequest::_isFinish()
+bool HttpRequest::isFinished()
 {
-	return _finishFlag;
+	return _finished;
 }
 
 /** IMPORTANT:
  * everytime a NEW Request comes, no need to do HttpRequest newRequest;
  * just _request.reset(), reuse the SAME OBJECT!!
  */
-void HttpRequest::_reset()
+void HttpRequest::reset()
 {
 	_header = Header(); //call default cons
 	_method = INVALID;
 	_path.clear();
 	_version.clear();
 	_body.clear();
-	_finishFlag = false;
+	_finished = false;
 }

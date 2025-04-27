@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/26 15:35:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 13:19:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "ServerConf.hpp"
+#include "HttpReqParser.hpp"
+
+#include "global.hpp" //just for testing
 
 class RequestHandler
 {

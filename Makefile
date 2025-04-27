@@ -17,6 +17,7 @@ SOURCES =	ReadConf.cpp \
 			Client.cpp \
 			Socket.cpp \
 			RequestHandler.cpp \
+			HttpReqParser.cpp \
 			HttpRequest.cpp \
 			HttpResponse.cpp \
 			Header.cpp \

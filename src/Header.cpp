@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/21 10:35:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 12:32:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Header::Header()
 {
+	std::cout << "Header default constructor called" << std::endl;
 	set("Host", "localhost"); //FOR TESTING PURPOSE, CHANGE
 }
 

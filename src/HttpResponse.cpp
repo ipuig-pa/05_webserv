@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 15:44:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 12:30:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 HttpResponse::HttpResponse()
 	:_status(), _header(), _body_presence(true), _body(""), _state(READING)
 {
+	std::cout << "response default constructor called" << std::endl;
 }
 
 HttpResponse::HttpResponse(Status &status, Header &header)

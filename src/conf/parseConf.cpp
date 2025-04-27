@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 15:00:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 11:00:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ParseConf.hpp"
 
 //parser for config, read, tokenize, and store the data
-ParseConf::ParseConf() : server_count(0) {
+ParseConf::ParseConf() : _server_count(0) {
 	// _initHandler(); or put this in mainparse???
 }
 ParseConf::~ParseConf(){}
@@ -103,7 +103,7 @@ void ParseConf::_addToServBlock(const std::vector<std::string>& tokens, size_t l
 	}
 	tmp_block.pop_back(); //remove the last " "
 	_single_server.push_back(tmp_block); //push cleanSTR to -single_serv: "server { listen 8080; host 127.0.0.1; }"
-	server_count += 1;
+	_server_count += 1;
 }
 
 //re-tokenize the clean_big_STR in std::vector<std::string> _single_server to tokens
@@ -113,7 +113,7 @@ std::vector<std::string> ParseConf::tokenize(const std::string& srv_block)
 	std::string token;
 	std::stringstream tk_tmp(srv_block);
 	while (tk_tmp >> token) {
-		tokens.push_back(token);				
+		tokens.push_back(token);
 	}
 	return tokens;
 }
@@ -121,7 +121,7 @@ std::vector<std::string> ParseConf::tokenize(const std::string& srv_block)
 //create instance of ServeConf 'servConf'
 void ParseConf::_createServBlock()
 {
-	if (_single_server.size() != static_cast<size_t>(server_count)) //use size_t directly? //the number of svr_block != srv_count, throw error, is this check necessary???
+	if (_single_server.size() != _server_count) //use size_t directly? //the number of svr_block != srv_count, throw error, is this check necessary???
 		throw std::runtime_error("Error: size not match.");
 	if (_handlers.empty())
 		_initHandler();
@@ -138,8 +138,23 @@ void ParseConf::_createServBlock()
 		// 		tokens = tokens.substr(tokens.find_first_not_of(" \n\t")));
 		ServerConf servConf;
 		servConf = _addCategory(tokens);
-		this->_servers.push_back(servConf);
-			// }
+		size_t j = 0;
+		while(j < _servers.size())
+		{
+			if(_servers[j][0].getPort() == servConf.getPort())
+			{
+				this->_servers[j].push_back(servConf);
+				break;
+			}
+			j++;
+		}
+		if (j == _servers.size())
+		{
+			std::vector<ServerConf>	newPort;
+			newPort.push_back(servConf);
+			this->_servers.push_back(newPort);
+		}
+		// }
 	}
 		// servConf = parseToServ(tokens);
 	// }
@@ -148,7 +163,7 @@ std::vector<std::string>& ParseConf::getSrvBlock()
 {
 	return _single_server;
 }
-std::vector<ServerConf>& ParseConf::getServers()
+std::vector<std::vector<ServerConf>> & ParseConf::getServers()
 {
 	return _servers;
 }

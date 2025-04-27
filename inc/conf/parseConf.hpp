@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 13:20:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 10:16:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,9 @@
 class ParseConf
 {
 private:
-	std::vector<ServerConf> _servers; //vector of servers, has mutil 'server{}' with all para
+	std::vector<std::vector<ServerConf> > _servers; //vector of servers, has mutil 'server{}' with all para
 	std::vector<std::string> _single_server; //tokenized, vector of config for ONE sever
-	int server_count; //make it size_t instead?!?!? (better to compare with size in for loops)
+	size_t _server_count; //make it size_t instead?!?!? (better to compare with size in for loops)
 	//type alias for categoryhandler
 	//'CategoryHandler' is the name for a PTR to a member funcion of this class
 	// bool _insideBlock;
@@ -41,7 +41,7 @@ public:
 	//int testMain(const std::string& fileName); //main entry for whole read-parse-create process
 	//getter for test private attribute
 	std::vector<std::string>& getSrvBlock();
-	std::vector<ServerConf>& getServers();
+	std::vector<std::vector<ServerConf>>& getServers();
 	
 	void _split(const std::vector<std::string>& tokens); //if multi 'server{}' found, split it
 	void _addToServBlock(const std::vector<std::string>& tokens, size_t left, size_t right);

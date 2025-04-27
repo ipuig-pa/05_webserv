@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 16:15:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/27 13:09:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 //CONSTRUCTORS
 //check listen_sock creation
-MultiServer::MultiServer(std::vector<std::vector<ServerConf> > serv_config)
+MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
 	:_serv_config(serv_config)
 {
 	init_sockets(_serv_config);
@@ -44,7 +44,7 @@ MultiServer::~MultiServer()
 	}
 }
 
-void	MultiServer::init_sockets(std::vector<std::vector<ServerConf> > serv_config)
+void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> &serv_config)
 {
 	for(size_t i = 0; i < serv_config.size(); i++)
 	{
@@ -55,6 +55,8 @@ void	MultiServer::init_sockets(std::vector<std::vector<ServerConf> > serv_config
 		_poll.push_back(listen_pollfd);
 		// _sockets.emplace(listen_fd, listen_socket); (In C++11)
 		_sockets.insert(std::pair<int,Socket*>(listen_fd, listen_socket));
+
+		std::cout << "creating socket num: " << listen_socket->getFd() << ", on: " << listen_socket->getDefaultConf().getHost() << ":" << listen_socket->getPort() << std::endl;
 	}
 }
 
@@ -74,8 +76,9 @@ void	MultiServer::acceptNewConnection(Socket *listen_socket)
 {
 	sockaddr_in	client_addr;
 	socklen_t addr_len = sizeof(client_addr);
+
+	std::cout << "accepting new connection on listening socket: " << listen_socket->getFd() << ", on port: " << listen_socket->getPort() << std::endl;
 	int client_socket = accept(listen_socket->getFd(), reinterpret_cast<sockaddr*>(&client_addr), &addr_len);
-	
 	if (client_socket == -1)
 	{
 		//handle error
@@ -112,6 +115,8 @@ int	MultiServer::run()
 	//change while(1) to while(Multiserver running) or similar -> how to check while Multiserver running?! -> include all this function inside a MultiServer Method call RUN?!!?!?
 	while (runServer)
 	{
+		std::cout << "server running..." << std::endl;
+
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
 		int ready = poll(_poll.data(), _poll.size(), -1);
 
@@ -130,7 +135,7 @@ int	MultiServer::run()
 			continue; // Skip this iteration and try polling again
 		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
-		for (int i = _poll.size() - 1; i > 0; i--) {
+		for (int i = _poll.size() - 1; i >= 0; i--) {
 			if (_poll[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
 				continue;
 			//get fd
