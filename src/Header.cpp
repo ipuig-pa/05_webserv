@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/27 12:32:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 10:37:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ bool Header::CaseInsensitiveCompare::operator()(const std::string& a, const std:
 }
 
 //Add or replace a header field
-void Header::set(const std::string& name, const std::string& value)
+void Header::set(const std::string name, const std::string value)
 {
 	_fields[name] = value;
 }

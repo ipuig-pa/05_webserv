@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 13:09:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 15:34:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,20 +159,23 @@ int	MultiServer::run()
 				if (_poll[i].revents & POLLIN) {
 					req_hand.handleClientRead(*(it_c->second));
 					int	file_fd = (it_c->second)->getFileFd();
-					//If a file has been linked to the client, add its fd to poll() monitoring
+					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
 					if (file_fd != -1)
 					{
 						struct pollfd file = {file_fd, POLLIN, 0};
 						_poll.push_back(file);
 					}
 					//After reading, set the client socket to POLLOUT
-					for (size_t i = 0; i < _poll.size(); i++) {
-						if (_poll[i].fd == fd) {
-							_poll[i].events = POLLOUT;
-							break;
+					if (it_c->second->getState() == SENDING_RESPONSE)
+					{
+						for (size_t i = 0; i < _poll.size(); i++) {
+							if (_poll[i].fd == fd) {
+								_poll[i].events = POLLOUT;
+								break;
+							}
 						}
 					}
-					(it_c->second)->setState(SENDING_RESPONSE);
+					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done
 				}
 				// Handle writing to client
 				if (_poll[i].revents & POLLOUT) {

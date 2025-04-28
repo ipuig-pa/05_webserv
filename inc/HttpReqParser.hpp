@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:57:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 14:46:11 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@ class HttpReqParser
 {
 private:
 	reqStage _stage;
-	size_t _hasBody;
-	std::string _line_buf;
+	size_t _bodyLength;
+	std::string _buffer;
+	bool	_header_complete;
 	HttpRequest &_httpReq;
 
 	bool _parseHeader(HttpRequest& request);
@@ -41,7 +42,8 @@ public:
 	~HttpReqParser();
 	
 	void reset();
-	bool httpParser(const std::string& reqLines, HttpRequest& req);
+	bool httpParse(void);
+	void	appendBuffer(const std::string data, size_t length);
 
 	//setter
 	// bool _setFinish(bool _flag);

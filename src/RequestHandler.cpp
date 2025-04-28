@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/27 13:22:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 16:04:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,38 +134,45 @@ void	RequestHandler::processRequest(Client &client)
 
 	//check first if the client request method is in the allowed methods in the current config file 
 	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse(), (client.getConf()));
-	runServer = false;
 }
 
 void	RequestHandler::handleClientRead(Client &client)
 {
+	char buffer[4096]; //Adjust buffer size
+
 	// (void) client; // FOR TESTING
 	std::cout << "reading client request" << std::endl;
 	// processRequest(client);
 
-	HttpReqParser parser(client.getRequest());
-	if (client.getState == NEW_REQUEST)
+	if (client.getState() == NEW_REQUEST)
 	{
-	char buffer[4096]; //Adjust buffer size
-	ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
-	if (bytesRead > 0)
+		std::cout << "client state is New request" << std::endl;
+		client.setState(READING_REQUEST);
+	}
+	if (client.getState() == READING_REQUEST)
 	{
-		parser.httpParser(buffer);
-		return (false);
+		std::cout << "client state changed to reading request" << std::endl;
+		ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
+		// std::cout << "already read " << bytesRead << "bytes." << std::endl;
+		if (bytesRead > 0)
+		{
+			if (!client.getRequest().isComplete())
+			{
+				std::string	buffer_str(buffer);
+				client.getParser().appendBuffer(buffer_str, bytesRead);
+				if (client.getParser().httpParse())
+				{
+					client.setState(PROCESSING);
+					// std::cout << "state set to processing" << std::endl;
+				}
+			}
+		}
+		else if (bytesRead == 0)
+			client.setState(CONNECTION_CLOSED);
+		//else
+			// bytesRead < 0: handle error during reading
 	}
-	else if (bytesRead == 0)
-	{
-		client.getResponse().setState(READ);
-		close(client.getFileFd());
-		client.setFileFd(-1);
-		return(true);
-	}
-		client.setState = READING_REQUEST;
-		if (parser.)
-			client.setState = PROCESSING; //inside parseRequest, change the client state to ReadingRequest, and somehow keep track when it is completed
-		//Check when it is completed (buffered and parsing!?)
-	}
-	else if (client.getState == PROCESSING)
+	if (client.getState() == PROCESSING)
 		processRequest(client);
 }
 
@@ -182,6 +189,7 @@ void	RequestHandler::handleClientWrite(Client &client)
 
 bool	RequestHandler::handleFileRead(Client &client)
 {
+	std::cout << "handle file read" << std::endl;
 	if (client.getResponse().getState() == READING && client.getEmptyBuffer() == true)
 	{
 		char buffer[4096]; //Adjust buffer size
@@ -202,6 +210,7 @@ bool	RequestHandler::handleFileRead(Client &client)
 		return(false);//check that we really want to keep it (return false) in this case
 	}
 	return(false);//check that we really want to keep it (return false) in this case
+	runServer = false; //FOR TESTING! DELETE
 }
 
 void	RequestHandler::handleFileWrite(Client &client)

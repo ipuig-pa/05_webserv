@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/21 10:35:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 10:28:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ public:
 	Header	&operator=(const Header &other);
 	~Header();
 
-	void set(const std::string& name, const std::string& value);
+	void set(const std::string name, const std::string value);
 	std::string get(const std::string& name) const;
 	const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const;
 

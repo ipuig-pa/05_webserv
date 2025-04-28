@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:30:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 10:42:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,12 +77,12 @@ void	HttpResponse::setHeader(Header &header)
 	_header = header;
 }
 
-void	HttpResponse::setHeaderField(const std::string& name, const std::string& value)
+void	HttpResponse::setHeaderField(const std::string name, const std::string value)
 {
 	_header.set(name, value);
 }
 
-void	HttpResponse::setBody(const std::string &body)
+void	HttpResponse::setBody(const std::string body)
 {
 	_body = body;
 	_header.set("Content-Length", std::to_string(_body.size()));
@@ -141,7 +141,7 @@ bool	HttpResponse::getBodyPresence(void) const
 //give somehow the path and not the body!?!?
 //use switch or something more elegant!?!?
 //where to include this function!!????
-std::string		getMediaType(const std::string& path)
+std::string		getMediaType(const std::string path)
 {
 	std::string extension = path.substr(path.find_last_of('.') + 1);
 	

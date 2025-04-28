@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:24:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 12:52:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "webserv.hpp"
 # include "HttpRequest.hpp"
+# include "HttpReqParser.hpp"
 # include "HttpResponse.hpp"
 # include "Header.hpp"
 # include "conf/ServerConf.hpp"
@@ -31,18 +32,20 @@ enum clientState
 	READING_REQUEST,
 	PROCESSING,
 	SENDING_RESPONSE,
-	BOUNCED
+	CONNECTION_CLOSED,
+	BOUNCED //when!?!?!?
 };
 
 class Client //or struct?
 {
 private:
 	HttpRequest		_request;
+	HttpReqParser	_req_parser;
 	HttpResponse	_response;
 	int				_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState		_state;
 	int				_file_fd;
-	std::string		_response_buffer;
+	std::string		_response_buffer; //put inside the response???
 	size_t			_bytes_sent;
 	bool			_empty_buffer;
 	ServerConf		&_currentConfig; //idea: maybe create a upper class
@@ -58,11 +61,12 @@ public:
 
 	HttpRequest		&getRequest(void);
 	HttpResponse	&getResponse(void);
-	int				&getSocket(void);
+	int				getSocket(void);
 	clientState		getState(void);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
 	ServerConf		&getConf(void);
+	HttpReqParser	&getParser(void);
 
 	void			setState(clientState state);
 	void			setResponse(HttpResponse response);

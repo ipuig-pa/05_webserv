@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:29:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 12:53:18 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _response_buffer(""), _bytes_sent(0), _empty_buffer(true), _currentConfig(default_conf)
+	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _response_buffer(""), _bytes_sent(0), _empty_buffer(true), _currentConfig(default_conf)
 {
 	//_request ->change _currentConfig according to request header (find )
 	//_response
@@ -59,6 +59,17 @@ int	Client::getFileFd(void)
 {
 	return (_file_fd);
 }
+
+int	Client::getSocket(void)
+{
+	return (_socket);
+}
+
+HttpReqParser	&Client::getParser(void)
+{
+	return (_req_parser);
+}
+
 
 void	Client::setEmptyBuffer(bool value)
 {

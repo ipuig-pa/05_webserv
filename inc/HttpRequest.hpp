@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:55:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 13:11:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 enum methodType
 {
 	GET,
+	HEAD,
 	POST,
 	DELETE,
 	INVALID
@@ -39,8 +40,8 @@ private:
 	methodType	_method;
 	std::string	_path;
 	std::string _version;
-	std::string	_body;
-	bool		_finished;
+	std::string	_body;	std::string	_buffer;
+	bool		_complete;
 
 	//attirbute (server name, method, path, header [...])
 	//public or private??
@@ -50,12 +51,12 @@ public:
 	
 	//todo: create interface with the common function used, for now just put it this way, will refine later
 	//setter
-	void setMethd(std::string& s); //set as methodType type
-	void setPath(const std::string &url);
-	void setVersion(const std::string& s); //return version like '/1.1', str1.compare(str2) == 0
-	void setHeaderField(const std::string& name, const std::string& value);
-	void setBody(const std::string &body);
-	void setFinished(bool flag); //flag for finsihing parsing or not
+	void setMethod(std::string s); //set as methodType type
+	void setPath(const std::string url);
+	void setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
+	void setHeaderField(const std::string name, const std::string value);
+	void setBody(const std::string body);
+	void setComplete(bool flag); //flag for finsihing parsing or not
 	
 	//getters	
 	int				getMethod(void) const;
@@ -65,7 +66,7 @@ public:
 	std::string&	getBody();
 	// methodType& getMethd();
 
-	bool			isFinished();
+	bool			isComplete();
 	//reset status
 	void			reset();
 };

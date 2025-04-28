@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 10:31:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 10:42:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ public:
 	void		setStatus(Status &status);
 	void		setStatusCode(int code);
 	void		setHeader(Header &header);
-	void		setHeaderField(const std::string& name, const std::string& value);
-	void		setBody(const std::string &body);
+	void		setHeaderField(const std::string name, const std::string value);
+	void		setBody(const std::string body);
 	void		setState(responseState state);
 
 	std::string	toString() const;
@@ -58,6 +58,6 @@ public:
 	std::string	headersToString() const;
 };
 
-std::string		getMediaType(const std::string& path);
+std::string		getMediaType(const std::string path);
 
 #endif

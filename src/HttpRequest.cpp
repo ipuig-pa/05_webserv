@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 12:33:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 11:37:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 
 //FOR TESTING PURPOSE:
 HttpRequest::HttpRequest()
-	: _header(), _method(GET), _path("/src/"), _version("HTTP1.1"), _body(""), _finished(false)
+	: _header(), _method(GET), _path(""), _version("HTTP1.1"), _body(""), _complete(false)
 {
 	std::cout << "request default constructor called" << std::endl;
 }
@@ -49,7 +49,7 @@ HttpRequest::~HttpRequest()
 }
 
 
-void HttpRequest::setMethd(std::string& s)
+void HttpRequest::setMethod(std::string s)
 {
 	if (s == "GET") {
 		this->_method = GET;
@@ -69,7 +69,7 @@ int	HttpRequest::getMethod(void) const
 	return (_method);
 }
 
-void HttpRequest::setPath(const std::string &url)
+void HttpRequest::setPath(const std::string url)
 {
 	this->_path = url; //the validity check to be add in creating interface
 }
@@ -79,7 +79,7 @@ std::string	&HttpRequest::getPath(void)
 	return _path;
 }
 
-void HttpRequest::setVersion(const std::string& s)
+void HttpRequest::setVersion(const std::string s)
 {
 	this->_version = s;
 }
@@ -90,7 +90,7 @@ std::string HttpRequest::getVersion()
 }
 
 //take from http response
-void HttpRequest::setHeaderField(const std::string& name, const std::string& value)
+void HttpRequest::setHeaderField(const std::string name, const std::string value)
 {
 	this->_header.set(name, value);
 }
@@ -100,7 +100,7 @@ std::string HttpRequest::getHeader(const std::string& name)
 	return _header.get(name);
 }
 
-void HttpRequest::setBody(const std::string& body)
+void HttpRequest::setBody(const std::string body)
 {
 	this->_body = body;
 }
@@ -110,14 +110,14 @@ std::string& HttpRequest::getBody()
 	return _body;
 }
 
-void HttpRequest::setFinished(bool flag)
+void HttpRequest::setComplete(bool flag)
 {
-	this->_finished = flag;
+	this->_complete = flag;
 }
 
-bool HttpRequest::isFinished()
+bool HttpRequest::isComplete()
 {
-	return _finished;
+	return _complete;
 }
 
 /** IMPORTANT:
@@ -131,5 +131,5 @@ void HttpRequest::reset()
 	_path.clear();
 	_version.clear();
 	_body.clear();
-	_finished = false;
+	_complete = false;
 }
