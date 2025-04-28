@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/28 10:42:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:21:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,17 @@
 
 #include "global.hpp" //just for testing
 
+//think if I have client as a parameter all the time, or if it should be as a privat attribute / request handler as a private atrribute for client?
 class RequestHandler
 {
 private:
-	void		handleGetRequest(Client &client, HttpResponse &response, ServerConf &config);
-	void		handlePostRequest(Client &client, HttpResponse &response, ServerConf &config);
-	void		handleDeleteRequest(Client &client, HttpResponse &response, ServerConf &config);
-	void		handleInvalidRequest(Client &client, HttpResponse &response, ServerConf &config);
-	void		handleDirectoryRequest(Client &client, HttpRequest &request, ServerConf &config);
-	void		handleDirectoryListing(Client &client, HttpRequest &request, ServerConf &config);
-	std::string	getPathFromUrl(const std::string &uripath, ServerConf &config);
+	void		handleGetRequest(Client &client, HttpResponse &response);
+	void		handlePostRequest(Client &client, HttpResponse &response);
+	void		handleDeleteRequest(Client &client, HttpResponse &response);
+	void		handleInvalidRequest(Client &client, HttpResponse &response);
+	void		handleDirectoryRequest(Client &client, std::string &path);
+	void		handleDirectoryListing(Client &client);
+	std::string	getPathFromUri(Client &client);
 
 public:
 	RequestHandler();

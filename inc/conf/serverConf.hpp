@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 15:56:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:07:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ public:
 	bool getAutoIndex() const;
 	const std::string& getRoot() const;
 	const std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
-	const std::string& getIndex() const;
+	const std::string getIndex() const;
 	const std::string& getSrvName() const;
 	const std::map<int, std::string>& getErrPage() const;
 	// const std::map<std::string, LocationConf>& getLocation() const;

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 16:15:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:06:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -418,7 +418,7 @@ const std::string& ServerConf::getRoot() const {
 const std::string& ServerConf::getHost() const {
 	return this->_host;
 }
-const std::string& ServerConf::getIndex() const {
+const std::string ServerConf::getIndex() const {
 	return this->_index;
 }
 const std::string& ServerConf::getSrvName() const {

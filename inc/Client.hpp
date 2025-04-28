@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 12:52:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:24:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 # include "HttpReqParser.hpp"
 # include "HttpResponse.hpp"
 # include "Header.hpp"
-# include "conf/ServerConf.hpp"
+# include "ServerConf.hpp"
+# include "LocationConf.hpp"
 
 /**
  * accept (new) client connection,
@@ -48,7 +49,8 @@ private:
 	std::string		_response_buffer; //put inside the response???
 	size_t			_bytes_sent;
 	bool			_empty_buffer;
-	ServerConf		&_currentConfig; //idea: maybe create a upper class
+	ServerConf		&_currentServerConf; //idea: maybe create a upper class
+	LocationConf	*_currentLocConf;
 
 	// int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	// std::string _data; //data for & from client
@@ -65,7 +67,8 @@ public:
 	clientState		getState(void);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
-	ServerConf		&getConf(void);
+	ServerConf		&getServerConf(void);
+	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
 
 	void			setState(clientState state);
@@ -73,7 +76,8 @@ public:
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
-	void			setConfig(ServerConf &conf);
+	void			setServerConf(ServerConf &conf);
+	void			setLocationConf(LocationConf *conf);
 
 	bool			sendResponseChunk(void);
 };

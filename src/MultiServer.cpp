@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 15:34:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:34:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void	MultiServer::acceptNewConnection(Socket *listen_socket)
 		//handle error
 	}
 	Client *client = new Client(client_socket, listen_socket->getDefaultConf());
-	client->setConfig(listen_socket->getConf(client->getRequest().getHeader("Host")));
+	client->setServerConf(listen_socket->getConf(client->getRequest().getHeader("Host")));
 	_clients.insert(std::pair<int, Client*>(client_socket, client));
 	fcntl(client_socket, F_SETFL, O_NONBLOCK);
 	struct pollfd cli_sock_fd = {client_socket, POLLIN, 0};
@@ -162,6 +162,7 @@ int	MultiServer::run()
 					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
 					if (file_fd != -1)
 					{
+						std::cout << "file fd has been created" << std::endl;
 						struct pollfd file = {file_fd, POLLIN, 0};
 						_poll.push_back(file);
 					}
@@ -192,11 +193,12 @@ int	MultiServer::run()
 					it_c = _clients.begin();
 					while (it_c != _clients.end())
 					{
-						if (it_c->first == fd)
+						if (it_c->second->getFileFd() == fd)
 							if (req_hand.handleFileRead(*(it_c->second)))
 								eraseFromPoll(fd);
 						it_c++;
 					}
+
 				}
 				// Handle client socket ready for writing
 				// if (Multiserver.getPoll().data()[i].revents & POLLOUT) {

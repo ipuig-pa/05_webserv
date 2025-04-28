@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   locationConf.cpp                                   :+:      :+:    :+:   */
+/*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 11:30:49 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:05:41 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ int LocationConf::getLocCMBS() const
 {
 	return this->_locCMBS;
 }
-const std::string& LocationConf::getLocIndex() const
+const std::string LocationConf::getLocIndex() const
 {
 	return this->_locIndex;
 }

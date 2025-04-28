@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   locationConf.hpp                                   :+:      :+:    :+:   */
+/*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 11:31:39 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:05:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class LocationConf
 	std::map<std::string, std::string> _path_ext_match;
 	bool _locAuto;
 	bool _autoflag; //flag to check repetition 
-	std::string _locIndex;
+	std::string _locIndex; //should be a vector? (there can be more that one index files??)
 	//other optional, may not use
 	std::string _returnUrl; //redirect: return url: 301 https://... or return error code
 	int _returnCode;
@@ -72,7 +72,7 @@ class LocationConf
 	std::vector<mType> getMethod() const; //return a copy
 	const std::string& getLocRoot() const;
 	int getLocCMBS() const;
-	const std::string& getLocIndex() const;
+	const std::string getLocIndex() const;
 	bool getLocAuto() const;
 	const std::string& getReturn() const;
 	// const std::string& getCgiPath() const;

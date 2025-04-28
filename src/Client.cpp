@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 12:53:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:24:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _response_buffer(""), _bytes_sent(0), _empty_buffer(true), _currentConfig(default_conf)
+	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _response_buffer(""), _bytes_sent(0), _empty_buffer(true), _currentServerConf(default_conf), _currentLocConf(nullptr)
 {
 	//_request ->change _currentConfig according to request header (find )
 	//_response
@@ -50,9 +50,14 @@ bool	Client::getEmptyBuffer(void)
 	return (_empty_buffer);
 }
 
-ServerConf	&Client::getConf(void)
+ServerConf	&Client::getServerConf(void)
 {
-	return	(_currentConfig);
+	return	(_currentServerConf);
+}
+
+LocationConf	*Client::getLocationConf(void)
+{
+	return	(_currentLocConf);
 }
 
 int	Client::getFileFd(void)
@@ -138,7 +143,12 @@ bool	Client::sendResponseChunk(void)
 	//else set it as already sent
 }
 
-void	Client::setConfig(ServerConf &conf)
+void	Client::setServerConf(ServerConf &conf)
 {
-	_currentConfig = conf;
+	_currentServerConf = conf;
+}
+
+void	Client::setLocationConf(LocationConf *conf)
+{
+	_currentLocConf = conf;
 }
