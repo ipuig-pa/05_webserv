@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 13:11:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:07:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ private:
 	methodType	_method;
 	std::string	_path;
 	std::string _version;
-	std::string	_body;	std::string	_buffer;
+	std::string	_body;
+	std::string	_buffer;
 	bool		_complete;
 
 	//attirbute (server name, method, path, header [...])

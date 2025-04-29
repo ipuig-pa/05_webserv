@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:34:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:22:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,19 +176,22 @@ int	MultiServer::run()
 							}
 						}
 					}
+					if (it_c->second->getState() == CONNECTION_CLOSED)
+					{
+						eraseFromPoll(fd);
+					}
 					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done
 				}
 				// Handle writing to client
 				if (_poll[i].revents & POLLOUT) {
 					req_hand.handleClientWrite(*(it_c->second));
+					if (it_c->second->getState() == NEW_REQUEST)
+						_poll[i].events = POLLIN;
 				}
 			}
 			//handle file descriptors belonging to files
 			else
 			{
-				// Find which client it belongs to
-				//?????
-				//Each client can have an array/vector / map of files linked to it inside!?!?
 				if (_poll.data()[i].revents & POLLIN) {
 					it_c = _clients.begin();
 					while (it_c != _clients.end())
@@ -198,7 +201,6 @@ int	MultiServer::run()
 								eraseFromPoll(fd);
 						it_c++;
 					}
-
 				}
 				// Handle client socket ready for writing
 				// if (Multiserver.getPoll().data()[i].revents & POLLOUT) {

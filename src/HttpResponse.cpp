@@ -6,45 +6,35 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 10:42:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 11:48:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse()
-	:_status(), _header(), _body_presence(true), _body(""), _state(READING)
+	:_status(), _header(), _body_presence(false), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0)
 {
 	std::cout << "response default constructor called" << std::endl;
 }
 
-HttpResponse::HttpResponse(Status &status, Header &header)
-	:_status(status), _header(header), _body_presence(true), _body(""), _state(READING)
-{
-}
+// HttpResponse::HttpResponse(const HttpResponse &other)
+// {
+// 	*this = other;
+// }
 
-HttpResponse::HttpResponse(Status &status, Header &header, std::string body)
-	:_status(status), _header(header), _body_presence(true), _body(body), _state(READING)
-{
-}
-
-HttpResponse::HttpResponse(const HttpResponse &other)
-{
-	*this = other;
-}
-
-HttpResponse	&HttpResponse::operator=(const HttpResponse &other)
-{
-	if (this != &other)
-	{
-		_status = other._status;
-		_header = other._header;
-		_body_presence = other._body_presence;
-		_body = other._body;
-		_state = other._state;
-	}
-	return *this;
-}
+// HttpResponse	&HttpResponse::operator=(const HttpResponse &other)
+// {
+// 	if (this != &other)
+// 	{
+// 		_status = other._status;
+// 		_header = other._header;
+// 		_body_presence = other._body_presence;
+// 		_body = other._body;
+// 		_state = other._state;
+// 	}
+// 	return *this;
+// }
 
 HttpResponse::~HttpResponse()
 {
@@ -82,10 +72,32 @@ void	HttpResponse::setHeaderField(const std::string name, const std::string valu
 	_header.set(name, value);
 }
 
-void	HttpResponse::setBody(const std::string body)
+void	HttpResponse::setBytesRead(size_t bytes_read)
 {
-	_body = body;
-	_header.set("Content-Length", std::to_string(_body.size()));
+	_bytes_read += bytes_read;
+}
+
+void	HttpResponse::setBytesSent(size_t bytes_sent)
+{
+	_bytes_sent += bytes_sent;
+}
+
+void	HttpResponse::setBodyPresence(bool body_presence)
+{
+	_body_presence = body_presence;
+}
+
+void	HttpResponse::setBodyBuffer(const std::string buffer)
+{
+	_body_buffer = buffer;
+}
+
+void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
+{
+	if (_body_buffer.empty())
+		_body_buffer = buffer;
+	else
+		_body_buffer.append(buffer, bytes_read);
 }
 
 void	HttpResponse::setState(responseState state)
@@ -104,19 +116,35 @@ responseState HttpResponse::getState(void) const
 	return _state;
 }
 
+size_t	HttpResponse::getBytesRead(void)
+{
+	return _bytes_read;
+}
+
+size_t	HttpResponse::getBytesSent(void)
+{
+	return	_bytes_sent;
+}
+
+
+bool	HttpResponse::getBodyPresence(void) const
+{
+	return _body_presence;
+}
+
+std::string	HttpResponse::getBodyBuffer(void)
+{
+	return _body_buffer;
+}
+
 std::string	HttpResponse::toString() const
 {
 	std::stringstream	response;
 
 	response << _status.toString() << _header.toString() << "\r\n";
-	if (!_body.empty())
-		response << _body;
+	if (!_body_buffer.empty())
+		response << _body_buffer;
 	return response.str();
-}
-
-std::string	&HttpResponse::getBody()
-{
-	return _body;
 }
 
 std::string	HttpResponse::statusToString() const
@@ -130,11 +158,6 @@ std::string	HttpResponse::headersToString() const
 
 	header << _header.toString() << "\r\n";
 	return header.str();
-}
-
-bool	HttpResponse::getBodyPresence(void) const
-{
-	return _body_presence;
 }
 
 //https://www.rfc-editor.org/rfc/rfc9110#media.type

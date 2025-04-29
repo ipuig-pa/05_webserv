@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/28 17:38:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:11:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response)
 	response.setStatusCode(200); //OK
 	response.setHeaderField("Content-Type", getMediaType(path));
 	response.setHeaderField("Content-Length", std::to_string(file_stat.st_size));
+	response.setBodyPresence(true);
 
 	client.setFileFd(file_fd);
 }
@@ -132,6 +133,7 @@ void	RequestHandler::processRequest(Client &client)
 	client.getRequest().setPath(path); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	//check first if the client request method is in the allowed methods in the current config file 
 	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse());
+	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
 
 void	RequestHandler::handleClientRead(Client &client)
@@ -177,6 +179,7 @@ void	RequestHandler::handleClientRead(Client &client)
 
 void	RequestHandler::handleClientWrite(Client &client)
 {
+	std::cout << "handle client write" << std::endl;
 	if (client.getState() == SENDING_RESPONSE)
 	{
 		if (!client.sendResponseChunk())
@@ -188,50 +191,50 @@ void	RequestHandler::handleClientWrite(Client &client)
 bool	RequestHandler::handleFileRead(Client &client)
 {
 	std::cout << "handle file read" << std::endl;
-	if (client.getResponse().getState() == READING && client.getEmptyBuffer() == true)
+	if (client.getResponse().getState() == READING)
 	{
 		char buffer[4096]; //Adjust buffer size
-		ssize_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
+		size_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
 		if (bytesRead > 0)
 		{
-			client.setBuffer(buffer, bytesRead);
-			client.setEmptyBuffer(false);
+			std::string	buffer_str(buffer);
+			client.getResponse().appendBodyBuffer(buffer_str, bytesRead);
+			client.getResponse().setBytesRead(bytesRead);
 			std::cout << "bytes read: " << bytesRead << std::endl;
-			runServer = false; //FOR TESTING! DELETE
 			return (false);
 		}
 		else if (bytesRead == 0)
 		{
-			client.getResponse().setState(READ);
-			close(client.getFileFd());
-			client.setFileFd(-1);
-			std::cout << "bytes read: " << bytesRead << std::endl;
-			runServer = false; //FOR TESTING! DELETE
-			return(true);
+			if (client.getResponse().getBytesRead() == static_cast<size_t>(std::stoi(client.getResponse().getHeader("Content-Length"))))
+			{
+				client.getResponse().setState(READ);
+				close(client.getFileFd());
+				client.setFileFd(-1);
+				std::cout << "bytes read: " << bytesRead << std::endl;
+				return(true);
+			}
 		}
-		return(false);//check that we really want to keep it (return false) in this case
 	}
 	return(false);//check that we really want to keep it (return false) in this case
-	runServer = false; //FOR TESTING! DELETE
 }
 
 void	RequestHandler::handleFileWrite(Client &client)
 {
-	(void)client;
-// 	if (client.getResponse().getState() == WRITING && client.getEmptyBuffer() == false)
-// 	{
-// 		write(client.getFileFd(), _response_buffer.c_str(), _response_buffer.length());
-// 		_empty_buffer = true;
-// 		return true;
-// 	}
-// 	//check somehow when it is already finished, and error handling. Close and erase from poll when needed.
-// 		// else if (bytesRead == 0)
-// 		// {
-// 		// 	client.getResponse().setState(READ);
-// 		// 	close(client.getFileFd());
-// 		// 	client.setFileFd(-1);
-// 		// 	ersaseFromPoll(client.getFileFd());
-// 		// }
+	(void) client;
+	// if (client.getResponse().getState() == WRITING && client.getEmptyBuffer() == false)
+	// {
+	// 	write(client.getFileFd(), _response_buffer.c_str(), _response_buffer.length());
+	// 	_empty_buffer = true;
+	// 	return true;
+	// }
+	// //check somehow when it is already finished, and error handling. Close and erase from poll when needed.
+	// 	// else if (bytesRead == 0)
+	// 	// {
+	// 	// 	client.getResponse().setState(READ);
+	// 	// 	close(client.getFileFd());
+	// 	// 	client.setFileFd(-1);
+	// 	// 	ersaseFromPoll(client.getFileFd());
+	// 	// }
 }
 
 //We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUri to point to LocationConf??)
