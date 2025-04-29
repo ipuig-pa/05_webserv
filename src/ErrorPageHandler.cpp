@@ -6,18 +6,18 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 17:31:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:35:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ErrorPageHandler.hpp"
 
-ErrorPageHandler::ErrorPageHandler(ServerConf &serv_conf, LocationConf &loc_conf)
-	:_serv_conf(serv_conf), _loc_conf(loc_conf)
+ErrorPageHandler::ErrorPageHandler(Client *client)
+	: _client(client)
 {
 }
 
-~ErrorPageHandler::ErrorPageHandler()
+ErrorPageHandler::~ErrorPageHandler()
 {
 }
 
@@ -25,25 +25,26 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 {
 	std::string	body;
 
-	if (_loc_conf)
-	{
-		body = _loc_conf.getErrPage(status_code);
-		if (!body.empty())
-		{
-			return (body);
-		}
-	}
-	body = _serv_conf.getErrPage(status_code);
+	//INCLUDE GET ERR PAGE IN LOCATION CONF, SO IT CAN BE CHECKED HERE!!!!!!!
+	// if (_client->getLocationConf())
+	// {
+	// 	body = _client->getLocationConf()->getErrPageCode(status_code);
+	// 	if (!body.empty())
+	// 	{
+	// 		return (body);
+	// 	}
+	// }
+	body = _client->getServerConf().getErrPageCode(status_code);
 	if (!body.empty())
 	{
 		return (body);
 	}
-	return getDefaultErrorPage(status_code);
+	return ErrorPageHandler::getDefaultErrorPage(status_code);
 }
 
 std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 {
-	std::string status_message = Status::getStatusMessage(status_code);
+	std::string status_message = _client->getResponse().getStatus().getStatusMessage();
 	std::stringstream ss;
 
 	ss	<< "<!DOCTYPE html>\n"

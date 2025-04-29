@@ -20,6 +20,7 @@ SOURCES =	ConfReader.cpp \
 			HttpReqParser.cpp \
 			HttpRequest.cpp \
 			HttpResponse.cpp \
+			ErrorPageHandler.cpp \
 			Header.cpp \
 			Status.cpp \
 			CgiChecker.cpp \

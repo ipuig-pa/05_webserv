@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:26:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:21:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,12 @@
 # include "HttpRequest.hpp"
 # include "HttpReqParser.hpp"
 # include "HttpResponse.hpp"
-# include "ErrorPageHandler.hpp"
 # include "Header.hpp"
 # include "ServerConf.hpp"
+# include "ErrorPageHandler.hpp"
 # include "LocationConf.hpp"
+
+class ErrorPageHandler;
 
 /**
  * accept (new) client connection,
@@ -44,6 +46,7 @@ private:
 	HttpRequest			_request;
 	HttpReqParser		_req_parser;
 	HttpResponse		_response;
+	ErrorPageHandler	*_error_handler;
 	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState			_state;
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
@@ -77,6 +80,7 @@ public:
 	void			setLocationConf(LocationConf *conf);
 
 	bool			sendResponseChunk(void);
+	void			prepareErrorResponse(int code);
 };
 
 #endif

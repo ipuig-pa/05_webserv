@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 17:21:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:37:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,18 @@ RequestHandler::RequestHandler(){}
 
 RequestHandler::~RequestHandler(){}
 
-void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response)
+void	RequestHandler::handleGetRequest(Client &client)
 {
 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
 
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {
-		response.setStatusCode(404); // Not found
-		// response.setBodyPresence(true); // ???
+		client.prepareErrorResponse(404); // Not found
 		return ;
 	}
 	if (access(path.c_str(), R_OK) != 0) {
-		response.setStatusCode(403); // Forbidden
+		client.prepareErrorResponse(403); // Forbidden
 		// response.setBodyPresence(true); // ???
 		return ;
 	}
@@ -44,7 +43,7 @@ void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response)
 	int file_fd = open(path.c_str(), O_RDONLY);
 
 	if (file_fd == -1) {
-		response.setStatusCode(404);
+		client.prepareErrorResponse(404); // Not Found
 		// response.setBodyPresence(true); // ???
 		return ;
 	}
@@ -52,30 +51,29 @@ void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response)
 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
 	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
 
-	response.setStatusCode(200); //OK
-	response.setHeaderField("Content-Type", getMediaType(path));
-	response.setHeaderField("Content-Length", std::to_string(file_stat.st_size));
-	response.setBodyPresence(true);
+	client.getResponse().setStatusCode(200); //OK
+	client.getResponse().setHeaderField("Content-Type", getMediaType(path));
+	client.getResponse().setHeaderField("Content-Length", std::to_string(file_stat.st_size));
+	client.getResponse().setBodyPresence(true);
 
 	client.setFileFd(file_fd);
 }
 
-void	RequestHandler::handlePostRequest(Client &client, HttpResponse &response)
+void	RequestHandler::handlePostRequest(Client &client)
 {
 	(void)client;
-	(void)response;
 // 	std::string path = client.getRequest().getPath(); //should be this same function or get the post somehow different?!
 
 // 	int file_fd = open(path.c_str(), O_CREAT, O_APPEND); //more flags?!?
 // 	if (file_fd == -1) {
-// 		response.setStatusCode(404);
+// 		client.prepareErrorResponse(404);
 // 		return;
 // 	}
 
 // 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
 // 	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
-// 	response.setStatusCode(201); //created
-// 	response.setHeaderField("Location", client.getRequest().getPath()); // URI should be there
+// 	client.getResponse().setStatusCode(201); //created
+// 	client.getResponse().setHeaderField("Location", client.getRequest().getPath()); // URI should be there
 	
 // 	client.setFd(file_fd);
 
@@ -83,27 +81,27 @@ void	RequestHandler::handlePostRequest(Client &client, HttpResponse &response)
 // 	_poll_fds.push_back(file);
 }
 
-void	RequestHandler::handleDeleteRequest(Client &client, HttpResponse &response)
+void	RequestHandler::handleDeleteRequest(Client &client)
 {
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {
-		response.setStatusCode(404); //Not found
+		client.prepareErrorResponse(404); //Not found
 		return;
 	}
 	struct stat file_stat;
 	stat(path.c_str(), &file_stat);
 	if ((access(path.c_str(), W_OK) != 0) || S_ISDIR(file_stat.st_mode)) {
-		response.setStatusCode(403); //Forbidden
+		client.prepareErrorResponse(403); //Forbidden
 		return;
 	}
 	try
 	{
 		if (std::remove(path.c_str()) == 0) {
-			response.setStatusCode(204); // Success - No Content
+			client.prepareErrorResponse(204); // Success - No Content
 			return ;
 		} else {
-			response.setStatusCode(500); //internal server error
+			client.prepareErrorResponse(500); //internal server error
 			return ;
 		}
 	}
@@ -113,15 +111,15 @@ void	RequestHandler::handleDeleteRequest(Client &client, HttpResponse &response)
 	}
 }
 
-void	RequestHandler::handleInvalidRequest(Client &client, HttpResponse &response)
+void	RequestHandler::handleInvalidRequest(Client &client)
 {
-	response.setStatusCode(405);
+	client.prepareErrorResponse(405);
 	(void)client;
 }
 
 void	RequestHandler::processRequest(Client &client)
 {
-	void	(RequestHandler::*handleMethod[])(Client &, HttpResponse &) = {
+	void	(RequestHandler::*handleMethod[])(Client &) = {
 		&RequestHandler::handleGetRequest, 
 		&RequestHandler::handlePostRequest, 
 		&RequestHandler::handleDeleteRequest, 
@@ -133,7 +131,7 @@ void	RequestHandler::processRequest(Client &client)
 
 	client.getRequest().setPath(path); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	//check first if the client request method is in the allowed methods in the current config file 
-	(this->*handleMethod[client.getRequest().getMethod()])(client, client.getResponse());
+	(this->*handleMethod[client.getRequest().getMethod()])(client);
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
 
@@ -263,7 +261,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client, std::string &path)
 		// Update the request path to include the index file ???
 		client.getRequest().setPath(path + indexFile); // ???
 		// Process as a normal file GET request
-		handleGetRequest(client, client.getResponse());
+		handleGetRequest(client);
 		return;
 	}
 	//IN THE CASE THAT MULTIPLE INDEX FILES CAN EXIST FOR THE SAME LOCATION!?!?
@@ -288,7 +286,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client, std::string &path)
 		handleDirectoryListing(client);
 	else {
 		// Directory listing is disabled and no index file exists
-		client.getResponse().setStatusCode(403); // Forbidden
+		client.prepareErrorResponse(403); // Forbidden
 	}
 }
 

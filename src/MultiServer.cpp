@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:56:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:37:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	MultiServer::acceptNewConnection(Socket *listen_socket)
 		return ;
 	}
 	Client *client = new Client(client_socket, listen_socket->getDefaultConf());
-	client->setServerConf(listen_socket->getConf(client->getRequest().getHeader("Host")));
+	client->setServerConf(listen_socket->getConf(client->getRequest().getHeaderVal("Host")));
 	_clients.insert(std::pair<int, Client*>(client_socket, client));
 	fcntl(client_socket, F_SETFL, O_NONBLOCK);
 	struct pollfd cli_sock_fd = {client_socket, POLLIN, 0};

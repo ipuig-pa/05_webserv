@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:05:09 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:32:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ public:
 	size_t		getBytesRead(void);
 	size_t		getBytesSent(void);
 	std::string	getBodyBuffer(void);
+	Status		&getStatus(void);
 
 	void		setBodyPresence(bool body_presence);
 	void		setStatus(Status &status);

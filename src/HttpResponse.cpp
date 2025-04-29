@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:31:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:33:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void	HttpResponse::setState(responseState state)
 
 std::string HttpResponse::getHeader(const std::string& name)
 {
-	return _header.get(name);
+	return _header.getVal(name);
 }
 
 responseState HttpResponse::getState(void) const
@@ -127,7 +127,6 @@ size_t	HttpResponse::getBytesSent(void)
 	return	_bytes_sent;
 }
 
-
 bool	HttpResponse::getBodyPresence(void) const
 {
 	return _body_presence;
@@ -136,6 +135,11 @@ bool	HttpResponse::getBodyPresence(void) const
 std::string	HttpResponse::getBodyBuffer(void)
 {
 	return _body_buffer;
+}
+
+Status		&HttpResponse::getStatus(void)
+{
+	return _status;
 }
 
 std::string	HttpResponse::toString() const

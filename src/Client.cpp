@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:26:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:40:11 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,14 @@
 Client::Client(int socket, ServerConf &default_conf)
 	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr)
 {
+	_error_handler = new ErrorPageHandler(this);
 	//_request ->change _currentConfig according to request header (find )
 	//_response
 }
 
 Client::~Client()
 {
+	delete (_error_handler);
 	//_request ->change _currentConfig according to request header (find )
 	//_response
 }
@@ -128,4 +130,11 @@ void	Client::setServerConf(ServerConf &conf)
 void	Client::setLocationConf(LocationConf *conf)
 {
 	_currentLocConf = conf;
+}
+
+void	Client::prepareErrorResponse(int code)
+{
+	_response.setStatusCode(code);
+	_response.setBodyBuffer(_error_handler->generateErrorBody(code));
+	
 }

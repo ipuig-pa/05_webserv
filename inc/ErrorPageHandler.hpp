@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 10:36:22 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 16:05:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 18:25:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,20 @@
 # define ERRORPAGEHANDLER_HPP
 
 # include "ServerConf.hpp"
+# include "Client.hpp"
+class Client;
 
 class ErrorPageHandler
 {
 private:
-	ServerConf	&_serv_conf;//be a pointer to a parent class that has both Server and LocationConf inside?
-	LocationConf &_loc_conf;
+	Client *_client;
 
 public:
-	ErrorPageHandler(ServerConf &serv_conf, LocationConf &loc_conf);
-	generateErrorBody(int status_code);
+	ErrorPageHandler(Client *client);
+	~ErrorPageHandler();
 
-}
+	std::string	generateErrorBody(int status_code);
+	std::string getDefaultErrorPage(int status_code);
+};
 
 # endif

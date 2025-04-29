@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 14:16:32 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 18:12:18 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ bool CgiChecker::_checkCGI(LocationConf& loc)
 		std::cerr << "Error: invalid cgi index page.";
 		return false;
 	}
-	if (!_validCgiPath(loc.getCgiPath())) {
+	if (!_validCgiPath(loc.getCgiSysPath())) {
 		std::cerr << "Error: invalid cgi path."; //usr/bin/php
 		return false;
 	}
@@ -44,7 +44,7 @@ bool CgiChecker::_checkCGI(LocationConf& loc)
 
 bool CgiChecker::_hasCgiPara(LocationConf& loc)
 {
-	return (!loc.getCgiPath().empty() &&
+	return (!loc.getCgiSysPath().empty() &&
 			!loc.getCgiExtension().empty() &&
 			!loc.getLocIndex().empty());
 }
@@ -90,7 +90,7 @@ bool CgiChecker::_validExtension(const std::vector<std::string>& _cgiextend)
 }
 bool CgiChecker::_mapPathExtension(LocationConf& loc)
 {
-	const std::vector<std::string>& _cgipath = loc.getCgiPath();
+	const std::vector<std::string>& _cgipath = loc.getCgiSysPath();
 	const std::vector<std::string>& _cgiextend = loc.getCgiExtension();
 	std::map<std::string, std::string> _path_extend;
 	for (size_t i = 0; i < _cgiextend.size(); ++i) {
@@ -108,7 +108,7 @@ bool CgiChecker::_mapPathExtension(LocationConf& loc)
 }
 bool CgiChecker::_matchSize(LocationConf& loc)
 {
-	if (loc.getCgiPath().size() == loc.getPathExMap().size()) {
+	if (loc.getCgiSysPath().size() == loc.getPathExMap().size()) {
 		return true;
 	}
 	return false;
