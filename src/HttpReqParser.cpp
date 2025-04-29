@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 15:42:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:01:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 HttpReqParser::HttpReqParser(HttpRequest &request)
 	: _stage(REQ_LINE), _bodyLength(0), _buffer(""), _header_complete(false), _httpReq(request)
 {
-	std::cout << "HttpReqParser constructor called" << std::endl;
+	LOG_DEBUG("HttpReqParser constructor called");
 }
 HttpReqParser::~HttpReqParser() {}
 
@@ -29,7 +29,6 @@ bool HttpReqParser::httpParse(void)
 			if (!_parseReqLine(_httpReq))
 			{
 				//_stage = PARSE_ERROR; the stage is set inside singleline() of (parseheader())
-				std::cout << _stage << std::endl;
 				return false;
 			}
 		}
@@ -40,7 +39,6 @@ bool HttpReqParser::httpParse(void)
 				//_stage = PARSE_ERROR; the stage is set inside singleline() of (parseheader())
 				return false;
 			}
-			std::cout << _stage << std::endl;
 		}
 		else if (_stage == BODY)
 		{
@@ -51,7 +49,6 @@ bool HttpReqParser::httpParse(void)
 			}
 		}
 	}
-	std::cout << _stage << std::endl;
 	return _stage == FINISH;
 }
 
@@ -93,10 +90,9 @@ bool HttpReqParser::_parseReqLine(HttpRequest &request)
 bool HttpReqParser::_singleHeaderLine(HttpRequest &request, const std::string& curLine)
 {
 	size_t pos = curLine.find(':');
-	std::cout << "found : at pos." << pos << std::endl;
 	if (pos == std::string::npos)
 	{
-		std::cerr << "PARSE_Error: no colon after line_name.";
+		LOG_ERR("Request header parsing found no colon after field name");
 		return false;
 	}
 	std::string name = curLine.substr(0, pos);
@@ -140,7 +136,7 @@ bool HttpReqParser::_parseHeader(HttpRequest &request)
 		std::string _content = request.getHeader("Content-Length"); // case sensitive or not?
 		if (_content.empty())
 		{
-			std::cout << "content-length not found" << _stage << std::endl;
+			LOG_WARN("Content-length header was not found in HttpRequest"); //add number of client?!
 			if (request.getMethod() != POST) // no body part, this request finished
 			{
 				_stage = FINISH;

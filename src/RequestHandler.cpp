@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 12:11:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:21:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,24 @@ RequestHandler::~RequestHandler(){}
 
 void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response)
 {
-	std::cout << "handling get request" << std::endl;
+	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
 
 	std::string path = client.getRequest().getPath();
-	
+
 	if (access(path.c_str(), F_OK) != 0) {
 		response.setStatusCode(404); // Not found
-		return;
+		// response.setBodyPresence(true); // ???
+		return ;
 	}
 	if (access(path.c_str(), R_OK) != 0) {
 		response.setStatusCode(403); // Forbidden
-		return;
+		// response.setBodyPresence(true); // ???
+		return ;
 	}
 	struct stat file_stat;
 	stat(path.c_str(), &file_stat);
 	if (S_ISDIR(file_stat.st_mode))
 	{
-		//handle directory request (implement function! -> use readdir)
 		handleDirectoryRequest(client, path);
 		return ;
 	}
@@ -44,7 +45,8 @@ void	RequestHandler::handleGetRequest(Client &client, HttpResponse &response)
 
 	if (file_fd == -1) {
 		response.setStatusCode(404);
-		return;
+		// response.setBodyPresence(true); // ???
+		return ;
 	}
 	// Set non-blocking
 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
@@ -125,10 +127,9 @@ void	RequestHandler::processRequest(Client &client)
 		&RequestHandler::handleDeleteRequest, 
 		&RequestHandler::handleInvalidRequest};
 
-	std::cout << "processing client request, with method: " << client.getRequest().getMethod() << std::endl;
+	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
 
 	std::string path = getPathFromUri(client);
-	std::cout << path << std::endl;
 
 	client.getRequest().setPath(path); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 	//check first if the client request method is in the allowed methods in the current config file 
@@ -138,20 +139,19 @@ void	RequestHandler::processRequest(Client &client)
 
 void	RequestHandler::handleClientRead(Client &client)
 {
-	char buffer[4096]; //Adjust buffer size
+	char buffer[BUFF_SIZE]; //Adjust buffer size
 
 	// (void) client; // FOR TESTING
-	std::cout << "reading client request" << std::endl;
+	LOG_DEBUG("Reading client request...");
 	// processRequest(client);
 
 	if (client.getState() == NEW_REQUEST)
 	{
-		std::cout << "client state is New request" << std::endl;
 		client.setState(READING_REQUEST);
+		LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to READING request");
 	}
 	if (client.getState() == READING_REQUEST)
 	{
-		std::cout << "client state changed to reading request" << std::endl;
 		ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
 		// std::cout << "already read " << bytesRead << "bytes." << std::endl;
 		if (bytesRead > 0)
@@ -163,12 +163,15 @@ void	RequestHandler::handleClientRead(Client &client)
 				if (client.getParser().httpParse())
 				{
 					client.setState(PROCESSING);
-					// std::cout << "state set to processing" << std::endl;
+					LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to PROCESSING request");
 				}
 			}
 		}
 		else if (bytesRead == 0)
+		{
 			client.setState(CONNECTION_CLOSED);
+			LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to CONNECTION CLOSED");
+		}
 		//else
 			// bytesRead < 0: handle error during reading
 	}
@@ -179,7 +182,7 @@ void	RequestHandler::handleClientRead(Client &client)
 
 void	RequestHandler::handleClientWrite(Client &client)
 {
-	std::cout << "handle client write" << std::endl;
+	LOG_DEBUG("Handle writing to client at socket " + std::to_string(client.getSocket()));
 	if (client.getState() == SENDING_RESPONSE)
 	{
 		if (!client.sendResponseChunk())
@@ -190,17 +193,17 @@ void	RequestHandler::handleClientWrite(Client &client)
 
 bool	RequestHandler::handleFileRead(Client &client)
 {
-	std::cout << "handle file read" << std::endl;
+	LOG_DEBUG("Reading file " + std::to_string(client.getFileFd()) + " ...");
 	if (client.getResponse().getState() == READING)
 	{
-		char buffer[4096]; //Adjust buffer size
+		char buffer[BUFF_SIZE]; //Adjust buffer size
 		size_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
 		if (bytesRead > 0)
 		{
 			std::string	buffer_str(buffer);
 			client.getResponse().appendBodyBuffer(buffer_str, bytesRead);
 			client.getResponse().setBytesRead(bytesRead);
-			std::cout << "bytes read: " << bytesRead << std::endl;
+			LOG_INFO(std::to_string(bytesRead) + " bytes read from file " + std::to_string(client.getFileFd()) + "linked to client " + std::to_string(client.getSocket()));
 			return (false);
 		}
 		else if (bytesRead == 0)
@@ -210,7 +213,6 @@ bool	RequestHandler::handleFileRead(Client &client)
 				client.getResponse().setState(READ);
 				close(client.getFileFd());
 				client.setFileFd(-1);
-				std::cout << "bytes read: " << bytesRead << std::endl;
 				return(true);
 			}
 		}
@@ -240,7 +242,7 @@ void	RequestHandler::handleFileWrite(Client &client)
 //We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUri to point to LocationConf??)
 void	RequestHandler::handleDirectoryRequest(Client &client, std::string &path)
 {
-	std::cout << "handle directory request" << std::endl;
+	LOG_DEBUG("Handling directory request");
 
 	// std::vector<std::string> indexFile;
 

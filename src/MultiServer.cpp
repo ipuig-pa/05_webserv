@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:12:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:56:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> &serv_config
 		// _sockets.emplace(listen_fd, listen_socket); (In C++11)
 		_sockets.insert(std::pair<int,Socket*>(listen_fd, listen_socket));
 
-		std::cout << "creating socket num: " << listen_socket->getFd() << ", on: " << listen_socket->getDefaultConf().getHost() << ":" << listen_socket->getPort() << std::endl;
+		LOG_INFO("Creating socket " + std::to_string(listen_socket->getFd()) + ", on " + listen_socket->getDefaultConf().getHost() + ":" + std::to_string(listen_socket->getPort()));
 	}
 }
 
@@ -77,11 +77,12 @@ void	MultiServer::acceptNewConnection(Socket *listen_socket)
 	sockaddr_in	client_addr;
 	socklen_t addr_len = sizeof(client_addr);
 
-	std::cout << "accepting new connection on listening socket: " << listen_socket->getFd() << ", on port: " << listen_socket->getPort() << std::endl;
+	LOG_INFO("Accepting new client connection on listening socket: " + std::to_string(listen_socket->getFd()) + ", on port: " + std::to_string(listen_socket->getPort()) + "...");
 	int client_socket = accept(listen_socket->getFd(), reinterpret_cast<sockaddr*>(&client_addr), &addr_len);
 	if (client_socket == -1)
 	{
-		//handle error
+		LOG_ERR("Fail to accept client on socket: " + std::to_string(listen_socket->getFd()));
+		return ;
 	}
 	Client *client = new Client(client_socket, listen_socket->getDefaultConf());
 	client->setServerConf(listen_socket->getConf(client->getRequest().getHeader("Host")));
@@ -112,7 +113,8 @@ void	MultiServer::eraseFromPoll(int fd)
 void	MultiServer::run()
 {
 	RequestHandler	req_hand;
-	//change while(1) to while(Multiserver running) or similar -> how to check while Multiserver running?! -> include all this function inside a MultiServer Method call RUN?!!?!?
+	if (runServer)
+		LOG_INFO("Server is now available");
 	while (runServer)
 	{
 		LOG_DEBUG("Server running...");
@@ -162,7 +164,7 @@ void	MultiServer::run()
 					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
 					if (file_fd != -1)
 					{
-						// LOG_INFO("File has been linked with client at socket " + it_c->second->getSocket());
+						LOG_INFO("File " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
 						struct pollfd file = {file_fd, POLLIN, 0};
 						_poll.push_back(file);
 					}

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 15:45:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:54:13 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,5 +40,6 @@
 
 #define DEFAULT_CONF "config/default.conf"
 #define DEFAULT_CONF_STR std::string(DEFAULT_CONF)
+#define BUFF_SIZE 4096
 
 #endif

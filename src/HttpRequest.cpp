@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 11:07:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:58:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@
 HttpRequest::HttpRequest()
 	: _header(), _method(GET), _path(""), _version("HTTP1.1"), _body(""), _complete(false)
 {
-	std::cout << "request default constructor called" << std::endl;
+	LOG_DEBUG("HttpRequest default constructor called");
 }
 
 HttpRequest::~HttpRequest()

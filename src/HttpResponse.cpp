@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 11:48:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:31:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 HttpResponse::HttpResponse()
 	:_status(), _header(), _body_presence(false), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0)
 {
-	std::cout << "response default constructor called" << std::endl;
+	LOG_DEBUG("HttpResponse default constructor called");
 }
 
 // HttpResponse::HttpResponse(const HttpResponse &other)
@@ -53,6 +53,7 @@ void	HttpResponse::setStatusCode(int code)
 		_body_presence = false;
 	else
 		_body_presence = true;
+	// _body_buffer = generateErrorBody(code);
 	//if (code != 200) //or other 200 and something???
 	// // Get appropriate error body based on status code
 	// std::string errorBody = errorPageHandler.getErrorPage(response.getStatusCode(), serverConfig);

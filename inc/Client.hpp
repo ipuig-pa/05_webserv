@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 12:09:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:26:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "HttpRequest.hpp"
 # include "HttpReqParser.hpp"
 # include "HttpResponse.hpp"
+# include "ErrorPageHandler.hpp"
 # include "Header.hpp"
 # include "ServerConf.hpp"
 # include "LocationConf.hpp"
@@ -40,14 +41,14 @@ enum clientState
 class Client //or struct?
 {
 private:
-	HttpRequest		_request;
-	HttpReqParser	_req_parser;
-	HttpResponse	_response;
-	int				_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
-	clientState		_state;
-	int				_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
-	ServerConf		&_currentServerConf; //idea: maybe create a upper class
-	LocationConf	*_currentLocConf;
+	HttpRequest			_request;
+	HttpReqParser		_req_parser;
+	HttpResponse		_response;
+	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
+	clientState			_state;
+	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
+	ServerConf			&_currentServerConf; //idea: maybe create a upper class
+	LocationConf		*_currentLocConf;
 
 	// int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	// std::string _data; //data for & from client
