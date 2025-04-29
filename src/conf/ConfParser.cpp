@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParseConf.cpp                                      :+:      :+:    :+:   */
+/*   ConfParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 11:00:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 10:41:21 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParseConf.hpp"
+#include "ConfParser.hpp"
 
 //parser for config, read, tokenize, and store the data
 ParseConf::ParseConf() : _server_count(0) {

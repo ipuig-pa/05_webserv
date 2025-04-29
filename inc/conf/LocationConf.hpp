@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:05:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 10:40:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LOCATIONCONF_HPP
 #define LOCATIONCONF_HPP
 
-#include "../webserv.hpp"
+#include "webserv.hpp"
 #include "ServerConf.hpp"
 
 //idea tmp.getlocation()

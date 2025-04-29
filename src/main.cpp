@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 11:01:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 10:43:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include "global.hpp"
-#include "ReadConf.hpp"
-#include "ParseConf.hpp"
+#include "ConfReader.hpp"
+#include "ConfParser.hpp"
 #include "ServerConf.hpp"
 #include "MultiServer.hpp"
 

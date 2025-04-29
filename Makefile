@@ -9,8 +9,8 @@ OBJ_DIR = obj
 VPATH =	$(SRC_DIR):\
 		$(SRC_DIR)/conf
 
-SOURCES =	ReadConf.cpp \
-			ParseConf.cpp \
+SOURCES =	ConfReader.cpp \
+			ConfParser.cpp \
 			ServerConf.cpp \
 			LocationConf.cpp \
 			MultiServer.cpp \

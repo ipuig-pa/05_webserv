@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:07:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 10:40:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 #define SERVERCONF_HPP
 
 #define MAX_BODY 2*1024*1024 //2 megebyte, random set now
-#include "../webserv.hpp"
+#include "webserv.hpp"
 #include "LocationConf.hpp"
-#include "../CgiChecker.hpp"
+#include "CgiChecker.hpp"
 class LocationConf;
 
 //setter for varible, set val to an instance of server
