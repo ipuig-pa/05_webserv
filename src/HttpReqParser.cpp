@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 13:01:24 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:23:16 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ HttpReqParser::~HttpReqParser() {}
 bool HttpReqParser::httpParse(void)
 {
 	_httpReq.setComplete(false);
-	while (_stage != FINISH && _stage != ERROR)
+	while (_stage != FINISH && _stage != PARSE_ERROR)
 	{
 		if (_stage == REQ_LINE)
 		{
 			if (!_parseReqLine(_httpReq))
 			{
-				//_stage = ERROR; the stage is set inside singleline() of (parseheader())
+				//_stage = PARSE_ERROR; the stage is set inside singleline() of (parseheader())
 				std::cout << _stage << std::endl;
 				return false;
 			}
@@ -37,7 +37,7 @@ bool HttpReqParser::httpParse(void)
 		{
 			if (!_parseHeader(_httpReq))
 			{
-				//_stage = ERROR; the stage is set inside singleline() of (parseheader())
+				//_stage = PARSE_ERROR; the stage is set inside singleline() of (parseheader())
 				return false;
 			}
 			std::cout << _stage << std::endl;
@@ -46,7 +46,7 @@ bool HttpReqParser::httpParse(void)
 		{
 			if (!_parseBody(_httpReq))
 			{
-				//_stage = ERROR; //can still process even erro in body?? bc body is just optional...??
+				//_stage = PARSE_ERROR; //can still process even erro in body?? bc body is just optional...??
 				return false;
 			}
 		}
@@ -63,7 +63,7 @@ bool HttpReqParser::_parseReqLine(HttpRequest &request)
 	size_t end = _buffer.find("\r\n");
 	if (end == std::string::npos)
 	{
-		// std::cerr << "Error: invalid request line. can't find '\\r\\n'"; // No, can happen that we have not received enough data yet, but no error
+		// std::cerr << "PARSE_Error: invalid request line. can't find '\\r\\n'"; // No, can happen that we have not received enough data yet, but no PARSE_error
 		return false;
 	}
 	std::string cur_line = _buffer.substr(0, end);
@@ -72,8 +72,8 @@ bool HttpReqParser::_parseReqLine(HttpRequest &request)
 	tmp >> method >> url >> ver;
 	if (method.empty() || url.empty() || ver.empty())
 	{
-		std::cerr << "Error: invalid request line. should be M U V";
-		_stage = ERROR;
+		std::cerr << "PARSE_Error: invalid request line. should be M U V";
+		_stage = PARSE_ERROR;
 		return false;
 	}
 	request.setMethod(method);
@@ -88,8 +88,8 @@ bool HttpReqParser::_parseReqLine(HttpRequest &request)
 	std::string tmp_v = "HTTP/1.1";
 	if (tmp_v.compare(ver) != 0)
 	{
-		std::cerr << "Error: invalid HTTP version";
-		_stage = ERROR;
+		std::cerr << "PARSE_Error: invalid HTTP version";
+		_stage = PARSE_ERROR;
 		return false;
 	}
 	request.setVersion(ver);
@@ -103,7 +103,7 @@ bool HttpReqParser::_singleHeaderLine(HttpRequest &request, const std::string& c
 	std::cout << "found : at pos." << pos << std::endl;
 	if (pos == std::string::npos)
 	{
-		std::cerr << "Error: no colon after line_name.";
+		std::cerr << "PARSE_Error: no colon after line_name.";
 		return false;
 	}
 	std::string name = curLine.substr(0, pos);
@@ -119,7 +119,7 @@ bool HttpReqParser::_singleHeaderLine(HttpRequest &request, const std::string& c
 	// size_t pos = _buffer.find(':');
 	// if (pos == std::string::npos)
 	// {
-	// 	std::cerr << "Error: no colon after line_name.";
+	// 	std::cerr << "PARSE_Error: no colon after line_name.";
 	// 	return false;
 	// }
 	// std::string _name = _buffer.substr(0, pos);
@@ -137,7 +137,7 @@ bool HttpReqParser::_parseHeader(HttpRequest &request)
 	size_t end = _buffer.find("\r\n");
 	// if (end == std::string::npos) // no needed because checked before
 	// {
-	// 	std::cerr << "Error: invalid hearder. can't find '\\r\\n'";
+	// 	std::cerr << "PARSE_Error: invalid hearder. can't find '\\r\\n'";
 	// 	return false;
 	// }
 	if (end == 0)
@@ -156,7 +156,7 @@ bool HttpReqParser::_parseHeader(HttpRequest &request)
 			}
 			else
 			{
-				_stage = ERROR;
+				_stage = PARSE_ERROR;
 				return false;
 				//triger response  411 Length Required status or 00 Bad Request
 			}
@@ -172,7 +172,7 @@ bool HttpReqParser::_parseHeader(HttpRequest &request)
 	_buffer.erase(0, end + 2);
 	if (!_singleHeaderLine(request, cur_line))
 	{
-		_stage = ERROR;
+		_stage = PARSE_ERROR;
 		return false;
 	}
 	return true;
@@ -182,7 +182,7 @@ bool HttpReqParser::_parseBody(HttpRequest &request)
 {
 	if (_buffer.size() < _bodyLength)
 	{
-		// std::cerr << "Error: invalid body size."; // Not enough data received yet.
+		// std::cerr << "PARSE_Error: invalid body size."; // Not enough data received yet.
 		return false;
 	}
 	std::string body = _buffer.substr(0, _bodyLength);
@@ -210,5 +210,5 @@ void	HttpReqParser::appendBuffer(const std::string data, size_t length)
 		_buffer.append(data, length);
 	size_t end = _buffer.find("\r\n\r\n");
 	if (end != std::string::npos)
-		_header_complete = true;// No enough data has been received yet, but no error
+		_header_complete = true;// No enough data has been received yet, but no PARSE_error
 }

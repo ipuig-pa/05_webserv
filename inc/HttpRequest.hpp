@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 13:28:00 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:22:26 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include "webserv.hpp"
 # include "Header.hpp"
+
+# include "Logger.hpp"
 // # include "HttpReqParser.hpp"
 
 /** TEMPLATE:

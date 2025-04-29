@@ -9,8 +9,8 @@ OBJ_DIR = obj
 VPATH =	$(SRC_DIR):\
 		$(SRC_DIR)/conf
 
-SOURCES =	ReadConf.cpp \
-			ParseConf.cpp \
+SOURCES =	ConfReader.cpp \
+			ConfParser.cpp \
 			ServerConf.cpp \
 			LocationConf.cpp \
 			MultiServer.cpp \
@@ -24,6 +24,7 @@ SOURCES =	ReadConf.cpp \
 			Status.cpp \
 			CgiChecker.cpp \
 			FileUtils.cpp \
+			Logger.cpp \
 			main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)

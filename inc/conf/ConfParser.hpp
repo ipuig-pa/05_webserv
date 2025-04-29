@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParseConf.hpp                                      :+:      :+:    :+:   */
+/*   ConfParser.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 10:16:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:05:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,11 @@
 #ifndef PARSECONF_HPP
 #define PARSECONF_HPP
 
-#include "../webserv.hpp"
-#include "ReadConf.hpp"
-#include "../FileUtils.hpp"
+#include "webserv.hpp"
+#include "ConfReader.hpp"
+#include "FileUtils.hpp"
 #include "ServerConf.hpp"
+# include "Logger.hpp"
 
 class ParseConf
 {

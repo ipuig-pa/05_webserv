@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:24:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:09:33 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,7 @@ private:
 	HttpResponse	_response;
 	int				_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState		_state;
-	int				_file_fd;
-	std::string		_response_buffer; //put inside the response???
-	size_t			_bytes_sent;
-	bool			_empty_buffer;
+	int				_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
 	ServerConf		&_currentServerConf; //idea: maybe create a upper class
 	LocationConf	*_currentLocConf;
 
@@ -72,7 +69,6 @@ public:
 	HttpReqParser	&getParser(void);
 
 	void			setState(clientState state);
-	void			setResponse(HttpResponse response);
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);

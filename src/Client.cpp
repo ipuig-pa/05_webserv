@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:24:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:11:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _response_buffer(""), _bytes_sent(0), _empty_buffer(true), _currentServerConf(default_conf), _currentLocConf(nullptr)
+	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr)
 {
 	//_request ->change _currentConfig according to request header (find )
 	//_response
@@ -43,11 +43,6 @@ HttpResponse	&Client::getResponse(void)
 clientState	Client::getState(void)
 {
 	return (_state);
-}
-
-bool	Client::getEmptyBuffer(void)
-{
-	return (_empty_buffer);
 }
 
 ServerConf	&Client::getServerConf(void)
@@ -75,20 +70,9 @@ HttpReqParser	&Client::getParser(void)
 	return (_req_parser);
 }
 
-
-void	Client::setEmptyBuffer(bool value)
-{
-	_empty_buffer = value;
-}
-
 void	Client::setState(clientState state)
 {
 	_state = state;
-}
-
-void	Client::setResponse(HttpResponse response)
-{
-	_response = response;
 }
 
 void	Client::setFileFd(int file_fd)
@@ -96,14 +80,9 @@ void	Client::setFileFd(int file_fd)
 	_file_fd = file_fd;
 }
 
-void	Client::setBuffer(char *buffer, size_t bytesRead)
-{
-	_response_buffer.assign(buffer, bytesRead);
-}
-
 bool	Client::sendResponseChunk(void)
 {
-	if (_bytes_sent == 0)
+	if (_response.getBytesSent() == 0)
 	{
 		std::string	status = _response.statusToString();
 		std::string	headers = _response.headersToString();
@@ -111,33 +90,31 @@ bool	Client::sendResponseChunk(void)
 		size_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
 			return false;
-		_bytes_sent = sent;
+		_response.setBytesSent(sent);
 		sent = send(_socket, headers.c_str(), headers.length(), 0);
 		if (sent < 0)
 			return false;
-		_bytes_sent += sent;
+		_response.setBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
 	if (_response.getBodyPresence() == true)
 	{
-		if (!_empty_buffer)
+		if (!_response.getBodyBuffer().empty())
 		{
-			size_t sent = send(_socket, _response_buffer.c_str(), _response_buffer.length(), 0);
+			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
 			if (sent < 0)
 				return false;
-			_empty_buffer = true;
-			_bytes_sent += sent;
+			_response.setBodyBuffer("");
+			_response.setBytesSent(sent);
 			return true;
 		}
-		if (_empty_buffer && _file_fd == -1 && _response.getState() != READ) //or handle the case where there was a fd and is already sent!
+		else if (_file_fd == -1 && _response.getState() == READ) //or handle the case where there was a fd and is already sent!
 		{
-			std::string	body = _response.getBody();
-			size_t	sent = send(_socket, body.c_str(), body.length(), 0);
-			if (sent < 0)
-				return false;
-			_bytes_sent += sent;
+			_state = NEW_REQUEST;
 			return true;
 		}
+		// else
+		// 	//error handling1??
 	}
 	return false; //!?!?!?
 	//else set it as already sent

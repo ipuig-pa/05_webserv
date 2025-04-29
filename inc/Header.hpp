@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 13:24:17 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:22:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 struct CaseInsensitiveCompare {
 	bool operator()(const std::string& a, const std::string& b) const;
 };
+
+# include "Logger.hpp"
 
 class Header
 {

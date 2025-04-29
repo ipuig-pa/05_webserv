@@ -6,16 +6,17 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 11:01:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:03:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include "global.hpp"
-#include "ReadConf.hpp"
-#include "ParseConf.hpp"
+#include "ConfReader.hpp"
+#include "ConfParser.hpp"
 #include "ServerConf.hpp"
 #include "MultiServer.hpp"
+#include "Logger.hpp"
 
 std::atomic<bool> runServer = true;
 
@@ -29,6 +30,7 @@ void signalHandler(const int signum) {
 
 int main(int ac, char **av)
 {
+	LOG_INIT(DEBUG, "webserv.log", true);
 	// Signal handling
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
@@ -37,7 +39,7 @@ int main(int ac, char **av)
 	std::string	config_path;
 	if (ac == 1)
 	{
-		std::cerr << "No config file is provided. " << DEFAULT_CONF << " will be used." << std::endl; //print in cerr or in LOG?!?!
+		LOG_WARN("No config file is provided. " + DEFAULT_CONF_STR + " will be used.");
 		config_path = DEFAULT_CONF;
 	}
 	else if (ac == 2)
@@ -46,7 +48,7 @@ int main(int ac, char **av)
 	}
 	else
 	{
-		std::cerr << "Provide a single config file as argument, or leave it empty to use the default one." << std::endl;
+		LOG_ERR("Invalid number of arguments.");
 	}
 
 	// Read config file -> should we call poll first!?!?

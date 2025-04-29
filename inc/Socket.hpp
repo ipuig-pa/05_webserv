@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/26 15:47:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:04:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 //do we really use this class?? Should be in fact a virtual class, and both client and server inherit from it?!?!?!
 #include "webserv.hpp"
 #include "ServerConf.hpp"
+# include "Logger.hpp"
 
 class Socket
 {

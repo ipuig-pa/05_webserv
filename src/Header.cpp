@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 13:26:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:23:04 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void Header::remove(const std::string& name)
 // 	// ...
 // }
 
-// Serialize headers to a string (for response generation)
+// Serialize headers to a string (for response generation). Classify with some order before!?!?!
 std::string Header::toString() const
 {
 	std::stringstream ss;

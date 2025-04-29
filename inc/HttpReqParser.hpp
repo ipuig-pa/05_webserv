@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 14:46:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:05:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,14 @@
 #include "webserv.hpp"
 #include "HttpRequest.hpp"
 
+# include "Logger.hpp"
+
 enum reqStage {
 	REQ_LINE, //raw lines of http request
 	HEADERS,
 	BODY,
 	FINISH,
-	ERROR	
+	PARSE_ERROR
 };
 class HttpReqParser
 {

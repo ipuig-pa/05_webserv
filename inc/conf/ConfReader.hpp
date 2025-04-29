@@ -1,19 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ReadConf.hpp                                       :+:      :+:    :+:   */
+/*   ConfReader.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:38:06 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/24 13:35:22 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:05:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef READCONF_HPP
 #define READCONF_HPP
 
-#include "../webserv.hpp" 
+#include "webserv.hpp"
+# include "Logger.hpp"
 
 //read and process .conf, return raw conflines
 //then process (skip comments, invalid var/value etc...), return vec of lines, already processed

@@ -6,15 +6,16 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 12:12:55 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:22:40 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LOCATIONCONF_HPP
 #define LOCATIONCONF_HPP
 
-#include "../webserv.hpp"
+#include "webserv.hpp"
 #include "ServerConf.hpp"
+# include "Logger.hpp"
 
 //idea tmp.getlocation()
 
