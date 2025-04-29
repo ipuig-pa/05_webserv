@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/28 10:37:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:26:46 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ Header::~Header()
 
 //overload the function operator, to enable struct behave like a function
 //compares the string a and b in a case insensitive manner
-bool Header::CaseInsensitiveCompare::operator()(const std::string& a, const std::string& b) const
+// bool Header::CaseInsensitiveCompare::operator()(const std::string& a, const std::string& b) const
+bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string& b) const
 {
 	return strcasecmp(a.c_str(), b.c_str()) < 0;
 }
@@ -51,7 +52,7 @@ void Header::set(const std::string name, const std::string value)
 }
 
 // Get a field value (returns empty string if not found)
-std::string Header::get(const std::string& name) const
+std::string Header::getVal(const std::string& name) const
 {
 	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.find(name);
 	if (it != _fields.end())
@@ -60,7 +61,8 @@ std::string Header::get(const std::string& name) const
 }
 
 // Get all headers
-const std::map<std::string, std::string, Header::CaseInsensitiveCompare>& Header::getAll() const
+// const std::map<std::string, std::string, Header::CaseInsensitiveCompare>& Header::getAll() const
+const std::map<std::string, std::string, CaseInsensitiveCompare>& Header::getAll() const
 {
 	return _fields;
 }

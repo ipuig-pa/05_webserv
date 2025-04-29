@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 13:11:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:28:00 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,10 @@ private:
 	Header		_header;
 	methodType	_method;
 	std::string	_path;
+	std::string _queryPart;
 	std::string _version;
-	std::string	_body;	std::string	_buffer;
+	std::string	_body;
+	std::string	_buffer;
 	bool		_complete;
 
 	//attirbute (server name, method, path, header [...])
@@ -53,6 +55,7 @@ public:
 	//setter
 	void setMethod(std::string s); //set as methodType type
 	void setPath(const std::string url);
+	void setQueryPart(const std::string s);
 	void setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
 	void setHeaderField(const std::string name, const std::string value);
 	void setBody(const std::string body);
@@ -62,8 +65,10 @@ public:
 	int				getMethod(void) const;
 	std::string		&getPath(void); //url
 	std::string		getVersion();
-	std::string		getHeader(const std::string& name);//needed?!!? -yes, this will check is there has a body or not
+	std::string		getHeaderVal(const std::string& name);//needed?!!? -yes, this will check is there has a body or not
+	std::map<std::string, std::string, CaseInsensitiveCompare> getHearderField(); //get whole filed <key> <value>
 	std::string&	getBody();
+	std::string		getQueryPart();
 	// methodType& getMethd();
 
 	bool			isComplete();

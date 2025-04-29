@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 11:37:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 13:27:03 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,16 @@ std::string	&HttpRequest::getPath(void)
 	return _path;
 }
 
+void HttpRequest::setQueryPart(const std::string s)
+{
+	this->_queryPart = s;
+}
+
+std::string HttpRequest::getQueryPart()
+{
+	return _queryPart;
+}
+
 void HttpRequest::setVersion(const std::string s)
 {
 	this->_version = s;
@@ -95,9 +105,14 @@ void HttpRequest::setHeaderField(const std::string name, const std::string value
 	this->_header.set(name, value);
 }
 
-std::string HttpRequest::getHeader(const std::string& name)
+std::string HttpRequest::getHeaderVal(const std::string& name)
 {
-	return _header.get(name);
+	return _header.getVal(name);
+}
+
+std::map<std::string, std::string, CaseInsensitiveCompare> HttpRequest::getHearderField()
+{
+	return _header.getAll();	
 }
 
 void HttpRequest::setBody(const std::string body)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:06:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:14:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,7 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 		{"client_max_body_size", [&](){ parseLocCMBS(locBlock, loc_tokens, i); }},
 		{"autoindex", [&](){ parseLocAuto(locBlock, loc_tokens, i); }},
 		{"index", [&](){ parseLocIndex(locBlock, loc_tokens, i); }},
-		{"cgi_path", [&](){ parseCgiPath(locBlock, loc_tokens, i); }},
+		{"cgi_path", [&](){ parseCgiSysPath(locBlock, loc_tokens, i); }},
 		{"cgi_extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
 		{"return", [&](){ parseReturn(locBlock, loc_tokens, i); }}
 	};
@@ -342,7 +342,7 @@ void ServerConf::parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_t
 	}
 	loc.setLocCMBS(tmp);
 }
-void ServerConf::parseCgiPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+void ServerConf::parseCgiSysPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()) {
 		throw std::runtime_error("Error: no parameter after 'cgi_path'.");
@@ -358,11 +358,11 @@ void ServerConf::parseCgiPath(LocationConf& loc, std::vector<std::string>& loc_t
 		else {
 			_cgiPath.push_back(loc_tks[i]);
 			if (i + 1 >= loc_tks.size()){
-				throw std::runtime_error("Error: cgipath parameter invalid.");
+				throw std::runtime_error("Error: cgi system path parameter invalid.");
 			}
 		}
 	}
-	loc.setCgiPath(_cgiPath);
+	loc.setCgiSysPath(_cgiPath);
 }
 void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
@@ -384,7 +384,7 @@ void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& 
 			}
 		}
 	}
-	loc.setCgiPath(_cgiExtend);
+	loc.setCgiExtenion(_cgiExtend);
 }
 void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
