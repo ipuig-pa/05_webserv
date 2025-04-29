@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 15:45:13 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:03:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int main(int ac, char **av)
 	std::string	config_path;
 	if (ac == 1)
 	{
-		LOG_INFO("No config file is provided. " + DEFAULT_CONF_STR + " will be used.");
+		LOG_WARN("No config file is provided. " + DEFAULT_CONF_STR + " will be used.");
 		config_path = DEFAULT_CONF;
 	}
 	else if (ac == 2)
@@ -48,7 +48,7 @@ int main(int ac, char **av)
 	}
 	else
 	{
-		std::cerr << "Provide a single config file as argument, or leave it empty to use the default one." << std::endl;
+		LOG_ERR("Invalid number of arguments.");
 	}
 
 	// Read config file -> should we call poll first!?!?

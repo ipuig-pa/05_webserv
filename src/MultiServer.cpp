@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 12:22:56 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:12:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,13 +109,13 @@ void	MultiServer::eraseFromPoll(int fd)
 }
 
 //change to MultiServer syntax
-int	MultiServer::run()
+void	MultiServer::run()
 {
 	RequestHandler	req_hand;
 	//change while(1) to while(Multiserver running) or similar -> how to check while Multiserver running?! -> include all this function inside a MultiServer Method call RUN?!!?!?
 	while (runServer)
 	{
-		std::cout << "server running..." << std::endl;
+		LOG_DEBUG("Server running...");
 
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
 		int ready = poll(_poll.data(), _poll.size(), -1);
@@ -124,12 +124,12 @@ int	MultiServer::run()
 		{
 			if (errno != EINTR) // check that the error was not due to a signal interrupting poll call, but not real error occured
 			{
-				std::cerr << "Poll error: " << strerror(errno) << std::endl;
+				LOG_ERR("Poll error: " + std::string(strerror(errno)));
 				// have into account other errors for specific behavior???
 				if (errno == ENOMEM) // Not enough space/cannot allocate memory
 				{
 					// cleanupAndExit(); //TO BE IMPLEMENTED!
-					return (1);
+					return ;
 				}
 			}
 			continue; // Skip this iteration and try polling again
@@ -162,7 +162,7 @@ int	MultiServer::run()
 					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
 					if (file_fd != -1)
 					{
-						std::cout << "file fd has been created" << std::endl;
+						// LOG_INFO("File has been linked with client at socket " + it_c->second->getSocket());
 						struct pollfd file = {file_fd, POLLIN, 0};
 						_poll.push_back(file);
 					}
@@ -213,7 +213,7 @@ int	MultiServer::run()
 			// }
 		}
 	}
-	return (0);
+	return ;
 }
 
 /*handle directory request:

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:42 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 15:53:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:59:13 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,8 @@ public:
 #define LOG_INIT(level, file, console) Logger::getInstance().init(level, file, console)
 #define LOG_DEBUG(msg) Logger::getInstance().debug(msg)
 #define LOG_INFO(msg) Logger::getInstance().info(msg)
-#define LOG_WARNING(msg) Logger::getInstance().warning(msg)
-#define LOG_ERROR(msg) Logger::getInstance().error(msg)
+#define LOG_WARN(msg) Logger::getInstance().warning(msg)
+#define LOG_ERR(msg) Logger::getInstance().error(msg)
 #define LOG_FATAL(msg) Logger::getInstance().fatal(msg)
 #define LOG_CLEANUP() Logger::getInstance().cleanup()
 

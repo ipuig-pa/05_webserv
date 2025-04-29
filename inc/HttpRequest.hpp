@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 15:25:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:05:13 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include "webserv.hpp"
 # include "Header.hpp"
+
+# include "Logger.hpp"
 // # include "HttpReqParser.hpp"
 
 /** TEMPLATE:

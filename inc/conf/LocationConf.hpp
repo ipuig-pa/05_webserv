@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 10:40:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:05:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include "webserv.hpp"
 #include "ServerConf.hpp"
+# include "Logger.hpp"
 
 //idea tmp.getlocation()
 

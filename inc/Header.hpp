@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/28 10:28:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:05:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include "webserv.hpp"
 # include <map>
+
+# include "Logger.hpp"
 
 class Header
 {

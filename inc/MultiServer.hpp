@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/27 11:54:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:04:49 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include "ServerConf.hpp"
 #include "Socket.hpp"
 #include "RequestHandler.hpp"
+
+# include "Logger.hpp"
 
 class MultiServer
 {
@@ -40,7 +42,7 @@ public:
 	std::vector<struct pollfd>	&getPoll(void);
 	std::map<int, Client*>		&getClients(void);
 
-	int		run();
+	void		run();
 
 //	void	handleConnectionClosed(???);
 	void	eraseFromPoll(int fd);
