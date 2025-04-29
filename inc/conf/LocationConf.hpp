@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:05:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:22:40 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class LocationConf
 	bool _cmbsFlag;
 	unsigned long long _locCMBS;
 	//for dynamic content
-	std::vector<std::string> cgi_path; //run script to generate customized content
+	std::vector<std::string> cgi_sys_path; //run script to generate customized content
 	std::vector<std::string> cgi_extension; //for surfix to treat as CGI: .py; .php; ...
 	std::map<std::string, std::string> _path_ext_match;
 	bool _locAuto;
@@ -60,7 +60,7 @@ class LocationConf
 	// void setLocCMBS(std::string s);
 	bool _cmbsSet() const;
 	void setLocCMBS(unsigned long long _size);
-	void setCgiPath(std::vector<std::string> s);
+	void setCgiSysPath(std::vector<std::string> s);
 	void setCgiExtenion(std::vector<std::string> s);
 	void setLocIndex(std::string s);
 	bool _autoSet() const;
@@ -77,7 +77,7 @@ class LocationConf
 	bool getLocAuto() const;
 	const std::string& getReturn() const;
 	// const std::string& getCgiPath() const;
-	const std::vector<std::string>& getCgiPath() const;
+	const std::vector<std::string>& getCgiSysPath() const;
 	// const std::string& getCgiExtension() const;
 	const std::vector<std::string>& getCgiExtension() const;
 	const std::map<std::string, std::string>& getPathExMap() const;

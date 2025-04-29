@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 17:05:41 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 12:14:22 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void LocationConf::setLocCMBS(unsigned long long _size)
 	this->_cmbsFlag = true;
 }
 
-void LocationConf::setCgiPath(std::vector<std::string> s)
+void LocationConf::setCgiSysPath(std::vector<std::string> s)
 {
 	for (size_t i = 0; i < s.size(); ++i)
 	{
@@ -106,7 +106,7 @@ void LocationConf::setCgiPath(std::vector<std::string> s)
 			throw std::runtime_error("invalid cgi path.");
 		}
 	}
-	this->cgi_path = s;
+	this->cgi_sys_path = s;
 }
 void LocationConf::setCgiExtenion(std::vector<std::string> s)
 {
@@ -176,9 +176,9 @@ const std::string& LocationConf::getReturn() const
 	return this->_returnUrl;
 }
 // const std::string& LocationConf::getCgiPath() const;
-const std::vector<std::string>& LocationConf::getCgiPath() const
+const std::vector<std::string>& LocationConf::getCgiSysPath() const
 {
-	return this->cgi_path;
+	return this->cgi_sys_path;
 }
 // const std::string& LocationConf::getCgiExtension() const;
 const std::vector<std::string>& LocationConf::getCgiExtension() const

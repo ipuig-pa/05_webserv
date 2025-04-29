@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 16:05:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:22:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,19 @@
 # include "webserv.hpp"
 # include <map>
 
+struct CaseInsensitiveCompare {
+	bool operator()(const std::string& a, const std::string& b) const;
+};
+
 # include "Logger.hpp"
 
 class Header
 {
 private:
 	//implement correctly in cpp file instead!?!
-	struct CaseInsensitiveCompare {
-		bool operator()(const std::string& a, const std::string& b) const;
-	};
+	// struct CaseInsensitiveCompare {
+	// 	bool operator()(const std::string& a, const std::string& b) const;
+	// };
 	std::map<std::string, std::string, CaseInsensitiveCompare> _fields;
 
 public:
@@ -34,7 +38,7 @@ public:
 	~Header();
 
 	void set(const std::string name, const std::string value);
-	std::string get(const std::string& name) const;
+	std::string getVal(const std::string& name) const;
 	const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const;
 
 	bool check_exist(const std::string& name) const;

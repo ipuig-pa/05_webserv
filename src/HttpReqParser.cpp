@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:01:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 17:34:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,14 @@ bool HttpReqParser::_parseReqLine(HttpRequest &request)
 		return false;
 	}
 	request.setMethod(method);
-	request.setPath(url);
+	
+	size_t questionSign = url.find('?');
+	if (questionSign != std::string::npos) { //url is: xxxxx?xxxxx format
+		request.setPath(url.substr(0, questionSign + 1));
+		request.setQueryPart(url.substr(questionSign + 1));
+	} else {
+		request.setPath(url);
+	}
 	std::string tmp_v = "HTTP/1.1";
 	if (tmp_v.compare(ver) != 0)
 	{
@@ -133,7 +140,7 @@ bool HttpReqParser::_parseHeader(HttpRequest &request)
 	{
 		//IMPORTANT!!! CHECK FOR Transfer-Encoding: chunked, which won't have the content-legth
 		_buffer.erase(0, 2);										 // erase empty line (\r\n\r\n count as 4)
-		std::string _content = request.getHeader("Content-Length"); // case sensitive or not?
+		std::string _content = request.getHeaderVal("Content-Length"); // case sensitive or not?
 		if (_content.empty())
 		{
 			LOG_WARN("Content-length header was not found in HttpRequest"); //add number of client?!

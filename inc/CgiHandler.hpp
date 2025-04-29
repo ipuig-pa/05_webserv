@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:31:33 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/27 13:33:06 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/29 16:11:21 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,25 +27,30 @@ class CgiHandler
 {
 private:
 	pid_t _cgiPid;
-	int _cgiInput[2]; //for POST, send data to CGI
-	int _cgiOutput[2]; //CGI send out data, namely for GET (to read fron cgiOut[0])
-	std::string _cgiPath;
-	std::string _cgiName; //content.php, example.py ...
-	std::string _rootPath; //05_webserv/www/cgi, needed??
+	int _pipToCgi[2]; //for POST, send data to CGI, stdin
+	int _pipFromCgi[2]; //stdout, CGI send out data, namely for GET (to read fron cgiOut[0])
+	std::string _cgiFullPath; //full path to executable: /05_webserv/www/cgi/xx.php
+	std::string _scriptName; //relative to root, identify which cgi to exec: cgi/xx.php
+	std::string _rootPath; //where to look for files: 05_webserv/www/
 	HttpRequest _request;
 	std::map<std::string, std::string> _env;
 	
-	void _setEnv(const HttpRequest& httpReq);//set var: method; QUERY_STR; content-length/content-type, header=>CGI
-	bool _execCGI(); //pipe, fork, [...]
+	void _setEnv();//set var: method; QUERY_STR; content-length/content-type, header=>CGI
+	bool _execCGI(std::string& cgiRawOutput); //pipe, fork, [...]
+	void _convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
 	HttpResponse _generateResponse(); //make HttpResponse from script
 	std::string _getCgiExtension(); //may not necessary?? since now just .php used
-	std::string _readCgiExtendsion(); //read extension accordingly (from getExt()), for now just try .php
-public:
+	std::string _extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
+	
+	public:
 	CgiHandler();
 	CgiHandler(const HttpRequest& httpReq, const std::string& cgiPath, const std::string& rootPath);
 	~CgiHandler();
 	
 	HttpResponse handleCgiRequest(); //entry point, setEnv->execGuc->generateResponse->return HttpResponse
+
+	// //helper
+	// void _toUpCase(std::string& s);
 };
 
 #endif

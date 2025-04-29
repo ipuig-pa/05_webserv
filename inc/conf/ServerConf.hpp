@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:05:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 16:22:48 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ public:
 	void parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	
 	void parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
-	void parseCgiPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseCgiSysPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	
