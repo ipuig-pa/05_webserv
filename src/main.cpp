@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 10:43:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:45:13 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "ConfParser.hpp"
 #include "ServerConf.hpp"
 #include "MultiServer.hpp"
+#include "Logger.hpp"
 
 std::atomic<bool> runServer = true;
 
@@ -29,6 +30,7 @@ void signalHandler(const int signum) {
 
 int main(int ac, char **av)
 {
+	LOG_INIT(DEBUG, "webserv.log", true);
 	// Signal handling
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
@@ -37,7 +39,7 @@ int main(int ac, char **av)
 	std::string	config_path;
 	if (ac == 1)
 	{
-		std::cerr << "No config file is provided. " << DEFAULT_CONF << " will be used." << std::endl; //print in cerr or in LOG?!?!
+		LOG_INFO("No config file is provided. " + DEFAULT_CONF_STR + " will be used.");
 		config_path = DEFAULT_CONF;
 	}
 	else if (ac == 2)

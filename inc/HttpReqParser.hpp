@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/28 14:46:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/29 15:42:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ enum reqStage {
 	HEADERS,
 	BODY,
 	FINISH,
-	ERROR	
+	PARSE_ERROR
 };
 class HttpReqParser
 {

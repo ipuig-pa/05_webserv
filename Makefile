@@ -24,6 +24,7 @@ SOURCES =	ConfReader.cpp \
 			Status.cpp \
 			CgiChecker.cpp \
 			FileUtils.cpp \
+			Logger.cpp \
 			main.cpp
 
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)
