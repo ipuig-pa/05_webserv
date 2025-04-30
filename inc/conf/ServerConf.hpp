@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 16:39:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ public:
 	static bool _hasSemicolon(const std::string& s);
 	static std::string rmvSemicolon(const std::string& token);
 	static int _validPath();
-	bool _codeRange(const std::string& errtoken);
+	static bool _codeRange(const std::string& errtoken);
 	int _cgiValid();
 	void _wrapLocChecker(LocationConf& loc);
 	bool _locReturnCheck(LocationConf& loc);
