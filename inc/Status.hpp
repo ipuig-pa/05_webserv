@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:17:44 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 18:34:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:06:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define STATUS_HPP
 
 # include "webserv.hpp"
-# include "Logger.hpp"
 
 class Status
 {

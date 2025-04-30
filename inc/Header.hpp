@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 16:22:14 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/30 14:07:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 struct CaseInsensitiveCompare {
 	bool operator()(const std::string& a, const std::string& b) const;
 };
-
-# include "Logger.hpp"
 
 class Header
 {

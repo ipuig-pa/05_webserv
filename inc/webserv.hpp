@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:54:13 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:05:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@
 #include <dirent.h>// for readdir
 #include <unistd.h> // for read, close, ...??
 
-
 //possible use of containers
 #include <map>
 #include <vector>
 #include <algorithm>
 #include <functional> //use of map<string, function> pair in loction class
+
+#include "Logger.hpp"
 
 #define DEFAULT_CONF "config/default.conf"
 #define DEFAULT_CONF_STR std::string(DEFAULT_CONF)

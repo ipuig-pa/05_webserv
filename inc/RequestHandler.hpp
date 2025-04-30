@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 18:08:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 15:14:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,10 @@
 #include "ServerConf.hpp"
 #include "HttpReqParser.hpp"
 
-# include "Logger.hpp"
 #include "global.hpp" //just for testing
 
 //ADD HEAD REQUEST!?!??!
-//think if I have client as a parameter all the time, or if it should be as a private attribute / request handler as a private atrribute for client?
+//think if I have client as a parameter all the time, or if it should be as a private attribute / request handler as a private atrribute for client? -> or like errorpage handler, have a pointer to the client
 class RequestHandler
 {
 private:
@@ -32,7 +31,7 @@ private:
 	void		handlePostRequest(Client &client);
 	void		handleDeleteRequest(Client &client);
 	void		handleInvalidRequest(Client &client);
-	void		handleDirectoryRequest(Client &client, std::string &path);
+	void		handleDirectoryRequest(Client &client);
 	void		handleDirectoryListing(Client &client);
 	std::string	getPathFromUri(Client &client);
 

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:42 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 15:59:13 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 13:54:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class Logger
 	static std::ofstream	_log_file;
 	static std::string		_file_path;
 	static bool				_console_output;
+	static bool				_append;
 
 	static std::string getTimestamp();
 	static std::string levelToString(LogLevel level);
@@ -41,7 +42,8 @@ public:
 
 	static Logger& getInstance();
 
-	static void	init(LogLevel level, const std::string& log_file_path, bool console_output);
+	static void	init(LogLevel level, const std::string& log_file_path, bool console_output, bool append);
+
 	static void	debug(const std::string& msg);
 	static void	info(const std::string& msg);
 	static void	warning(const std::string& msg);
@@ -51,7 +53,7 @@ public:
 	static void cleanup();
 };
 
-#define LOG_INIT(level, file, console) Logger::getInstance().init(level, file, console)
+#define LOG_INIT(level, log_file_path, console_output, append) Logger::getInstance().init(level, log_file_path, console_output, append)
 #define LOG_DEBUG(msg) Logger::getInstance().debug(msg)
 #define LOG_INFO(msg) Logger::getInstance().info(msg)
 #define LOG_WARN(msg) Logger::getInstance().warning(msg)

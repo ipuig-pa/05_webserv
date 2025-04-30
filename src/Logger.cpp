@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:14 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 16:18:03 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 13:52:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,19 @@ LogLevel Logger::_level = DEBUG;
 std::ofstream Logger::_log_file;
 bool Logger::_console_output = true;
 std::string Logger::_file_path = "";
+bool Logger::_append = false;
 
-void	Logger::init(LogLevel level, const std::string& file_path, bool console_output)
+void	Logger::init(LogLevel level, const std::string& file_path, bool console_output, bool append)
 {
 	_level = level; 
 	_file_path = file_path;
+	_append = append;
 	if (!file_path.empty()) {
 		_file_path = file_path;
-		_log_file.open(file_path, std::ios::app);
+		if (_append)
+			_log_file.open(file_path, std::ios::app);
+		else
+			_log_file.open(file_path, std::ios::trunc);
 		if (!_log_file.is_open()) {
 			std::cerr << "Error: Cannot open log file: " << _file_path << std::endl;
 		}

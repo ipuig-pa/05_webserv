@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:05:39 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:06:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include "ConfReader.hpp"
 #include "FileUtils.hpp"
 #include "ServerConf.hpp"
-# include "Logger.hpp"
 
 class ParseConf
 {

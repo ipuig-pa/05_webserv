@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 18:40:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 13:56:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void	Client::setLocationConf(LocationConf *conf)
 
 void	Client::prepareErrorResponse(int code)
 {
+	LOG_ERR("Error " + std::to_string(code) + " occurred");
 	_response.setStatusCode(code);
 	_response.setBodyBuffer(_error_handler->generateErrorBody(code));
-	
 }

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:16:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:07:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include "ConfParser.hpp"
 #include "ServerConf.hpp"
 #include "MultiServer.hpp"
-#include "Logger.hpp"
 
 std::atomic<bool> runServer = true;
 
@@ -30,7 +29,7 @@ void signalHandler(const int signum) {
 
 int main(int ac, char **av)
 {
-	LOG_INIT(DEBUG, "webserv.log", true);
+	LOG_INIT(DEBUG, "webserv.log", true, false);
 	// Signal handling
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);

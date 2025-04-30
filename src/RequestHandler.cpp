@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 18:37:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 15:42:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	RequestHandler::handleGetRequest(Client &client)
 	stat(path.c_str(), &file_stat);
 	if (S_ISDIR(file_stat.st_mode))
 	{
-		handleDirectoryRequest(client, path);
+		handleDirectoryRequest(client);
 		return ;
 	}
 	int file_fd = open(path.c_str(), O_RDONLY);
@@ -151,7 +151,7 @@ void	RequestHandler::handleClientRead(Client &client)
 	if (client.getState() == READING_REQUEST)
 	{
 		ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
-		// std::cout << "already read " << bytesRead << "bytes." << std::endl;
+		std::cout << "already read " << bytesRead << "bytes." << std::endl;
 		if (bytesRead > 0)
 		{
 			if (!client.getRequest().isComplete())
@@ -186,6 +186,10 @@ void	RequestHandler::handleClientWrite(Client &client)
 		if (!client.sendResponseChunk())
 			//error handling??
 			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
+	}
+	if (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() + static_cast<size_t>(std::stoi(client.getResponse().getHeader("Content-Length")))) && client.getRequest().getHeaderVal("Connection") == "close")
+	{
+		client.setState(CONNECTION_CLOSED);
 	}
 }
 
@@ -238,31 +242,44 @@ void	RequestHandler::handleFileWrite(Client &client)
 }
 
 //We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUri to point to LocationConf??)
-void	RequestHandler::handleDirectoryRequest(Client &client, std::string &path)
+void	RequestHandler::handleDirectoryRequest(Client &client)
 {
 	LOG_DEBUG("Handling directory request");
 
 	// std::vector<std::string> indexFile;
 
 	std::string indexFile;
+	std::string path;
 	//Check for index files first
 	if (client.getLocationConf())
-		indexFile = client.getLocationConf()->getLocIndex(); // how is it stored in config?? should I also look into LocationConf!?!
-	else 
+	{
+		indexFile = client.getLocationConf()->getLocIndex();
+		path = client.getLocationConf()->getLocRoot() + client.getLocationConf()->getLocPath();
+	}
+	else
+	{
 		indexFile = client.getServerConf().getIndex();
-	std::string fullPath = path + "/" + indexFile;
-	// Check if the index file exists and is readable
-	if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
-		// Found an index file, modify the request path and process as a file request:
+		path = client.getServerConf().getRoot();
+	}
+
+	if (!indexFile.empty())
+	{
 		// If path doesn't end with '/', add it
 		if (path[path.length() - 1] != '/') {
 			path += "/";
 		}
-		// Update the request path to include the index file ???
-		client.getRequest().setPath(path + indexFile); // ???
-		// Process as a normal file GET request
-		handleGetRequest(client);
-		return;
+		std::string fullPath = path + indexFile;
+
+		// Check if the index file exists and is readable
+		LOG_INFO("Checking access to directory " + fullPath);
+		if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
+			// Found an index file, modify the request path and process as a file request:
+			// Update the request path to include the index file ???
+			client.getRequest().setPath(fullPath); // ???
+			// Process as a normal file GET request
+			handleGetRequest(client);
+			return;
+		}
 	}
 	//IN THE CASE THAT MULTIPLE INDEX FILES CAN EXIST FOR THE SAME LOCATION!?!?
 	// for (size_t i = 0; i < indexFiles.size(); i++) {
@@ -292,28 +309,28 @@ void	RequestHandler::handleDirectoryRequest(Client &client, std::string &path)
 
 void	RequestHandler::handleDirectoryListing(Client &client)
 {
-	(void) client;
-	// std::string path = client.getRequest().getPath();
-	// DIR	*dirp = opendir(path.c_str());
+	std::string path = client.getRequest().getPath();
+	DIR	*dirp = opendir(path.c_str());
 
-	// if (!dirp)
-	// {
-	// 	client.getResponse().setStatusCode(500); //Internal Server error
-	// 	return;
-	// }
-	// //Build HTML Content: check with telnet - nginx what exactly to build
-	// struct dirent	*dirent = readdir(dirp);
-	// while (dirent)
-	// {
-	// 	//write the HTML content: d_name etc
-	// 	//dirent->d_name;
-	// 	dirent = readdir(dirp);
-	// }
-	// if (errno) // will catch errors from readdir
-	// {
-	// 	std::cerr << "Poll error: " << strerror(errno) << std::endl;
-	// 	//handle error
-	// }
+	LOG_DEBUG("About to list " + path);
+	if (!dirp)
+	{
+		client.prepareErrorResponse(500); //Internal Server error
+		return;
+	}
+	//Build HTML Content: check with telnet - nginx what exactly to build
+	struct dirent	*dirent = readdir(dirp);
+	while (dirent)
+	{
+		//write the HTML content: d_name etc
+		//dirent->d_name;
+		dirent = readdir(dirp);
+	}
+	if (errno) // will catch errors from readdir
+	{
+		LOG_ERR("Poll error: " + std::string(strerror(errno)));
+		//handle error
+	}
 }
 
 std::string	RequestHandler::getPathFromUri(Client &client)

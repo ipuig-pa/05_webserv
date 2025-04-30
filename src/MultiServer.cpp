@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:37:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 10:24:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,7 @@ void	MultiServer::run()
 					}
 					if (it_c->second->getState() == CONNECTION_CLOSED)
 					{
+						close(fd);
 						eraseFromPoll(fd);
 					}
 					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done

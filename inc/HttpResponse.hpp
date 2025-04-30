@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 18:32:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/04/30 14:07:07 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@
 # include "webserv.hpp"
 # include "Header.hpp"
 # include "Status.hpp"
-
-# include "Logger.hpp"
 
 enum responseState
 {

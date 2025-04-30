@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 12:14:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/30 16:37:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,9 +173,10 @@ bool ServerConf::_locReturnCheck(LocationConf& loc)
 
 void ServerConf::_wrapLocChecker(LocationConf& loc)
 {
-	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
-		loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance
-	}
+	//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
+	// if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
+	// 	loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance //handle it in the directory request better?!?!?
+	// }
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
 	}
@@ -190,9 +191,10 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		if (loc.getLocRoot().empty()) { 
 			loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
 		}
-		if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
-			throw std::runtime_error("Error: path in loction is invalid: ");
-		}
+		//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
+		// if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
+		// 	throw std::runtime_error("Error: path in loction is invalid: ");
+		// }
 		if (!_locReturnCheck(loc)) {
 			throw std::runtime_error("Error: invalid return parameter.");
 		}
@@ -453,6 +455,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 			{
 				match = _location[i].getLocPath().size();
 				longest_match = &_location[i];
+				std::cout << "longest match for " + uripath + " is location num. " << i << std::endl;
 			}
 		}
 	}
