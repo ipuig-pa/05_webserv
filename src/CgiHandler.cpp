@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:06:52 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:18:37 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/30 16:15:09 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,39 @@ CgiHandler::CgiHandler()
 	_cgiPid = -1;
 	_pipToCgi[0] = _pipToCgi[1] = -1;
 	_pipFromCgi[0] = _pipFromCgi[1] = -1;
-	_cgiFullPath = "";
+	_cgiPath = "";
 }
 
-CgiHandler::CgiHandler(const HttpRequest& httpReq, const std::string& cgiPath, const std::string& rootPath)
-: _cgiFullPath(cgiPath), _rootPath(rootPath), _request(httpReq)
+CgiHandler::CgiHandler(const HttpRequest& httpReq, const std::string& req_url, const std::string& rootPath)
+: _cgiPath(req_url), _rootPath(rootPath), _request(httpReq)
 {
 	_cgiPid = -1;
 	_pipToCgi[0] = _pipToCgi[1] = -1;
 	_pipFromCgi[0] = _pipFromCgi[1] = -1;
+	_scriptName = _cgiPath;
 }
 
+//close all fd
+//maybe: check _cgiPid > 0, then kill()
 CgiHandler::~CgiHandler()
 {
-	//close all fd
-	//maybe: check _cgiPid > 0, then kill()
+	_cgiPid = -1;
+	if (_pipToCgi[0] != -1) {
+		close(_pipToCgi[0]);
+		_pipToCgi[0] = -1;
+	}
+	if (_pipToCgi[1] != -1) {
+		close(_pipToCgi[1]);
+		_pipToCgi[1] = -1;
+	}
+	if (_pipFromCgi[0] != -1) {
+		close(_pipFromCgi[0]);
+		_pipFromCgi[0] = -1;
+	}
+	if (_pipFromCgi[1] != -1) {
+		close(_pipFromCgi[1]);
+		_pipFromCgi[1] = -1;
+	}
 }
 
 HttpResponse CgiHandler::handleCgiRequest()
@@ -56,92 +74,272 @@ void CgiHandler::_convertFormat(std::map<std::string, std::string, CaseInsensiti
 	}
 }
 
+/**
+ * NOTE: different path value explaination with cur_structure
+ * SCRIPT_NAME: /cgi/some.sh
+ * PATH_INFO: 
+ * 	- extra info passed to CGI, if a request is: http://yourserver/cgi/some.sh/some/additional/info
+ * 	- INFO: /some/additional/info
+ * DOCUMENT_ROOT: /User/ewu/05_webserv/www (where to find static and cgi script)
+ * SCRIPT_FILENAME:
+ * 	- combine rootDoc + scripyName
+ * 	- : /User/ewu/05_webserv/www/cgi/some.sh
+ */
 //hard code to setEnv, maybe use setenv() func later?
 void CgiHandler::_setEnv()
 {
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	_env["REQUEST_METHOD"] = _request.getMethod();
-	_env["REQUEST_URI"] = _request.getPath() + _request.getQueryPart(); //set queryPart defaul ""
+	if (!_request.getQueryPart().empty()) {
+		_env["REQUEST_URI"] = _request.getPath() + "?" + _request.getQueryPart(); //set queryPart defaul ""
+	} else
+		_env["REQUEST_URI"] = _request.getPath();
 	_env["SERVER_PROTOCOL"] = _request.getVersion(); //HTTP/1.1
 	_env["SCRIPT_NAME"] = _scriptName; //name of executable
-	_env["SCRIPT_FILENAME"] = _cgiFullPath;
+	_env["SCRIPT_FILENAME"] = _rootPath + _cgiPath; //_rootPath + _request.getPath();
 	_env["DOCUMENT_ROOT"] = _rootPath;
+	_env["PATH_INFO"] = "place_holder";
 	_env["QUERY_STRING"] = _request.getQueryPart();
 	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = _request.getHearderField();
 	_convertFormat(_reqHeader);
 	std::string contentType = _request.getHeaderVal("Content-Type");
-	if (!contentType.empty()) {
+	if (!contentType.empty())
 		_env["CONTENT_TYPE"] = contentType;
-	}
 	std::string contentLen = _request.getHeaderVal("Content-Length");
-	if (!contentLen.empty()) {
+	if (!contentLen.empty())
 		_env["CONTENT_LENGTH"] = contentLen;
-	}
 	_env["SERVER_NAME"] = _request.getHeaderVal("Host");
 	_env["SERVER_PORT"] = "8002"; //placeholder, should from ServerConf::getListen()
 	_env["REMOTE_ADDR"] =  "127.0.0.1"; //placeholder, use client::getSocket(), ip address of client
 	// _env["HTTP_COOKIES"] = _request.getHeaderVal("cookie"); optional, see do bonus or not
 }
 
+bool CgiHandler::_forkErr()
+{
+	LOG_ERR("fail forking");
+	close(_pipToCgi[0]);
+	close(_pipToCgi[1]);
+	close(_pipFromCgi[0]);
+	close(_pipFromCgi[1]);
+	return false; //close of all fd is in destructor
+}
+
+std::vector<char*> CgiHandler::_createEnvp()
+{
+	std::vector<std::string> _envStr;
+	std::vector<char*> _envp;
+	std::map<std::string, std::string>::iterator iter;
+	for (iter = _env.begin(); iter != _env.end(); ++iter) {
+		_envStr.push_back(iter->first + "=" + iter->second);//create env-format string "key=value"
+	}
+	for (size_t i = 0; i < _envStr.size(); ++i) {
+		_envp.push_back(const_cast<char*>(_envStr[i].c_str()));
+	}
+	_envp.push_back(nullptr);
+	return _envp;
+}
+
+void CgiHandler::_child()
+{
+	close(_pipToCgi[1]);
+	dup2(_pipToCgi[0], STDIN_FILENO);
+	close(_pipToCgi[0]); //redirect read
+	close(_pipFromCgi[0]);
+	dup2(_pipFromCgi[1], STDOUT_FILENO);
+	close(_pipFromCgi[1]); //redirect write
+	std::vector<char*> _envp = _createEnvp();
+	std::string cgiExtend = _getCgiExtension(_scriptName);
+	std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	char* av[3];
+	av[0] = const_cast<char*>(sysPath.c_str());
+	av[1] = const_cast<char*>(_cgiPath.c_str());
+	av[2] = NULL;
+	if (execve(av[0], av, _envp.data()) == -1) { //std::vector:data() return a PTR to first element in mem_array
+		LOG_ERR("fail in execve for CGI(_child() func).");
+		exit(1);
+	}
+}
+
+bool CgiHandler::_parent(std::string& cgiRawOutput)
+{
+	int status;
+	
+	close(_pipToCgi[0]);//close CGI'stdin in parent
+	close(_pipFromCgi[1]);
+	if (_request.getMethod() == POST) { //write to cgi if its POST
+		const std::string& postBody = _request.getBody();
+		if (!postBody.empty()) {
+			write(_pipToCgi[1], postBody.c_str(), postBody.length());
+		}
+	}
+	close(_pipToCgi[1]);
+	// read from cgi
+	char tmpBuff[1024*2*2];
+	ssize_t bytes;
+	while (1) {
+		bytes = read(_pipFromCgi[0], tmpBuff, sizeof(tmpBuff) - 1);
+		if (bytes <= 0) { //reach EOF or fail
+			break ;
+		}
+		cgiRawOutput.append(tmpBuff, bytes);
+	}
+	close(_pipFromCgi[0]);
+	waitpid(_cgiPid, &status, 0);
+	return (WIFEXITED(status) && WEXITSTATUS(status) == 0);
+}
+
 //real execute process of CGI script. collect its output into _cgiOutput string
 bool CgiHandler::_execCGI(std::string& cgiRawOutput)
 {
 	if (pipe(_pipToCgi) < 0 || pipe(_pipFromCgi) < 0) {
-		std::cerr << "Error: fail creating pipe";
+		LOG_ERR("fail creating pipe");
 		return false;
 	}
 	_cgiPid = fork();
 	if (_cgiPid < 0) {
-		std::cerr << "Error: fail forking";
-		return false; //close of all fd is in destructor
+		return _forkErr();
 	}
-	if (_cgiPid == 0) { //child
-		close(_pipToCgi[1]);
-		dup2(_pipToCgi[0], STDIN_FILENO);
-		close(_pipToCgi[0]); //redirect read
-		close(_pipFromCgi[0]);
-		dup2(_pipFromCgi[1], STDOUT_FILENO);
-		close(_pipFromCgi[1]); //redirect write
-		std::vector<std::string> _envStr;
-		std::vector<char*> _envp;
-		std::map<std::string, std::string>::iterator iter;
-		for (iter = _env.begin(); iter != _env.end(); ++iter) {
-			_envStr.push_back(iter->first + "=" + iter->second);//create env-format string "key=value"
-		}
-		for (size_t i = 0; i < _envStr.size(); ++i) {
-			_envp.push_back(const_cast<char*>(_envStr[i].c_str()));
-		}
-		_envp.push_back(nullptr);
-		std::string cgiExtend = _getCgiExtension();
-		std::string sysPath = _extSysPath(cgiExtend);//the path to bin/bash/php
-		char* av[3];
-		av[0] = const_cast<char*>(sysPath.c_str());
-		av[1] = const_cast<char*>(_cgiFullPath.c_str());
-		av[2] = NULL;
-		execve(av[0], av, _envp.data());
-		
-		//to implement parent process
+	if (_cgiPid == 0) {
+		_child();
 	}
-	
+	return _parent(cgiRawOutput);
 }
 
+void CgiHandler::_trimLeadBack(std::string& s)
+{
+	size_t start = s.find_first_not_of(" \t");
+	s.erase(0, start);
+	size_t end = s.find_last_not_of(" \t");
+	s.erase(end + 1);
+}
 
+void CgiHandler::_cgiHeaderScope(const std::string& line, HttpResponse& response)
+{
+	size_t pos = line.find(':');
+	if (pos == std::string::npos) {
+		return ;
+	}
+	std::string name = line.substr(0, pos);
+	std::string val = line.substr(pos + 1);
+	_trimLeadBack(val);
+	if (name == "Status") {
+		if (!ServerConf::_codeRange(val)) {
+			LOG_ERR("invalid status code from cgi output.");
+			return ;
+		}
+		else {
+			response.setStatusCode(std::stoi(val));
+		}
+	}
+}
 
+HttpResponse CgiHandler::_convertToResponse(std::string& cgiRawOutput)
+{
+	HttpResponse response;
+	response.setStatusCode(200); //set default, will be used if CGI didnt provide one
+	bool isHeader = true;
+	std::istringstream tmp(cgiRawOutput);
+	std::string line;
+	std::ostringstream content;
+	while (std::getline(tmp, line)) {
+		if (!line.empty()) {
+			if (line[line.length() - 1] == '\r') {
+				line.erase(line.length() - 1); //to unify format, Windows use '\r\n'; Mac&Linux '\n'
+			}
+		}
+		if (line.empty() && isHeader == true) { //in the '\n', delim of HEADER & BODY
+			isHeader = false;
+			continue ;
+		}
+		if (isHeader == true) {
+			_cgiHeaderScope(line, response);
+		}
+		else { //not in header scope
+			content << line << "\n";
+		}
+	}
+	response.setBodyBuffer(content.str());
+	return response;
+}
 
+//getter
+std::string CgiHandler::_getCgiExtension(std::string& script_path)
+{
+	size_t pos = script_path.rfind('.');
+	if (pos == std::string::npos) {
+		return (""); //return empty str
+	}
+	return script_path.substr(pos); //".php"
+}
 
+std::string CgiHandler::_extSysPath(std::string& cgiExt)//scalable function
+{
+	if (cgiExt == ".php") {
+		return ("/usr/bin/php");
+	}
+	else
+		return ("for debugging, ext cant match");
+}
 
+/** 
+ * CGI raw output format:
+ =============================
+ Status: 302\r\n (check if this appears or not, if exist, overwrite default set 200)
+ Content-Type: text/html (or Content-Type: text/plain)\r\n
+ Set-Cookie: xxxxx=xxxxx; path=/\r\n
+ \r\n
+ <!DOCTYPE html>
+ <html>
+ <head>
+ <title>Simple CGI Output</title>
+ </head>
+ <body>
+ <h1>Hello from CGI!</h1>
+ <p>This is a simple HTML page generated by a CGI script.</p>
+ </body>
+ </html>
+ ==============================
+ */
 
-
-
-
-
-
-
-
-
-
-
-// void CgiHandler::_toUpCase(std::string& s)
-// {
-// 	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+// size_t pos = line.find(':');
+// if (pos != std::string::npos) {
+// 	std::string name = line.substr(0, pos);
+// 	std::string val = line.substr(pos + 1);
+// 	_trimLeadBack(val);
+// 	if (name == "Status") {
+// 		if (!ServerConf::_codeRange(val)) {
+// 			LOG_ERR("invalid status code from cgi output.");
+// 		} else {
+// 			response.setStatusCode(std::stoi(val));
+// 		}
+// 	} else {
+// 		response.setHeaderField(name, val);
+// 	}
 // }
+//=========================================================
+// close(_pipToCgi[1]);
+// dup2(_pipToCgi[0], STDIN_FILENO);
+// close(_pipToCgi[0]); //redirect read
+// close(_pipFromCgi[0]);
+// dup2(_pipFromCgi[1], STDOUT_FILENO);
+// close(_pipFromCgi[1]); //redirect write
+// std::vector<std::string> _envStr;
+	// std::vector<char*> _envp;
+	// std::map<std::string, std::string>::iterator iter;
+	// for (iter = _env.begin(); iter != _env.end(); ++iter) {
+	// 	_envStr.push_back(iter->first + "=" + iter->second);//create env-format string "key=value"
+	// }
+	// for (size_t i = 0; i < _envStr.size(); ++i) {
+	// 	_envp.push_back(const_cast<char*>(_envStr[i].c_str()));
+	// }
+	// _envp.push_back(nullptr);
+	// std::string cgiExtend = _getCgiExtension();
+	// std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	// char* av[3];
+	// av[0] = const_cast<char*>(sysPath.c_str());
+	// av[1] = const_cast<char*>(_cgiFullPath.c_str());
+	// av[2] = NULL;
+	// if (execve(av[0], av, _envp.data()) == -1) { //std::vector:data() return a PTR to first element in mem_array
+	// 	LOG_ERR("fail in execve for CGI(_child() func).");
+	// 	exit(1);
+	// }

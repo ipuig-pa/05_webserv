@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:22:48 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/30 13:44:36 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ public:
 	static bool _hasSemicolon(const std::string& s);
 	static std::string rmvSemicolon(const std::string& token);
 	static int _validPath();
-	bool _codeRange(const std::string& errtoken);
+	static bool _codeRange(const std::string& errtoken);
 	int _cgiValid();
 	void _wrapLocChecker(LocationConf& loc);
 	bool _locReturnCheck(LocationConf& loc);

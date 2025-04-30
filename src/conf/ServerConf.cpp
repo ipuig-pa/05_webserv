@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 12:14:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/04/30 13:43:50 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,8 @@ valid range : 100-599
 bool ServerConf::_codeRange(const std::string& errtoken)
 {
 	if (!_allDigit(errtoken)) {
-		throw std::runtime_error("Error: error code must be all digits.");
+		// throw std::runtime_error("Error: error code must be all digits.");
+		LOG_ERR("error code must be all digits.");
 		return false;
 	}
 	int tmp = std::stoi(errtoken);
