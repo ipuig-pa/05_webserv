@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 15:05:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/01 14:24:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,8 @@ void LocationConf::setCgiSysPath(std::vector<std::string> s)
 {
 	for (size_t i = 0; i < s.size(); ++i)
 	{
-		if (s[i].find("/php") == std::string::npos) {
-			throw std::runtime_error("invalid cgi path.");
+		if ((s[i].find("/php") == std::string::npos) && (s[i].find("/py") == std::string::npos)) {
+			throw std::runtime_error("invalid cgi path. non '/php' nor '/py' found");
 		}
 	}
 	this->cgi_sys_path = s;

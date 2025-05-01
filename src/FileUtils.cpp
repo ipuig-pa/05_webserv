@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/25 11:27:05 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/01 12:20:50 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int FileUtils::_pathType(const std::string _filePath)
 		}
 	}
 	else {
-		return _type;
+		return -1; //reture _type;
 	}
 }
 
@@ -46,6 +46,19 @@ int FileUtils::_pathValid(const std::string _filePath, int _permission)
 {
 	int _validity = access(_filePath.c_str(), _permission);
 	return _validity; //fail on -1, success on 0
+}
+
+int FileUtils::_isExec(const std::string _filePath)
+{
+	struct stat info;
+	int type;
+	type = stat(_filePath.c_str(), &info);
+	if (type == 0) {
+		if (info.st_mode && S_IXUSR == 0) {
+			return 0;
+		}
+	}
+	return -1;
 }
 
 int FileUtils::_blockPathValid(std::string _path, std::string _index)
@@ -72,6 +85,14 @@ int FileUtils::_blockPathValid(std::string _path, std::string _index)
 		return 0;
 	}
 	return -1;
+}
+
+void FileUtils::_trimLeadBack(std::string& s)
+{
+	size_t start = s.find_first_not_of(" \t");
+	s.erase(0, start);
+	size_t end = s.find_last_not_of(" \t");
+	s.erase(end + 1);
 }
 
 std::string FileUtils::_resolvePath(const std::string& _filePath)

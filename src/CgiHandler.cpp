@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:06:52 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 16:15:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/01 14:18:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ CgiHandler::CgiHandler()
 }
 
 CgiHandler::CgiHandler(const HttpRequest& httpReq, const std::string& req_url, const std::string& rootPath)
-: _cgiPath(req_url), _rootPath(rootPath), _request(httpReq)
+: _scriptName(req_url), _rootPath(rootPath), _request(httpReq)
 {
 	_cgiPid = -1;
 	_pipToCgi[0] = _pipToCgi[1] = -1;
 	_pipFromCgi[0] = _pipFromCgi[1] = -1;
-	_scriptName = _cgiPath;
+	_cgiPath = rootPath + _scriptName;
 }
 
 //close all fd
@@ -52,9 +52,28 @@ CgiHandler::~CgiHandler()
 	}
 }
 
+//main entry of the execute, public
 HttpResponse CgiHandler::handleCgiRequest()
 {
-	//main entry of the execute, public
+	HttpResponse response;
+	std::string cgiOutput;
+	if (FileUtils::_pathType(_cgiPath) == -1) {
+		response.setStatusCode(404); //not found
+		LOG_ERR("invalid full path to cgi (root + scriptname).");
+		return response;
+	}
+	if (FileUtils::_isExec(_cgiPath) == -1) {
+		response.setStatusCode(403); //forbidden
+		LOG_ERR("not executable cgi path.");
+		return response;
+	}
+	_setEnv();
+	if (!_execCGI(cgiOutput)) {
+		response.setStatusCode(500); //handle err case
+		LOG_ERR("fail in _exectCGI(), debuging message");
+		return response;
+	}
+	return _convertToResponse(cgiOutput);
 }
 
 void CgiHandler::_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader)
@@ -96,7 +115,7 @@ void CgiHandler::_setEnv()
 		_env["REQUEST_URI"] = _request.getPath();
 	_env["SERVER_PROTOCOL"] = _request.getVersion(); //HTTP/1.1
 	_env["SCRIPT_NAME"] = _scriptName; //name of executable
-	_env["SCRIPT_FILENAME"] = _rootPath + _cgiPath; //_rootPath + _request.getPath();
+	_env["SCRIPT_FILENAME"] = _cgiPath; //_rootPath + _request.getPath();
 	_env["DOCUMENT_ROOT"] = _rootPath;
 	_env["PATH_INFO"] = "place_holder";
 	_env["QUERY_STRING"] = _request.getQueryPart();
@@ -205,14 +224,6 @@ bool CgiHandler::_execCGI(std::string& cgiRawOutput)
 	return _parent(cgiRawOutput);
 }
 
-void CgiHandler::_trimLeadBack(std::string& s)
-{
-	size_t start = s.find_first_not_of(" \t");
-	s.erase(0, start);
-	size_t end = s.find_last_not_of(" \t");
-	s.erase(end + 1);
-}
-
 void CgiHandler::_cgiHeaderScope(const std::string& line, HttpResponse& response)
 {
 	size_t pos = line.find(':');
@@ -221,7 +232,7 @@ void CgiHandler::_cgiHeaderScope(const std::string& line, HttpResponse& response
 	}
 	std::string name = line.substr(0, pos);
 	std::string val = line.substr(pos + 1);
-	_trimLeadBack(val);
+	FileUtils::_trimLeadBack(val);
 	if (name == "Status") {
 		if (!ServerConf::_codeRange(val)) {
 			LOG_ERR("invalid status code from cgi output.");
@@ -276,6 +287,9 @@ std::string CgiHandler::_extSysPath(std::string& cgiExt)//scalable function
 {
 	if (cgiExt == ".php") {
 		return ("/usr/bin/php");
+	}
+	else if (cgiExt == ".py") {
+		return ("/usr/local/bin/python3");
 	}
 	else
 		return ("for debugging, ext cant match");

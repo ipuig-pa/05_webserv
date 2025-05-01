@@ -1,3 +1,6 @@
+//todo 0105
+cgi-handler under request-handler, in the PROCESSING stage, direct to cgi or static, and then GET POST REQUEST
+
 //IDEA on 26th April
 - build an abstract class inherit locaConf and servConf
 - parsing reference or coyp, check later - avoid memory issues

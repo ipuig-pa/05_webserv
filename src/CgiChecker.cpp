@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 18:12:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/01 14:15:23 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,11 @@ bool CgiChecker::_validCgiPath(const std::vector<std::string>& _cgipath)
 bool CgiChecker::_validExtension(const std::vector<std::string>& _cgiextend)
 {
 	for (size_t i = 0; i < _cgiextend.size(); ++i) {
-		if (_cgiextend[i] != ".php") {//idea: if more extension wanted, add '||' check
-			return false;
+		if (_cgiextend[i] == ".php" || _cgiextend[i] == ".py") {//idea: if more extension wanted, add '||' check
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 bool CgiChecker::_mapPathExtension(LocationConf& loc)
 {
@@ -94,18 +94,21 @@ bool CgiChecker::_mapPathExtension(LocationConf& loc)
 	const std::vector<std::string>& _cgiextend = loc.getCgiExtension();
 	std::map<std::string, std::string> _path_extend;
 	for (size_t i = 0; i < _cgiextend.size(); ++i) {
-		if (_cgiextend[i] == ".php" || _cgiextend[i] == "*.php") {
-			for (size_t j = 0; j < _cgipath.size(); ++j) {
-				if (_cgipath[j].find("php") != std::string::npos) {
-					_path_extend[".php"] = _cgipath[j];
-					break ;
-				}
+		const std::string& ext = _cgiextend[i];
+		for (size_t j = 0; j < _cgipath.size(); ++j)
+		{
+			if ((ext == ".php" || ext == "*.php") && (_cgipath[j].find("php") != std::string::npos)) {
+				_path_extend[".php"] = _cgipath[j];
+			}
+			else if ((ext == ".py" || ext == "*.py") && (_cgipath[j].find("py") != std::string::npos)) {
+				_path_extend[".py"] = _cgipath[j];
 			}
 		}
 	}
 	loc.setPathExMap(_path_extend);
 	return !_path_extend.empty();
 }
+
 bool CgiChecker::_matchSize(LocationConf& loc)
 {
 	if (loc.getCgiSysPath().size() == loc.getPathExMap().size()) {
@@ -113,3 +116,23 @@ bool CgiChecker::_matchSize(LocationConf& loc)
 	}
 	return false;
 }
+
+//singularly check .php only
+// bool CgiChecker::_mapPathExtension(LocationConf& loc)
+// {
+// 	const std::vector<std::string>& _cgipath = loc.getCgiSysPath();
+// 	const std::vector<std::string>& _cgiextend = loc.getCgiExtension();
+// 	std::map<std::string, std::string> _path_extend;
+// 	for (size_t i = 0; i < _cgiextend.size(); ++i) {
+// 		if (_cgiextend[i] == ".php" || _cgiextend[i] == "*.php") {
+// 			for (size_t j = 0; j < _cgipath.size(); ++j) {
+// 				if (_cgipath[j].find("php") != std::string::npos) {
+// 					_path_extend[".php"] = _cgipath[j];
+// 					break ;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	loc.setPathExMap(_path_extend);
+// 	return !_path_extend.empty();
+// }
