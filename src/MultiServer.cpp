@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 12:36:14 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/01 14:46:03 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,18 +150,18 @@ void	MultiServer::run()
 				if (_poll[i].revents & POLLIN)
 				{
 					MultiServer::acceptNewConnection(it_s->second);
-					//continue; //so start the loop againg, and check again poll, including this new client
+					// continue; //so start the loop againg, and check again poll, including this new client
 				}
 			}
 			std::map<int, Client*>::iterator it_c;
 			it_c = _clients.find(fd);
 			// Check if this is a client socket and handle client sockets if it is
-			if (it_c != _clients.end()) 
+			if (it_c != _clients.end())
 			{
 				if (_poll[i].revents & POLLIN) {
 					req_hand.handleClientRead(*(it_c->second));
-					int	file_fd = (it_c->second)->getFileFd();
 					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
+					int	file_fd = (it_c->second)->getFileFd();
 					if (file_fd != -1)
 					{
 						LOG_INFO("File " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
@@ -181,6 +181,7 @@ void	MultiServer::run()
 					if (it_c->second->getState() == CONNECTION_CLOSED)
 					{
 						close(fd);
+						_clients.erase(it_c);
 						eraseFromPoll(fd);
 					}
 					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done
