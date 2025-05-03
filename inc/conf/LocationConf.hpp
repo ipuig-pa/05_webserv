@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 13:31:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class LocationConf
 	private:
 	std::string _locPath; //where path starts: /images (ie: go under this dir)
 	// std::vector<std::string> _methods; //GET POST DELETE
-	bool _methods[3]; //3 methods supported
+	bool _methods[4]; //4 methods supported : GET, HEAD, POST, DELETE
 	bool _methodSet;
 	//for serve files
 	std::string _locRoot; //where to get files: ./www/images, if not set, go with SRV_root
@@ -45,7 +45,7 @@ class LocationConf
 	std::map<int, std::string> _error_page; //err_code, url
 	
 	public:
-	enum mType { GET, POST, DELETE, INVALID };
+	enum mType { GET, HEAD, POST, DELETE, INVALID };
 	LocationConf();
 	~LocationConf();
 	
@@ -69,7 +69,7 @@ class LocationConf
 	
 	//getters
 	const std::string& getLocPath() const;
-	std::vector<mType> getMethod() const; //return a copy
+	bool getMethod(int method); //return a copy
 	const std::string& getLocRoot() const;
 	int getLocCMBS() const;
 	const std::string getLocIndex() const;

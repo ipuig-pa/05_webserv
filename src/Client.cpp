@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 13:56:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 12:43:28 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ bool	Client::sendResponseChunk(void)
 		_response.setBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
-	if (_response.getBodyPresence() == true)
+	if (_response.getBodyLength() != 0)
 	{
 		if (!_response.getBodyBuffer().empty())
 		{

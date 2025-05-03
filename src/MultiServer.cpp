@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 14:46:03 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 12:10:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,10 +206,6 @@ void	MultiServer::run()
 						it_c++;
 					}
 				}
-				// Handle client socket ready for writing
-				// if (Multiserver.getPoll().data()[i].revents & POLLOUT) {
-				// 	req_hand.handleFileWrite(i);
-				// }
 			}
 			// Handle errors or closed connections -> maybe erase from poll here all the closed connections, so no interference to the i is done in between the loop??
 			// if (Multiserver.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {

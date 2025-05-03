@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:05:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 13:33:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #include <stdexcept> //for exceptions
 #include <cstdio> // for remove
 #include <cstdlib> //for setenv(), unsetenv()
+#include <climits>
+#include <iomanip> // for put_time
 
 #include <sys/socket.h> //socket(), bind/listen/accept/send/recv()
 #include <fcntl.h> //for fcntl() (non-blocking i/o)
@@ -30,6 +32,7 @@
 #include <sys/stat.h> //use stat(), and stat struct, to get and hold information about a file or directory.
 #include <dirent.h>// for readdir
 #include <unistd.h> // for read, close, ...??
+#include <signal.h>
 
 //possible use of containers
 #include <map>

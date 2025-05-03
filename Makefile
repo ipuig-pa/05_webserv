@@ -1,13 +1,15 @@
 NAME = webserv
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++17 -Iinc -Iinc/conf
+#CFLAGS = -Wall -Wextra -Werror -std=c++17 -Iinc -Iinc/conf
+CFLAGS = -Wall -Wextra -std=c++17 -Iinc -Iinc/conf
 
 SRC_DIR = src
 OBJ_DIR = obj
 
 VPATH =	$(SRC_DIR):\
-		$(SRC_DIR)/conf
+		$(SRC_DIR)/conf:\
+		$(SRC_DIR)/RequestHandler
 
 SOURCES =	ConfReader.cpp \
 			ConfParser.cpp \
@@ -17,6 +19,12 @@ SOURCES =	ConfReader.cpp \
 			Client.cpp \
 			Socket.cpp \
 			RequestHandler.cpp \
+			ProcessRequest.cpp \
+			GetHeadRequest.cpp \
+			PostRequest.cpp \
+			DeleteRequest.cpp \
+			AutoindexRequest.cpp \
+			InvalidRequest.cpp \
 			HttpReqParser.cpp \
 			HttpRequest.cpp \
 			HttpResponse.cpp \

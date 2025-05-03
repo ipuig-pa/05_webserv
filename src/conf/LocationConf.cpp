@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 14:24:10 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/03 13:37:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ bool LocationConf::_isSet() const
 void LocationConf::setMethod(std::vector<std::string>& s)
 {
 	this->_methods[GET] = false;
+	this->_methods[HEAD] = false;
 	this->_methods[POST] = false;
 	this->_methods[DELETE] = false;
 	
@@ -62,6 +63,8 @@ void LocationConf::setMethod(std::vector<std::string>& s)
 	{
 		if (s[i] == "GET")
 			this->_methods[GET] = true;
+		else if (s[i] == "HEAD")
+			this->_methods[HEAD] = true;
 		else if (s[i] == "POST")
 			this->_methods[POST] = true;
 		else if (s[i] == "DELETE")
@@ -141,20 +144,12 @@ const std::string& LocationConf::getLocPath() const
 {
 	return this->_locPath;
 }
-std::vector<LocationConf::mType> LocationConf::getMethod() const
+
+bool LocationConf::getMethod(int method)
 {
-	std::vector<mType> tmp_m;
-	if (_methods[GET]) {
-		tmp_m.push_back(GET);
-	}
-	if (_methods[POST]) {
-		tmp_m.push_back(POST);
-	}
-	if (_methods[DELETE]) {
-		tmp_m.push_back(DELETE);
-	}
-	return tmp_m;
+	return _methods[method];
 }
+
 const std::string& LocationConf::getLocRoot() const
 {
 	return this->_locRoot;

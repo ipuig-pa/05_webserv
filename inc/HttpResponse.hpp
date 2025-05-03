@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:07:07 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 12:32:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class HttpResponse
 private:
 	Status			_status;
 	Header			_header;
-	bool			_body_presence;
+	size_t			_body_length;
 	std::string		_body_buffer; //(https://datatracker.ietf.org/doc/html/rfc9112#section-6.3)
 	//add some attribute ot method to check if the response is complete and track how much has been sent.
 	responseState	_state;
@@ -46,13 +46,13 @@ public:
 
 	std::string	getHeader(const std::string& name);//needed?!!?
 	responseState	getState(void) const;
-	bool		getBodyPresence(void) const;
+	size_t		getBodyLength(void) const;
 	size_t		getBytesRead(void);
 	size_t		getBytesSent(void);
 	std::string	getBodyBuffer(void);
 	Status		&getStatus(void);
 
-	void		setBodyPresence(bool body_presence);
+	void		setBodyLength(size_t body_length);
 	void		setStatus(Status &status);
 	void		setStatusCode(int code);
 	void		setHeader(Header &header);

@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 18:33:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 12:44:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
 HttpResponse::HttpResponse()
-	:_status(), _header(), _body_presence(false), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0)
+	:_status(), _header(), _body_length(0), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0)
 {
 	LOG_DEBUG("HttpResponse default constructor called");
 }
@@ -49,17 +49,6 @@ void	HttpResponse::setStatus(Status &status)
 void	HttpResponse::setStatusCode(int code)
 {
 	_status = Status(code);
-	if (code == 204 || code == 304)
-		_body_presence = false;
-	else
-		_body_presence = true;
-	// _body_buffer = generateErrorBody(code);
-	//if (code != 200) //or other 200 and something???
-	// // Get appropriate error body based on status code
-	// std::string errorBody = errorPageHandler.getErrorPage(response.getStatusCode(), serverConfig);
-	// // Set the body and update headers
-	// response.setBody(errorBody);
-	// response.addHeaderField("Content-Type", "text/html");
 }
 
 //correctly implemented!?!?
@@ -83,9 +72,9 @@ void	HttpResponse::setBytesSent(size_t bytes_sent)
 	_bytes_sent += bytes_sent;
 }
 
-void	HttpResponse::setBodyPresence(bool body_presence)
+void	HttpResponse::setBodyLength(size_t body_length)
 {
-	_body_presence = body_presence;
+	_body_length = body_length;
 }
 
 void	HttpResponse::setBodyBuffer(const std::string buffer)
@@ -127,9 +116,9 @@ size_t	HttpResponse::getBytesSent(void)
 	return	_bytes_sent;
 }
 
-bool	HttpResponse::getBodyPresence(void) const
+size_t	HttpResponse::getBodyLength(void) const
 {
-	return _body_presence;
+	return _body_length;
 }
 
 std::string	HttpResponse::getBodyBuffer(void)

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 16:40:00 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 09:10:41 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,9 +175,9 @@ bool ServerConf::_locReturnCheck(LocationConf& loc)
 void ServerConf::_wrapLocChecker(LocationConf& loc)
 {
 	//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
-	// if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
-	// 	loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance //handle it in the directory request better?!?!?
-	// }
+	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
+		loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance //handle it in the directory request better?!?!?
+	}
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
 	}
@@ -442,10 +442,15 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	LocationConf	*longest_match = nullptr;
 	size_t			match;
 
+	std::cout << "finding " << uripath << " location" << std::endl;
+	std::cout << _location.size() << std::endl;
 	for(size_t i = 0; i < _location.size(); ++i)
 	{
 		if ((_location[i]).getLocPath().compare(uripath) == 0)
+		{
+			std::cout << i << std::endl;
 			return (&_location[i]);
+		}
 	}
 	match = 0;
 	for(size_t i = 0; i < _location.size(); ++i)
@@ -462,6 +467,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	}
 	if (longest_match)
 		return (longest_match);
+	std::cout << "found " << uripath << " in location" << longest_match << std::endl;
 	return (nullptr);
 }
 

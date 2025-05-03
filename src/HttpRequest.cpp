@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:53:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 11:13:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,9 @@ void HttpRequest::setMethod(std::string s)
 {
 	if (s == "GET") {
 		this->_method = GET;
+	}
+	else if (s == "HEAD") {
+		this->_method = HEAD;
 	}
 	else if (s == "POST") {
 		this->_method = POST;

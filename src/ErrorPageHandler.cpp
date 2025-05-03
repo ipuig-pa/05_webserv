@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 18:35:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/03 12:47:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,17 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 	body = _client->getServerConf().getErrPageCode(status_code);
 	if (!body.empty())
 	{
+		_client->getResponse().setBodyLength(body.length());
+		_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
 		return (body);
 	}
-	return ErrorPageHandler::getDefaultErrorPage(status_code);
+	if (status_code == 204 || status_code == 304)
+	{
+		_client->getResponse().setBodyLength(0);
+		return ("");
+	}	
+	else
+		return ErrorPageHandler::getDefaultErrorPage(status_code);
 }
 
 std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
@@ -58,6 +66,8 @@ std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 		<< "</body>\n"
 		<< "</html>";
 
+	_client->getResponse().setBodyLength(ss.str().length());
+	_client->getResponse().setHeaderField("Content-Length", ss.str());
 	return ss.str();
 }
 
