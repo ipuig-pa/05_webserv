@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/03 13:27:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 11:04:21 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,21 @@ void	RequestHandler::processRequest(Client &client)
 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
 			method_allowed = true;
 	}
-	else
-	{
-		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD)
+	else {
+		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
 			method_allowed = true;
+		}
 	}
-	if (method_allowed)
+	if (method_allowed) {
+		if (isCgiRequest(client) == true) {
+			std::cout << "CGI request received.\n";
+			LOG_INFO("CGI received");
+			CgiHandler cgi(client.getRequest(), client.getRequest().getPath(), client.getLocationConf()->getLocRoot());
+			HttpResponse cgiRes = cgi.handleCgiRequest();
+			client.setCgiResponse(cgiRes);
+		}
 		(this->*handleMethod[client.getRequest().getMethod()])(client);
+	}
 	else
 		(this->*handleMethod[4])(client); // invalid request
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
@@ -73,3 +81,37 @@ std::string	RequestHandler::getPathFromUri(Client &client)
 	}
 	return locationRoot + relativePath;
 }
+
+// void	RequestHandler::processRequest(Client &client)
+// {
+// 	void	(RequestHandler::*handleMethod[])(Client &) = {
+// 		&RequestHandler::handleGetRequest, 
+// 		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
+// 		&RequestHandler::handlePostRequest, 
+// 		&RequestHandler::handleDeleteRequest, 
+// 		&RequestHandler::handleInvalidRequest};
+
+// 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
+// 	// do I need to check if the method is allowed, or it is already checked in the httprequest parsing?!?!!?
+// 	bool method_allowed = false;
+
+// 	std::string path = getPathFromUri(client);
+// 	client.getRequest().setPath(path); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
+
+// 	if (client.getLocationConf())
+// 	{
+// 		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
+// 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
+// 			method_allowed = true;
+// 	}
+// 	else
+// 	{
+// 		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD)
+// 			method_allowed = true;
+// 	}
+// 	if (method_allowed)
+// 		(this->*handleMethod[client.getRequest().getMethod()])(client);
+// 	else
+// 		(this->*handleMethod[4])(client); // invalid request
+// 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
+// }

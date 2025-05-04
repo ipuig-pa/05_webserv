@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 12:43:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 10:27:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,11 @@ bool	Client::sendResponseChunk(void)
 	}
 	return false; //!?!?!?
 	//else set it as already sent
+}
+
+void	Client::setCgiResponse(HttpResponse& Cgires)
+{
+	this->_response = Cgires;
 }
 
 void	Client::setServerConf(ServerConf &conf)

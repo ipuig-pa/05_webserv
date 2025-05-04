@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/03 12:34:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 09:40:47 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,4 +82,13 @@ void	RequestHandler::handleClientWrite(Client &client)
 		else
 			client.setState(NEW_REQUEST);
 	}
+}
+
+bool RequestHandler::isCgiRequest(Client& client)
+{
+	std::string tmp = client.getRequest().getPath();
+	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
+		return true;
+	}
+	return false;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/30 15:14:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 09:47:16 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "HttpResponse.hpp"
 #include "ServerConf.hpp"
 #include "HttpReqParser.hpp"
+#include "CgiHandler.hpp"
 
 #include "global.hpp" //just for testing
 
@@ -34,6 +35,7 @@ private:
 	void		handleDirectoryRequest(Client &client);
 	void		handleDirectoryListing(Client &client);
 	std::string	getPathFromUri(Client &client);
+	bool		isCgiRequest(Client& client);
 
 public:
 	RequestHandler();

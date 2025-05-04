@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 18:21:47 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 10:25:51 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,8 @@ public:
 	ServerConf		&getServerConf(void);
 	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
-
+	
+	void			setCgiResponse(HttpResponse& response);//set the resonse with the return-val 'response' from cgi_handler
 	void			setState(clientState state);
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
