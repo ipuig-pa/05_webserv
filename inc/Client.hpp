@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/04 10:25:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/04 15:39:04 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ private:
 	HttpRequest			_request;
 	HttpReqParser		_req_parser;
 	HttpResponse		_response;
+	HttpResponse		_cgiResponse;
+	bool				_hasCgi;
 	ErrorPageHandler	*_error_handler;
 	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState			_state;
@@ -64,6 +66,10 @@ public:
 
 	HttpRequest		&getRequest(void);
 	HttpResponse	&getResponse(void);
+	HttpResponse	&getCgiResponse(void);
+	bool			checkCgiFlag();
+	void			setCgiFlag(); //set to true, will call after specif behaviour done
+	void			resetCgiFlag(void); //reset to false
 	int				getSocket(void);
 	clientState		getState(void);
 	int				getFileFd(void);

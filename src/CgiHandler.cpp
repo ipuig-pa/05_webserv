@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 12:06:52 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 14:18:42 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/04 17:16:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,18 @@ HttpResponse CgiHandler::handleCgiRequest()
 {
 	HttpResponse response;
 	std::string cgiOutput;
-	if (FileUtils::_pathType(_cgiPath) == -1) {
+	// if (FileUtils::_pathType(_cgiPath) == -1) {
+	if (FileUtils::_pathType(_scriptName) == -1) {
 		response.setStatusCode(404); //not found
 		LOG_ERR("invalid full path to cgi (root + scriptname).");
+		std::cout << "\033[31m path is: " << _scriptName << "\033[0m" << std::endl;
 		return response;
 	}
-	if (FileUtils::_isExec(_cgiPath) == -1) {
+	// if (FileUtils::_isExec(_cgiPath) == -1) {
+	if (FileUtils::_isExec(_scriptName) == -1) {
 		response.setStatusCode(403); //forbidden
 		LOG_ERR("not executable cgi path.");
+		std::cout << "\033[31m path is: " << _scriptName << "\033[0m" << std::endl;
 		return response;
 	}
 	_setEnv();
@@ -188,7 +192,12 @@ bool CgiHandler::_parent(std::string& cgiRawOutput)
 	if (_request.getMethod() == POST) { //write to cgi if its POST
 		const std::string& postBody = _request.getBody();
 		if (!postBody.empty()) {
-			write(_pipToCgi[1], postBody.c_str(), postBody.length());
+			if (write(_pipToCgi[1], postBody.c_str(), postBody.length()) == -1) {
+				LOG_ERR("fail writing to CGI script (POST request)");
+				close(_pipToCgi[1]);
+				close(_pipFromCgi[0]);
+				return false;
+			}
 		}
 	}
 	close(_pipToCgi[1]);
@@ -197,15 +206,40 @@ bool CgiHandler::_parent(std::string& cgiRawOutput)
 	ssize_t bytes;
 	while (1) {
 		bytes = read(_pipFromCgi[0], tmpBuff, sizeof(tmpBuff) - 1);
-		if (bytes <= 0) { //reach EOF or fail
+		if (bytes > 0) {
+			cgiRawOutput.append(tmpBuff, bytes);
+		} else if (bytes = 0) { //reach EOF or fail
+			int st;
+			pid_t res = waitpid(_cgiPid, &st, WNOHANG);
+			if (res == _cgiPid) {
+				std::cerr << "\033[31mError message in the parent of CGI\033[0m\n";
+				break ;
+			} else {
+				std::cerr << "\033[31mwaiting\033[0m\n";
+				usleep(10000);
+				continue;
+			}
+		} else {
+			std::cerr << "\033[31merror in reading CGI (pipe)\033[0m\n";
 			break ;
 		}
-		cgiRawOutput.append(tmpBuff, bytes);
 	}
 	close(_pipFromCgi[0]);
 	waitpid(_cgiPid, &status, 0);
 	return (WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
+// while (bytes = read(_pipFromCgi[0], tmpBuff, sizeof(tmpBuff) - 1) > 0) {
+// 	tmpBuff[bytes] = 0;
+// 	cgiRawOutput += tmpBuff;
+// }
+
+// while (1) {
+// 	bytes = read(_pipFromCgi[0], tmpBuff, sizeof(tmpBuff) - 1);
+// 	if (bytes <= 0) { //reach EOF or fail
+// 		break ;
+// 	}
+// 	cgiRawOutput.append(tmpBuff, bytes);
+// }
 
 //real execute process of CGI script. collect its output into _cgiOutput string
 bool CgiHandler::_execCGI(std::string& cgiRawOutput)
@@ -241,6 +275,8 @@ void CgiHandler::_cgiHeaderScope(const std::string& line, HttpResponse& response
 		else {
 			response.setStatusCode(std::stoi(val));
 		}
+	} else {
+		response.setHeaderField(name, val);
 	}
 }
 

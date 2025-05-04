@@ -1,3 +1,7 @@
+//0405
+- will check confParser::addCategory(), check the end of block! now get some logic problem in detecting the literal 'server' as invalid!
+
+
 //todo 0105
 cgi-handler under request-handler, in the PROCESSING stage, direct to cgi or static, and then GET POST REQUEST
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 12:44:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 12:22:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,23 +18,23 @@ HttpResponse::HttpResponse()
 	LOG_DEBUG("HttpResponse default constructor called");
 }
 
-// HttpResponse::HttpResponse(const HttpResponse &other)
-// {
-// 	*this = other;
-// }
+HttpResponse::HttpResponse(const HttpResponse &other)
+{
+	*this = other;
+}
 
-// HttpResponse	&HttpResponse::operator=(const HttpResponse &other)
-// {
-// 	if (this != &other)
-// 	{
-// 		_status = other._status;
-// 		_header = other._header;
-// 		_body_presence = other._body_presence;
-// 		_body = other._body;
-// 		_state = other._state;
-// 	}
-// 	return *this;
-// }
+HttpResponse	&HttpResponse::operator=(const HttpResponse &other)
+{
+	if (this != &other)
+	{
+		_status = other._status;
+		_header = other._header;
+		// _body_presence = other._body_presence;
+		// _body = other._body;
+		_state = other._state;
+	}
+	return *this;
+}
 
 HttpResponse::~HttpResponse()
 {

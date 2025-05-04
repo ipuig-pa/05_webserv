@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 09:40:47 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/04 13:22:47 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ void	RequestHandler::handleClientWrite(Client &client)
 bool RequestHandler::isCgiRequest(Client& client)
 {
 	std::string tmp = client.getRequest().getPath();
+	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
 		return true;
 	}

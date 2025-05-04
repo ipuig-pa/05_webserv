@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/04 10:27:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/04 15:38:17 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 Client::Client(int socket, ServerConf &default_conf)
 	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr)
 {
+	_hasCgi = false;
 	_error_handler = new ErrorPageHandler(this);
 	//_request ->change _currentConfig according to request header (find )
 	//_response
@@ -40,6 +41,11 @@ HttpRequest	&Client::getRequest(void)
 HttpResponse	&Client::getResponse(void)
 {
 	return (_response);
+}
+
+HttpResponse	&Client::getCgiResponse(void)
+{
+	return (_cgiResponse);
 }
 
 clientState	Client::getState(void)
@@ -124,8 +130,22 @@ bool	Client::sendResponseChunk(void)
 
 void	Client::setCgiResponse(HttpResponse& Cgires)
 {
-	this->_response = Cgires;
+	this->_cgiResponse = Cgires;
 }
+
+bool	Client::checkCgiFlag()
+{
+	return _hasCgi;
+}
+
+void	Client::setCgiFlag()
+{
+	_hasCgi = true;
+}
+void	Client::resetCgiFlag(void)
+{
+	_hasCgi = false;
+}	
 
 void	Client::setServerConf(ServerConf &conf)
 {

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 12:20:50 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/04 13:40:54 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int FileUtils::_isExec(const std::string _filePath)
 	int type;
 	type = stat(_filePath.c_str(), &info);
 	if (type == 0) {
-		if (info.st_mode && S_IXUSR == 0) {
+		if (info.st_mode & S_IXUSR) {
 			return 0;
 		}
 	}

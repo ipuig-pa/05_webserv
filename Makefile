@@ -32,6 +32,7 @@ SOURCES =	ConfReader.cpp \
 			Header.cpp \
 			Status.cpp \
 			CgiChecker.cpp \
+			CgiHandler.cpp \
 			FileUtils.cpp \
 			Logger.cpp \
 			main.cpp

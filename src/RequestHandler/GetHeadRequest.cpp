@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GetHeadRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/03 12:34:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/04 16:49:11 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,14 @@
 void	RequestHandler::handleGetRequest(Client &client)
 {
 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
-
+	
+	if (client.checkCgiFlag() == true) {
+		HttpResponse& tmp_res = client.getCgiResponse();
+		client.setCgiResponse(tmp_res);
+		// client.setCgiResponse(client.getCgiResponse());
+		client.resetCgiFlag(); //avoid reuse
+		return ;
+	}
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {
@@ -60,7 +67,6 @@ void	RequestHandler::handleGetRequest(Client &client)
 		client.setFileFd(-1);
 	}
 }
-
 
 //We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUri to point to LocationConf??)
 void	RequestHandler::handleDirectoryRequest(Client &client)
@@ -157,3 +163,51 @@ bool	RequestHandler::handleFileRead(Client &client)
 	}
 	return(false);//check that we really want to keep it (return false) in this case
 }
+
+// void	RequestHandler::handleGetRequest(Client &client)
+// {
+// 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
+
+// 	std::string path = client.getRequest().getPath();
+
+// 	if (access(path.c_str(), F_OK) != 0) {
+// 		client.prepareErrorResponse(404); // Not found
+// 		return ;
+// 	}
+// 	if (access(path.c_str(), R_OK) != 0) {
+// 		client.prepareErrorResponse(403); // Forbidden
+// 		return ;
+// 	}
+// 	struct stat file_stat;
+// 	stat(path.c_str(), &file_stat);
+// 	if (S_ISDIR(file_stat.st_mode))
+// 	{
+// 		handleDirectoryRequest(client);
+// 		return ;
+// 	}
+// 	int file_fd = open(path.c_str(), O_RDONLY);
+
+// 	if (file_fd == -1) {
+// 		client.prepareErrorResponse(404); // Not Found
+// 		return ;
+// 	}
+// 	// Set non-blocking
+// 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
+// 	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
+
+// 	client.getResponse().setStatusCode(200); //OK
+// 	client.getResponse().setHeaderField("Content-Type", getMediaType(path));
+// 	client.getResponse().setHeaderField("Content-Length", std::to_string(file_stat.st_size));
+// 	if (client.getRequest().getMethod() == GET)
+// 	{
+// 		client.getResponse().setBodyLength(file_stat.st_size);
+// 		client.setFileFd(file_fd);
+// 		client.getResponse().setState(READING);
+// 	}
+// 	else if (client.getRequest().getMethod() == HEAD)
+// 	{
+// 		client.getResponse().setState(READ);
+// 		close(client.getFileFd());
+// 		client.setFileFd(-1);
+// 	}
+// }

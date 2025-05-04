@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 11:04:21 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/04 16:49:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ void	RequestHandler::processRequest(Client &client)
 			LOG_INFO("CGI received");
 			CgiHandler cgi(client.getRequest(), client.getRequest().getPath(), client.getLocationConf()->getLocRoot());
 			HttpResponse cgiRes = cgi.handleCgiRequest();
-			client.setCgiResponse(cgiRes);
+			client.setCgiFlag(); //_hasCgi flag set true
+			client.setCgiResponse(cgiRes); 
 		}
 		(this->*handleMethod[client.getRequest().getMethod()])(client);
 	}
