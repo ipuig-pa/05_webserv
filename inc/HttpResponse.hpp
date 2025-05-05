@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 12:32:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:27:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ public:
 	std::string	toString() const;
 	std::string	statusToString() const;
 	std::string	headersToString() const;
+	void		checkMandatoryHeaders();
 };
 
 std::string		getMediaType(const std::string path);

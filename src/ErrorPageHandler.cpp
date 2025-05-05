@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/03 12:47:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 17:04:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,10 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 {
 	std::string	body;
 
+
+	//Handle here the status specific headers???
+
+
 	//INCLUDE GET ERR PAGE IN LOCATION CONF, SO IT CAN BE CHECKED HERE!!!!!!!
 	// if (_client->getLocationConf())
 	// {
@@ -37,7 +41,8 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 	body = _client->getServerConf().getErrPageCode(status_code);
 	if (!body.empty())
 	{
-		_client->getResponse().setBodyLength(body.length());
+		_client->getResponse().setBodyLength(body.length()); // or should read from there?
+		_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
 		_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
 		return (body);
 	}
@@ -67,7 +72,8 @@ std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 		<< "</html>";
 
 	_client->getResponse().setBodyLength(ss.str().length());
-	_client->getResponse().setHeaderField("Content-Length", ss.str());
+	_client->getResponse().setHeaderField("Content-Type", "text/html");
+	_client->getResponse().setHeaderField("Content-Length", std::to_string(ss.str().length()));
 	return ss.str();
 }
 

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 13:37:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 14:40:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,25 @@ const std::string& LocationConf::getLocPath() const
 bool LocationConf::getMethod(int method)
 {
 	return _methods[method];
+}
+
+std::vector<std::string> LocationConf::getMethodStr() const
+{
+	std::vector<std::string> methods;
+
+	if (_methods[GET]) {
+		methods.push_back("GET");
+	}
+	if (_methods[HEAD]) {
+		methods.push_back("HEAD");
+	}
+	if (_methods[POST]) {
+		methods.push_back("POST");
+	}
+	if (_methods[DELETE]) {
+		methods.push_back("DELETE");
+	}
+	return methods;
 }
 
 const std::string& LocationConf::getLocRoot() const

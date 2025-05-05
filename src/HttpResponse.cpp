@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 12:44:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:42:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,4 +181,22 @@ std::string		getMediaType(const std::string path)
 	// Add more types if needed
 
 	return "application/octet-stream"; // Default binary type
+}
+
+void	HttpResponse::checkMandatoryHeaders()
+{
+	if (getHeader("Date").empty())
+	{
+		time_t now = time(nullptr);
+		struct tm *gmt = gmtime(&now);
+		char buffer[50];
+		strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
+		setHeaderField("Date", std::string(buffer));
+	}
+	if (getHeader("Server").empty())
+		setHeaderField("Server", "webserv");
+	if (getHeader("Content-Type").empty())
+		LOG_ERR("No Content-Type header is found in HttpResponse");
+	if (getHeader("Content-Length").empty())
+		setHeaderField("Content-Length", std::to_string(_body_length));
 }

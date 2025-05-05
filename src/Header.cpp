@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 17:33:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:30:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 Header::Header()
 {
 	LOG_DEBUG("Header default constructor called");
-	set("Host", "localhost"); //FOR TESTING PURPOSE, CHANGE
 }
 
 Header::Header(const Header &other)
@@ -23,7 +22,7 @@ Header::Header(const Header &other)
 	*this = other;
 }
 
-//correctly implemented!?!?!?
+//correctly implemented!?!?!
 Header	&Header::operator=(const Header &other)
 {
 	if (this != &other)

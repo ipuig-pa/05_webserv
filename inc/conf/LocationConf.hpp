@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 13:31:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:40:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ class LocationConf
 	//getters
 	const std::string& getLocPath() const;
 	bool getMethod(int method); //return a copy
+	std::vector<std::string> getMethodStr() const; //returns the allowed methods in a string form
 	const std::string& getLocRoot() const;
 	int getLocCMBS() const;
 	const std::string getLocIndex() const;

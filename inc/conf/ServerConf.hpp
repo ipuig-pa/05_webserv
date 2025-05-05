@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 16:39:44 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:28:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ public:
 	// std::vector<std::string>& getErrPage() const;
 	const std::vector<LocationConf>& getLocation() const;
 	//[...]
+	unsigned int	getMaxBodySize() const;
 	
 	//map<string, function<void()>> parser list for location block
 	void parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
