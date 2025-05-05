@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/03 12:34:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 17:19:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,13 @@ void	RequestHandler::handleGetRequest(Client &client)
 	client.getResponse().setStatusCode(200); //OK
 	client.getResponse().setHeaderField("Content-Type", getMediaType(path));
 	client.getResponse().setHeaderField("Content-Length", std::to_string(file_stat.st_size));
+	
+	time_t lastModTime = file_stat.st_mtime;
+	struct tm* gmTime = gmtime(&lastModTime);
+	char buffer[100];
+	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmTime);
+
+	client.getResponse().setHeaderField("Last-Modified", buffer);
 	if (client.getRequest().getMethod() == GET)
 	{
 		client.getResponse().setBodyLength(file_stat.st_size);
