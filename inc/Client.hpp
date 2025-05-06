@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/04 15:39:04 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 13:40:34 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ enum clientState
 	NEW_REQUEST,
 	READING_REQUEST,
 	PROCESSING,
+	WRITING_CGI, //POST
+	READING_CGI,
 	SENDING_RESPONSE,
 	CONNECTION_CLOSED,
 	BOUNCED //when!?!?!?
@@ -46,30 +48,32 @@ private:
 	HttpRequest			_request;
 	HttpReqParser		_req_parser;
 	HttpResponse		_response;
-	HttpResponse		_cgiResponse;
-	bool				_hasCgi;
 	ErrorPageHandler	*_error_handler;
 	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState			_state;
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
 	ServerConf			&_currentServerConf; //idea: maybe create a upper class
 	LocationConf		*_currentLocConf;
+	
+	int					_cgiPid;
+	int					_pipFromCgi;//read from cgi stdout
+	int					_pipToCgi; //for POST body -> stdin
+	size_t				_cgiBodywrite;
+	std::string			_cgiBuffer;
+	// bool				_checkCgiPost;
+	bool				_cgiActive;
+	// bool wrtFlag;
 
 	// int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	// std::string _data; //data for & from client
-	// bool wrtFlag;
-
-public:
+	
+	public:
 	// Client();
 	Client(int fd, ServerConf &default_conf); //to init attributes in class
 	~Client();
-
+	
 	HttpRequest		&getRequest(void);
 	HttpResponse	&getResponse(void);
-	HttpResponse	&getCgiResponse(void);
-	bool			checkCgiFlag();
-	void			setCgiFlag(); //set to true, will call after specif behaviour done
-	void			resetCgiFlag(void); //reset to false
 	int				getSocket(void);
 	clientState		getState(void);
 	int				getFileFd(void);
@@ -78,16 +82,42 @@ public:
 	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
 	
-	void			setCgiResponse(HttpResponse& response);//set the resonse with the return-val 'response' from cgi_handler
 	void			setState(clientState state);
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
 	void			setServerConf(ServerConf &conf);
 	void			setLocationConf(LocationConf *conf);
-
+	
 	bool			sendResponseChunk(void);
 	void			prepareErrorResponse(int code);
+	
+	// bool			createCgiPip(bool postFlag);
+	void			setCgiResponse(const HttpResponse& response);//set the resonse with the return-val 'response' from cgi_handler
+	void			appendCgiOutputBuff(std::string buffer, size_t bytes);
+	std::string		getCgiOutputBuff();
+	void			setCgiBodyWrite(size_t size);
+	size_t			getCgiBodyWrite();
+	
+	void			setCgiPid(int pid);
+	int				getCgiPid();
+	void			closeCgiFd();
+	
+	void			setFromCgi(int fd);
+	int				getFromCgi();
+	void			setToCgi(int fd);
+	int				getToCgi();
+	
+	// void			setCgiPost(bool postFlg);
+	// bool			getCgiPost();
+	
+	void			setCgiActive(bool flg);
+	bool			checkCgiActive();
+	
+	//void			setCgiFlag(); //set to true, will call after specif behaviour done
+	// bool			checkCgiFlag();
+	// void			resetCgiFlag(void); //reset to false
+	// HttpResponse	&getCgiResponse(void);
 };
 
 #endif

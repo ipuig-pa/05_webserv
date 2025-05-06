@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/04 15:38:17 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 13:40:55 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,12 @@
 Client::Client(int socket, ServerConf &default_conf)
 	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr)
 {
-	_hasCgi = false;
+	//_hasCgi = false;
+	_cgiActive = false;
+	_cgiPid = -1;
+	_pipToCgi = -1;
+	_pipFromCgi = -1;
+	// _cgiBodywrite = "";
 	_error_handler = new ErrorPageHandler(this);
 	//_request ->change _currentConfig according to request header (find )
 	//_response
@@ -41,11 +46,6 @@ HttpRequest	&Client::getRequest(void)
 HttpResponse	&Client::getResponse(void)
 {
 	return (_response);
-}
-
-HttpResponse	&Client::getCgiResponse(void)
-{
-	return (_cgiResponse);
 }
 
 clientState	Client::getState(void)
@@ -94,14 +94,14 @@ bool	Client::sendResponseChunk(void)
 	{
 		std::string	status = _response.statusToString();
 		std::string	headers = _response.headersToString();
-
+		
 		size_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
-			return false;
+		return false;
 		_response.setBytesSent(sent);
 		sent = send(_socket, headers.c_str(), headers.length(), 0);
 		if (sent < 0)
-			return false;
+		return false;
 		_response.setBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
@@ -111,7 +111,7 @@ bool	Client::sendResponseChunk(void)
 		{
 			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
 			if (sent < 0)
-				return false;
+			return false;
 			_response.setBodyBuffer("");
 			_response.setBytesSent(sent);
 			return true;
@@ -127,25 +127,6 @@ bool	Client::sendResponseChunk(void)
 	return false; //!?!?!?
 	//else set it as already sent
 }
-
-void	Client::setCgiResponse(HttpResponse& Cgires)
-{
-	this->_cgiResponse = Cgires;
-}
-
-bool	Client::checkCgiFlag()
-{
-	return _hasCgi;
-}
-
-void	Client::setCgiFlag()
-{
-	_hasCgi = true;
-}
-void	Client::resetCgiFlag(void)
-{
-	_hasCgi = false;
-}	
 
 void	Client::setServerConf(ServerConf &conf)
 {
@@ -163,3 +144,100 @@ void	Client::prepareErrorResponse(int code)
 	_response.setStatusCode(code);
 	_response.setBodyBuffer(_error_handler->generateErrorBody(code));
 }
+
+void Client::setCgiPid(int pid)
+{
+	_cgiPid = pid;
+}
+int	Client::getCgiPid()
+{
+	return _cgiPid;
+}
+void Client::closeCgiFd()
+{
+	if (_pipFromCgi != -1) {
+		close(_pipFromCgi);
+	}
+	if (_pipToCgi != -1) {
+		close(_pipToCgi);
+	}
+	_pipFromCgi = -1;
+	_pipToCgi = -1;
+}
+void Client::setFromCgi(int fd)
+{
+	_pipFromCgi = fd;
+}
+int	Client::getFromCgi()
+{
+	return _pipFromCgi;
+}
+void Client::setToCgi(int fd)
+{
+	_pipToCgi = fd;
+}
+int	Client::getToCgi()
+{
+	return _pipToCgi;
+}
+
+// void	Client::setCgiPost(bool postFlg)
+// {
+// 	_checkCgiPost = postFlg;
+// }
+// bool	Client::getCgiPost()
+// {
+// 	return _checkCgiPost;
+// }
+void	Client::setCgiActive(bool flg)
+{
+	_cgiActive = flg;
+}
+bool	Client::checkCgiActive()
+{
+	return _cgiActive;
+}
+void Client::appendCgiOutputBuff(std::string buffer, size_t bytes)
+{
+	if (_cgiBuffer.empty() == true) {
+		_cgiBuffer = buffer;
+	}
+	else
+		_cgiBuffer.append(buffer, bytes);
+}
+std::string	Client::getCgiOutputBuff()
+{
+	return _cgiBuffer;
+}
+void Client::setCgiBodyWrite(size_t size)
+{
+	_cgiBodywrite = size;
+}
+size_t	Client::getCgiBodyWrite()
+{
+	return _cgiBodywrite;
+}
+
+void	Client::setCgiResponse(const HttpResponse& Cgires)
+{
+	this->_response = Cgires;
+}
+
+// HttpResponse	&Client::getCgiResponse(void)
+// {
+// 	return (_cgiResponse);
+// }
+
+// bool	Client::checkCgiFlag()
+// {
+// 	return _hasCgi;
+// }
+
+// void	Client::setCgiFlag()
+// {
+// 	_hasCgi = true;
+// }
+// void	Client::resetCgiFlag(void)
+// {
+// 	_hasCgi = false;
+// }	

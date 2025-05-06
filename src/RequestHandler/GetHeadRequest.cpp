@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 16:49:11 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/05 14:19:37 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,6 @@ void	RequestHandler::handleGetRequest(Client &client)
 {
 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
 	
-	if (client.checkCgiFlag() == true) {
-		HttpResponse& tmp_res = client.getCgiResponse();
-		client.setCgiResponse(tmp_res);
-		// client.setCgiResponse(client.getCgiResponse());
-		client.resetCgiFlag(); //avoid reuse
-		return ;
-	}
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {

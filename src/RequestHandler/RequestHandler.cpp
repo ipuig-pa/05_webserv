@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 13:22:47 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 12:17:48 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,22 @@ void	RequestHandler::handleClientRead(Client &client)
 		//else
 			// bytesRead < 0: handle error during reading
 	}
-	if (client.getState() == PROCESSING)
-		processRequest(client);
+	if (client.getState() == PROCESSING) {
+			processRequest(client);			
+	}
 }
-
+// if (client.getState() == READING_CGI) {
+// 	readCgiOutput(client);
+// }
+// if (isCgiRequest(client)) {
+// 	if (initCgi(client) == false) {
+// 		client.prepareErrorResponse(500);
+// 	}
+// 	else {
+// 		client.setState(READING_CGI);
+// 	}
+// 	return ;
+// }
 
 void	RequestHandler::handleClientWrite(Client &client)
 {
@@ -67,11 +79,11 @@ void	RequestHandler::handleClientWrite(Client &client)
 	if (client.getState() == SENDING_RESPONSE)
 	{
 		if (!client.sendResponseChunk())
-			//error handling??
-			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
+		//error handling??
+		std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
 	}
 	std::cout << "sent " << client.getResponse().getBytesSent() << ".\nStatus: " << client.getResponse().statusToString().length() << ".\nHeader: " << client.getResponse().headersToString().length() << ".\nBody: " << client.getResponse().getHeader("Content-Length") << std::endl;
-
+	
 	if (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() +  client.getResponse().getBodyLength()))
 	{
 		client.getResponse().setState(SENT);
@@ -80,16 +92,12 @@ void	RequestHandler::handleClientWrite(Client &client)
 			client.setState(CONNECTION_CLOSED);
 		}
 		else
-			client.setState(NEW_REQUEST);
+		client.setState(NEW_REQUEST);
 	}
 }
-
-bool RequestHandler::isCgiRequest(Client& client)
-{
-	std::string tmp = client.getRequest().getPath();
-	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
-	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
-		return true;
-	}
-	return false;
-}
+// if (client.getState() == WRITING_CGI) {
+// 	if (writeToCgi(client)) {
+// 		client.setState(READING_CGI);
+// 	}
+// 	return ;
+// }

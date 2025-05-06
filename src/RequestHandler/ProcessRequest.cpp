@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 16:49:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 13:13:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,7 @@ void	RequestHandler::processRequest(Client &client)
 	std::string path = getPathFromUri(client);
 	client.getRequest().setPath(path); //this function should map URL to a file system path based on configuration locations. Use it as a method implemented in config!?!? or a function in which we pass the config?
 
-	if (client.getLocationConf())
-	{
+	if (client.getLocationConf()) {
 		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
 			method_allowed = true;
@@ -41,20 +40,20 @@ void	RequestHandler::processRequest(Client &client)
 	}
 	if (method_allowed) {
 		if (isCgiRequest(client) == true) {
-			std::cout << "CGI request received.\n";
-			LOG_INFO("CGI received");
-			CgiHandler cgi(client.getRequest(), client.getRequest().getPath(), client.getLocationConf()->getLocRoot());
-			HttpResponse cgiRes = cgi.handleCgiRequest();
-			client.setCgiFlag(); //_hasCgi flag set true
-			client.setCgiResponse(cgiRes); 
+			LOG_INFO("\033[32mCGI Request recived\033[0m");
+			if (!initCgi(client)) {
+				LOG_DEBUG("\033[31mCGI init fail\033[0m");
+				client.prepareErrorResponse(500);
+				return ;
+			}
+		} else {
+			(this->*handleMethod[client.getRequest().getMethod()])(client);
 		}
-		(this->*handleMethod[client.getRequest().getMethod()])(client);
-	}
-	else
+	} else {
 		(this->*handleMethod[4])(client); // invalid request
+	}
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
-
 
 std::string	RequestHandler::getPathFromUri(Client &client)
 {

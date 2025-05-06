@@ -19,6 +19,7 @@ SOURCES =	ConfReader.cpp \
 			Client.cpp \
 			Socket.cpp \
 			RequestHandler.cpp \
+			CgiRequest.cpp \
 			ProcessRequest.cpp \
 			GetHeadRequest.cpp \
 			PostRequest.cpp \
@@ -32,7 +33,6 @@ SOURCES =	ConfReader.cpp \
 			Header.cpp \
 			Status.cpp \
 			CgiChecker.cpp \
-			CgiHandler.cpp \
 			FileUtils.cpp \
 			Logger.cpp \
 			main.cpp

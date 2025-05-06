@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 12:10:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/06 13:04:31 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,6 @@ void	MultiServer::eraseFromPoll(int fd)
 	}
 }
 
-//change to MultiServer syntax
 void	MultiServer::run()
 {
 	RequestHandler	req_hand;
@@ -118,7 +117,17 @@ void	MultiServer::run()
 	while (runServer)
 	{
 		LOG_DEBUG("Server running...");
-
+		for (std::map<int, Client*>::iterator _it = _clients.begin(); _it != _clients.end(); ++_it)
+		{
+			// Client *cgi_client = it->second;
+			if (_it->second->getState() == WRITING_CGI && _it->second->getToCgi() != -1) { //dup check needed??
+				_poll.push_back((struct pollfd) { _it->second->getToCgi(), POLLOUT, 0 });
+			}
+			else if (_it->second->getState() == READING_CGI && _it->second->getFromCgi() != -1) {
+				_poll.push_back((struct pollfd) { _it->second->getFromCgi(), POLLIN, 0 });
+			}
+		}
+		
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
 		int ready = poll(_poll.data(), _poll.size(), -1);
 
@@ -159,8 +168,15 @@ void	MultiServer::run()
 			if (it_c != _clients.end())
 			{
 				if (_poll[i].revents & POLLIN) {
-					req_hand.handleClientRead(*(it_c->second));
-					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
+					if (_poll[i].fd == it_c->second->getSocket()) {
+						req_hand.handleClientRead(*(it_c->second));
+					}
+					else if (_poll[i].fd == it_c->second->getFromCgi()) {
+						req_hand.readCgiOutput(*it_c->second);
+						if (it_c->second->checkCgiActive() == false) {
+							eraseFromPoll(_poll[i].fd);
+						}
+					}
 					int	file_fd = (it_c->second)->getFileFd();
 					if (file_fd != -1)
 					{
@@ -188,12 +204,21 @@ void	MultiServer::run()
 				}
 				// Handle writing to client
 				if (_poll[i].revents & POLLOUT) {
-					req_hand.handleClientWrite(*(it_c->second));
+					if (_poll[i].fd == it_c->second->getSocket()) {
+						req_hand.handleClientWrite(*(it_c->second));
+					} else if (_poll[i].fd == it_c->second->getToCgi()) {
+						if (req_hand.writeToCgi(*it_c->second)) {
+							eraseFromPoll(_poll[i].fd);
+							close(it_c->second->getToCgi());
+							it_c->second->setState(READING_CGI);
+						}
+					}
 					if (it_c->second->getState() == NEW_REQUEST)
 						_poll[i].events = POLLIN;
 				}
 			}
 			//handle file descriptors belonging to files
+			//todo: else if for CGI check
 			else
 			{
 				if (_poll.data()[i].revents & POLLIN) {
@@ -215,6 +240,114 @@ void	MultiServer::run()
 	}
 	return ;
 }
+
+//change to MultiServer syntax
+// void	MultiServer::run()
+// {
+// 	RequestHandler	req_hand;
+// 	if (runServer)
+// 		LOG_INFO("Server is now available");
+// 	while (runServer)
+// 	{
+// 		LOG_DEBUG("Server running...");
+
+// 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
+// 		int ready = poll(_poll.data(), _poll.size(), -1);
+
+// 		if (ready < 0)
+// 		{
+// 			if (errno != EINTR) // check that the error was not due to a signal interrupting poll call, but not real error occured
+// 			{
+// 				LOG_ERR("Poll error: " + std::string(strerror(errno)));
+// 				// have into account other errors for specific behavior???
+// 				if (errno == ENOMEM) // Not enough space/cannot allocate memory
+// 				{
+// 					// cleanupAndExit(); //TO BE IMPLEMENTED!
+// 					return ;
+// 				}
+// 			}
+// 			continue; // Skip this iteration and try polling again
+// 		}
+// 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
+// 		for (int i = _poll.size() - 1; i >= 0; i--) {
+// 			if (_poll[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
+// 				continue;
+// 			//get fd
+// 			int fd = _poll[i].fd;
+// 			// if it is a listening socket and it is ready, accept new clients
+// 			std::map<int, Socket*>::iterator it_s;
+// 			it_s = _sockets.find(fd);
+// 			if (it_s != _sockets.end())
+// 			{
+// 				if (_poll[i].revents & POLLIN)
+// 				{
+// 					MultiServer::acceptNewConnection(it_s->second);
+// 					// continue; //so start the loop againg, and check again poll, including this new client
+// 				}
+// 			}
+// 			std::map<int, Client*>::iterator it_c;
+// 			it_c = _clients.find(fd);
+// 			// Check if this is a client socket and handle client sockets if it is
+// 			if (it_c != _clients.end())
+// 			{
+// 				if (_poll[i].revents & POLLIN) {
+// 					req_hand.handleClientRead(*(it_c->second));
+// 					//If a file has been linked to the client (during processing, once reading request is completed), add its fd to poll() monitoring
+// 					int	file_fd = (it_c->second)->getFileFd();
+// 					if (file_fd != -1)
+// 					{
+// 						LOG_INFO("File " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
+// 						struct pollfd file = {file_fd, POLLIN, 0};
+// 						_poll.push_back(file);
+// 					}
+// 					//After reading, set the client socket to POLLOUT
+// 					if (it_c->second->getState() == SENDING_RESPONSE)
+// 					{
+// 						for (size_t i = 0; i < _poll.size(); i++) {
+// 							if (_poll[i].fd == fd) {
+// 								_poll[i].events = POLLOUT;
+// 								break;
+// 							}
+// 						}
+// 					}
+// 					if (it_c->second->getState() == CONNECTION_CLOSED)
+// 					{
+// 						close(fd);
+// 						_clients.erase(it_c);
+// 						eraseFromPoll(fd);
+// 					}
+// 					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done
+// 				}
+// 				// Handle writing to client
+// 				if (_poll[i].revents & POLLOUT) {
+// 					req_hand.handleClientWrite(*(it_c->second));
+// 					if (it_c->second->getState() == NEW_REQUEST)
+// 						_poll[i].events = POLLIN;
+// 				}
+// 			}
+// 			//handle file descriptors belonging to files
+// 			//todo: else if for CGI check
+// 			else
+// 			{
+// 				if (_poll.data()[i].revents & POLLIN) {
+// 					it_c = _clients.begin();
+// 					while (it_c != _clients.end())
+// 					{
+// 						if (it_c->second->getFileFd() == fd)
+// 							if (req_hand.handleFileRead(*(it_c->second)))
+// 								eraseFromPoll(fd);
+// 						it_c++;
+// 					}
+// 				}
+// 			}
+// 			// Handle errors or closed connections -> maybe erase from poll here all the closed connections, so no interference to the i is done in between the loop??
+// 			// if (Multiserver.getPoll()[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+// 			// 	Multiserver.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
+// 			// }
+// 		}
+// 	}
+// 	return ;
+// }
 
 /*handle directory request:
 Using readdir() for Directory Handling

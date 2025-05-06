@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 15:52:57 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/05 14:17:41 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,6 @@
 //todo: need change
 void	RequestHandler::handlePostRequest(Client &client)
 {
-	if (client.checkCgiFlag() == true) {
-		HttpResponse& tmp_res = client.getCgiResponse();
-		client.setCgiResponse(tmp_res);
-		// client.setCgiResponse(client.getCgiResponse());
-		client.resetCgiFlag(); //avoid reuse
-		return ;
-	}
 	std::string path = client.getRequest().getPath();
 
 	std::ofstream file(path);

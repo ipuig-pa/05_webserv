@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:52:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 10:46:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,13 @@ public:
 	
 	//getters	
 	int				getMethod(void) const;
+	std::string		getMthStr() const; //to get the string, not int from enum
 	std::string		&getPath(void); //url
-	std::string		getVersion();
-	std::string		getHeaderVal(const std::string& name);//needed?!!? -yes, this will check is there has a body or not
-	std::map<std::string, std::string, CaseInsensitiveCompare> getHearderField(); //get whole filed <key> <value>
+	std::string		getVersion() const;
+	std::string		getHeaderVal(const std::string& name) const;//needed?!!? -yes, this will check is there has a body or not
+	std::map<std::string, std::string, CaseInsensitiveCompare> getHearderField() const; //get whole filed <key> <value>
 	std::string&	getBody();
-	std::string		getQueryPart();
+	std::string		getQueryPart() const;
 	// methodType& getMethd();
 
 	bool			isComplete();

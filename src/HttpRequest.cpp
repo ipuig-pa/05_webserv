@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 11:13:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 10:45:48 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,24 @@ int	HttpRequest::getMethod(void) const
 {
 	return (_method);
 }
+std::string	HttpRequest::getMthStr() const
+{
+	if (_method == 0) {
+		return ("GET");
+	}
+	else if (_method == 1) {
+		return ("HEAD");
+	}
+	else if (_method == 2) {
+		return ("POST");
+	}
+	else if (_method == 3) {
+		return ("DELETE");
+	}
+	else {
+		return ("INVALID");
+	}
+}
 
 void HttpRequest::setPath(const std::string url)
 {
@@ -87,7 +105,7 @@ void HttpRequest::setQueryPart(const std::string s)
 	this->_queryPart = s;
 }
 
-std::string HttpRequest::getQueryPart()
+std::string HttpRequest::getQueryPart() const
 {
 	return _queryPart;
 }
@@ -97,7 +115,7 @@ void HttpRequest::setVersion(const std::string s)
 	this->_version = s;
 }
 
-std::string HttpRequest::getVersion()
+std::string HttpRequest::getVersion() const
 {
 	return _version;
 }
@@ -108,12 +126,12 @@ void HttpRequest::setHeaderField(const std::string name, const std::string value
 	this->_header.set(name, value);
 }
 
-std::string HttpRequest::getHeaderVal(const std::string& name)
+std::string HttpRequest::getHeaderVal(const std::string& name) const
 {
 	return _header.getVal(name);
 }
 
-std::map<std::string, std::string, CaseInsensitiveCompare> HttpRequest::getHearderField()
+std::map<std::string, std::string, CaseInsensitiveCompare> HttpRequest::getHearderField() const
 {
 	return _header.getAll();	
 }

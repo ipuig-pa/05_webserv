@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:31:33 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 12:25:06 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/05 10:19:09 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "FileUtils.hpp"
+
 
 /**
 * take request -> set env ->exec script ->catch output ->convert to response
@@ -38,15 +39,17 @@ private:
 	HttpRequest _request;
 	std::map<std::string, std::string> _env;
 	
-	void _setEnv();//set var: method; QUERY_STR; content-length/content-type, header=>CGI
-	bool _execCGI(std::string& cgiRawOutput); //pipe, fork, [...]
-	bool _forkErr();
-	std::vector<char*> _createEnvp();
-	void _child();
-	bool _parent(std::string& cgiRawOutput);
+	
+	static std::vector<char*> createEnv(const HttpRequest& httpReq, const std::string& req_url, const std::string& rootPath);
+	static std::vector<char*> _convertToEnvp(std::vector<std::string>& envStr);
+	// void _setEnv();//set var: method; QUERY_STR; content-length/content-type, header=>CGI
+	// bool _execCGI(std::string& cgiRawOutput); //pipe, fork, [...]
+	// bool _forkErr();
+	// void _child();
+	// bool _parent(std::string& cgiRawOutput);
 	void _convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
 	void _cgiHeaderScope(const std::string& line, HttpResponse& response);
-	HttpResponse _convertToResponse(std::string& cgiRawOutput); //generate HttpResponse from script
+	// HttpResponse _convertToResponse(std::string& cgiRawOutput); //generate HttpResponse from script
 	std::string _getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
 	std::string _extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
 	
@@ -56,7 +59,10 @@ private:
 	~CgiHandler();
 	
 	HttpResponse handleCgiRequest(); //entry point, setEnv->execGuc->generateResponse->return HttpResponse
-
+	void setMethod(std::string& s);
+	void setContentType(std::string& s);
+	void setContentLen(size_t length);
+	void setBody(std::string& s);
 	// //helper
 	// void _toUpCase(std::string& s);
 };
