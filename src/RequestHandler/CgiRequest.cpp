@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 13:34:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 18:25:51 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,16 @@ std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::st
 	env.push_back("CONTENT_TYPE=" + httpReq.getHeaderVal("Content-Type"));
 	env.push_back("CONTENT_LENGTH=" + httpReq.getHeaderVal("Content-Length"));
 	env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
+	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
+	_convertFormat(_reqHeader);
+	std::string contentType = httpReq.getHeaderVal("Content-Type");
+	if (!contentType.empty()) {
+		env.push_back("CONTENT_TYPE=" + contentType);
+	}
+	std::string contentLen = httpReq.getHeaderVal("Content-Length");
+	if (!contentLen.empty()) {
+		env.push_back("CONTENT_LENGTH=" + contentLen);
+	}
 	// env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
 	// env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
@@ -185,22 +195,22 @@ std::vector<char*> RequestHandler::_convertToEnvp(std::vector<std::string>& envS
 	return _envp;
 }
 
-// void RequestHandler::_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader)
-// {
-// 	std::map<std::string, std::string, CaseInsensitiveCompare>::iterator iter;
-// 	for (iter = reqHeader.begin(); iter != reqHeader.end(); ++iter) {
-// 		std::string key = "HTTP_" + iter->first;
-// 		for (size_t i = 0; i < key.size(); ++i) {
-// 			if (key[i] == '-') {
-// 				key[i] = '_';
-// 			}
-// 			else {
-// 				key[i] = std::toupper(key[i]);
-// 			}
-// 		}
-// 		reqHeader[key] = iter->second;
-// 	}
-// }
+void RequestHandler::_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader)
+{
+	std::map<std::string, std::string, CaseInsensitiveCompare>::iterator iter;
+	for (iter = reqHeader.begin(); iter != reqHeader.end(); ++iter) {
+		std::string key = "HTTP_" + iter->first;
+		for (size_t i = 0; i < key.size(); ++i) {
+			if (key[i] == '-') {
+				key[i] = '_';
+			}
+			else {
+				key[i] = std::toupper(key[i]);
+			}
+		}
+		reqHeader[key] = iter->second;
+	}
+}
 
 void RequestHandler::_cgiHeaderScope(const std::string& line, HttpResponse& response)
 {
