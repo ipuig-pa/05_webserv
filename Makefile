@@ -31,6 +31,8 @@ SOURCES =	ConfReader.cpp \
 			ErrorPageHandler.cpp \
 			Header.cpp \
 			Status.cpp \
+			TimeoutConf.cpp \
+			ConnectionTracker.cpp \
 			CgiChecker.cpp \
 			FileUtils.cpp \
 			Logger.cpp \

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 17:05:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:02:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_REQUEST), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr)
+	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _tracker()
 {
 	_error_handler = new ErrorPageHandler(this);
 	//_request ->change _currentConfig according to request header (find )
@@ -72,6 +72,11 @@ HttpReqParser	&Client::getParser(void)
 	return (_req_parser);
 }
 
+ConnectionTracker	&Client::getTracker(void)
+{
+	return (_tracker);
+}
+
 void	Client::setState(clientState state)
 {
 	_state = state;
@@ -114,6 +119,7 @@ bool	Client::sendResponseChunk(void)
 		else if (_file_fd == -1 && _response.getState() == READ) //or handle the case where there was a fd and is already sent!
 		{
 			_state = NEW_REQUEST;
+			this->getTracker().setLastActivity();
 			return true;
 		}
 		// else

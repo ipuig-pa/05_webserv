@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/04 10:25:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 15:02:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include "ServerConf.hpp"
 # include "ErrorPageHandler.hpp"
 # include "LocationConf.hpp"
+# include "ConnectionTracker.hpp"
 
 class ErrorPageHandler;
 
@@ -32,6 +33,7 @@ class ErrorPageHandler;
 
 enum clientState
 {
+	NEW_CONNECTION,
 	NEW_REQUEST,
 	READING_REQUEST,
 	PROCESSING,
@@ -52,6 +54,7 @@ private:
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
 	ServerConf			&_currentServerConf; //idea: maybe create a upper class
 	LocationConf		*_currentLocConf;
+	ConnectionTracker	_tracker;
 
 	// int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	// std::string _data; //data for & from client
@@ -71,6 +74,7 @@ public:
 	ServerConf		&getServerConf(void);
 	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
+	ConnectionTracker	&getTracker(void);
 	
 	void			setCgiResponse(HttpResponse& response);//set the resonse with the return-val 'response' from cgi_handler
 	void			setState(clientState state);

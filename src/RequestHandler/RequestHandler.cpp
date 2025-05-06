@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 09:40:47 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 12:47:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,18 @@ void	RequestHandler::handleClientRead(Client &client)
 	LOG_DEBUG("Reading client request...");
 	// processRequest(client);
 
-	if (client.getState() == NEW_REQUEST)
-	{
-		client.setState(READING_REQUEST);
-		LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to READING request");
-	}
-	if (client.getState() == READING_REQUEST)
+	if (client.getState() == NEW_CONNECTION || client.getState() == NEW_REQUEST || client.getState() == READING_REQUEST)
 	{
 		ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
 		std::cout << "already read " << bytesRead << "bytes." << std::endl;
 		if (bytesRead > 0)
 		{
+			if(client.getState() != READING_REQUEST)
+			{
+				client.setState(READING_REQUEST);
+				LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to READING request");
+			}
+			client.getTracker().setLastActivity();
 			if (!client.getRequest().isComplete())
 			{
 				std::string	buffer_str(buffer);

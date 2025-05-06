@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 12:10:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:01:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 //CONSTRUCTORS
 //check listen_sock creation
 MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
-	:_serv_config(serv_config)
+	:_serv_config(serv_config), _timeouts()
 {
 	init_sockets(_serv_config);
 }
@@ -178,13 +178,27 @@ void	MultiServer::run()
 							}
 						}
 					}
-					if (it_c->second->getState() == CONNECTION_CLOSED)
-					{
-						close(fd);
-						_clients.erase(it_c);
-						eraseFromPoll(fd);
-					}
+					// if (it_c->second->getState() == CONNECTION_CLOSED)
+					// {
+					// 	close(fd);
+					// 	_clients.erase(it_c);
+					// 	eraseFromPoll(fd);
+					// }
 					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done
+				}
+				if (_poll[i].revents & (POLLIN | POLLOUT) && (it_c->second->getState() == CONNECTION_CLOSED))
+				{
+					LOG_INFO("Closing connection on client at socket " + std::to_string(it_c->second->getSocket()) + " and associated fd");
+					int assoc_fd = it_c->second->getFileFd();
+					//check also cgi_fd if no file_fd is found
+					if (assoc_fd != -1)
+					{
+						close (assoc_fd);
+						eraseFromPoll(assoc_fd);
+					}
+					close(fd);
+					_clients.erase(it_c);
+					eraseFromPoll(fd);
 				}
 				// Handle writing to client
 				if (_poll[i].revents & POLLOUT) {
@@ -212,70 +226,58 @@ void	MultiServer::run()
 			// 	Multiserver.handleConnectionClosed(i); //TO BE IMPLEMENTED! add into a to_erase list to finally erase them all (in a inverse order, as it has to maintain the i correct)
 			// }
 		}
+		MultiServer::checkTimeouts();
 	}
 	return ;
 }
 
-/*handle directory request:
-Using readdir() for Directory Handling
-The readdir() function is used to read the contents of a directory:
-cpp#include <dirent.h>
-#include <string>
-#include <vector>
+void	MultiServer::checkTimeouts()
+{
+	time_t current_time = time(NULL);
 
-std::vector<std::string> listDirectory(const std::string& path) {
-	std::vector<std::string> result;
-	
-	DIR* dir = opendir(path.c_str());
-	if (dir == NULL) {
-		return result; // Return empty vector on error
-	}
-	
-	struct dirent* entry;
-	while ((entry = readdir(dir)) != NULL) {
-		// Skip "." and ".." entries
-		if (std::string(entry->d_name) != "." && std::string(entry->d_name) != "..") {
-			result.push_back(entry->d_name);
+	for (auto it = _clients.begin(); it != _clients.end(); ) {
+		Client* client = it->second;
+		bool should_close = false;
+
+		// Check connection establishment timeout
+		if (client->getState() == NEW_CONNECTION && 
+			(current_time - client->getTracker().getConnectionStart() > _timeouts.getConnection())) {
+			LOG_ERR("Connection establishment timeout for client at socket" + std::to_string(client->getSocket()));
+			should_close = true;
+		}
+		
+		// Check read timeout
+		if (client->getState() == READING_REQUEST && 
+			(current_time - client->getTracker().getLastActivity() > _timeouts.getRead())) {
+			LOG_ERR("Reading request timeout for client at socket" + std::to_string(client->getSocket()));
+			should_close = true;
+		}
+		
+		// Check write timeout
+		if (client->getState() == SENDING_RESPONSE && 
+			(current_time - client->getTracker().getResponseStart() > _timeouts.getWrite())) {
+			LOG_ERR("Sending response timeout for client at socket" + std::to_string(client->getSocket()));
+			should_close = true;
+		}
+		
+		// Check keep-alive timeout
+		if (client->getState() == NEW_REQUEST && 
+			(current_time - client->getTracker().getLastActivity() > _timeouts.getKeepAlive())) {
+			LOG_ERR("Keep-alive timeout for client at socket" + std::to_string(client->getSocket()));
+			should_close = true;
+		}
+		
+		if (should_close) {
+			// Send 408 Request Timeout if appropriate
+			if (client->getState() == READING_REQUEST) {
+				LOG_ERR("Preparing error code 408 for client at socket " + std::to_string(client->getSocket()));
+				client->prepareErrorResponse(408); // + close?!?!?
+			}
+			else {
+				client->setState(CONNECTION_CLOSED);
+			}
+		} else {
+			++it;
 		}
 	}
-	
-	closedir(dir);
-	return result;
 }
-Advantages of using readdir()
-
-Direct directory access: Allows iterating through directory entries
-Access to file information: Each dirent structure contains basic file information
-Required for directory listing: Essential for implementing directory listing in your web Multiserver
-*/
-
-
-
-//TO MOVE TO THE SERVERCONF CLASS
-// LocationConf	*ServerConf::getMatchingLocation(std::string urlpath)
-// {
-// 	std::map<std::string, LocationConf>::iterator it;
-// 	LocationConf	*longest_match == nullptr
-// 	size_t			match;
-
-// 	for(it = _locations.begin(); it != _locations.end(); ++it)
-// 	{
-// 		if ((it->first).compare(urlpath) == 0)
-// 			return (&it->second);
-// 	}
-// 	match = 0;
-// 	for(it = _locations.begin(); it != _locations.end(); ++it)
-// 	{
-// 		if (!(it->first).empty() && (it->first).back() == '/' && urlpath.find(it->first) == 0)
-// 		{
-// 			if ((it->first).size() > match)
-// 			{
-// 				match = (it->first).size()
-// 				longest_match = &it->second;
-// 			}
-// 		}
-// 	}
-// 	if (longest_match)
-// 		return (longest_match);
-// 	return (_root);
-// }

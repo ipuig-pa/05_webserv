@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/04 11:04:21 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 15:04:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ void	RequestHandler::processRequest(Client &client)
 	else
 		(this->*handleMethod[4])(client); // invalid request
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
+	client.getTracker().setResponseStart();
+	LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to SENDING_RESPONSE");
 }
 
 

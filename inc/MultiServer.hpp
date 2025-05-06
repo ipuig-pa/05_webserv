@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/06 11:50:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "ServerConf.hpp"
 #include "Socket.hpp"
 #include "RequestHandler.hpp"
+#include "TimeoutConf.hpp"
 
 class MultiServer
 {
@@ -27,6 +28,7 @@ private:
 	std::vector<struct pollfd>				_poll;
 	std::map<int, Socket*>					_sockets; //maps each socket fd to the object socket
 	std::map<int, Client*>					_clients;//int should be the fd of the client socket
+	TimeoutConf								_timeouts;
 
 	void	init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
 	void	acceptNewConnection(Socket *listen_socket);
@@ -43,6 +45,7 @@ public:
 	void		run();
 
 //	void	handleConnectionClosed(???);
+	void	checkTimeouts();
 	void	eraseFromPoll(int fd);
 };
 

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 16:42:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/06 10:49:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,4 +199,5 @@ void	HttpResponse::checkMandatoryHeaders()
 		LOG_ERR("No Content-Type header is found in HttpResponse");
 	if (getHeader("Content-Length").empty())
 		setHeaderField("Content-Length", std::to_string(_body_length));
+	// also include Connection: keep-alive or close?
 }
