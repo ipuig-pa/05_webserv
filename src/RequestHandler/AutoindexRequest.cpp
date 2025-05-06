@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RequestHandler copy 2.cpp                          :+:      :+:    :+:   */
+/*   AutoindexRequest.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/03 10:54:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/06 15:01:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,4 +120,5 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	client.getResponse().setHeaderField("Content-Length", std::to_string(html.str().size()));
 	client.getResponse().setBodyBuffer(html.str());
 	client.setState(SENDING_RESPONSE);
+	client.getTracker().setResponseStart();
 }

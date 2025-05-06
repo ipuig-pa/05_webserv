@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 13:40:34 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 17:46:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include "ServerConf.hpp"
 # include "ErrorPageHandler.hpp"
 # include "LocationConf.hpp"
+# include "ConnectionTracker.hpp"
 
 class ErrorPageHandler;
 
@@ -32,6 +33,7 @@ class ErrorPageHandler;
 
 enum clientState
 {
+	NEW_CONNECTION,
 	NEW_REQUEST,
 	READING_REQUEST,
 	PROCESSING,
@@ -63,6 +65,7 @@ private:
 	// bool				_checkCgiPost;
 	bool				_cgiActive;
 	// bool wrtFlag;
+	ConnectionTracker	_tracker;
 
 	// int clientFd; // choose between this or Socket object, otherwise it is redundant!
 	// std::string _data; //data for & from client
@@ -81,6 +84,7 @@ private:
 	ServerConf		&getServerConf(void);
 	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
+	ConnectionTracker	&getTracker(void);
 	
 	void			setState(clientState state);
 	void			setFileFd(int file_fd);

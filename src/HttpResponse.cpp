@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 13:43:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 17:47:52 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,4 +199,5 @@ void	HttpResponse::checkMandatoryHeaders()
 		LOG_ERR("No Content-Type header is found in HttpResponse");
 	if (getHeader("Content-Length").empty())
 		setHeaderField("Content-Length", std::to_string(_body_length));
+	// also include Connection: keep-alive or close?
 }
