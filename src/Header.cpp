@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 17:33:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 17:46:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 Header::Header()
 {
 	LOG_DEBUG("Header default constructor called");
-	set("Host", "localhost"); //FOR TESTING PURPOSE, CHANGE
 }
 
 Header::Header(const Header &other)
@@ -23,7 +22,7 @@ Header::Header(const Header &other)
 	*this = other;
 }
 
-//correctly implemented!?!?!?
+//correctly implemented!?!?!
 Header	&Header::operator=(const Header &other)
 {
 	if (this != &other)
@@ -90,9 +89,21 @@ void Header::remove(const std::string& name)
 std::string Header::toString() const
 {
 	std::stringstream ss;
-	for (std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.begin(); 
-		 it != _fields.end(); ++it) {
-		ss << it->first << ": " << it->second << "\r\n";
+
+	const std::vector<std::string> preferredOrder = {"Date", "Server", "Content-Type", "Content-Length", "Location", "Last-Modified", "Connection"};
+
+	for (std::vector<std::string>::const_iterator orderIt = preferredOrder.begin(); orderIt != preferredOrder.end(); ++orderIt) {
+		std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.find(*orderIt);
+		if (it != _fields.end()) {
+			ss << it->first << ": " << it->second << "\r\n";
+		}
 	}
+
+	for (std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.begin(); it != _fields.end(); ++it) {
+		if (std::find(preferredOrder.begin(), preferredOrder.end(), it->first) == preferredOrder.end()) {
+			ss << it->first << ": " << it->second << "\r\n";
+		}
+	}
+
 	return ss.str();
 }

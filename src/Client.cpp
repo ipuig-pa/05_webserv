@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 13:40:55 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 13:43:19 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,7 @@ bool	Client::sendResponseChunk(void)
 {
 	if (_response.getBytesSent() == 0)
 	{
+		_response.checkMandatoryHeaders(); //check all mandatory headers needed: include header date and server! (and content-tyep and length)
 		std::string	status = _response.statusToString();
 		std::string	headers = _response.headersToString();
 		

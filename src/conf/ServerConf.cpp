@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/03 09:10:41 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/05 16:29:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -477,4 +477,10 @@ std::string	ServerConf::getErrPageCode(int status_code)
 	if (it != _error_page.end())
 		return it->second;
 	return "";
+}
+
+
+unsigned int	ServerConf::getMaxBodySize() const
+{
+	return _max_body_size;
 }

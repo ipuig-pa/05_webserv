@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 13:05:11 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/06 13:42:55 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ public:
 	std::string	toString() const;
 	std::string	statusToString() const;
 	std::string	headersToString() const;
+	void		checkMandatoryHeaders();
 };
 
 std::string		getMediaType(const std::string path);
