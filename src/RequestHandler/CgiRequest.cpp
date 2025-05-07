@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 12:13:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 16:48:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ bool RequestHandler::initCgi(Client& client)
 		return false;
 	}
 	if (cgiPid == 0) {
-		// dup2(pipFromCgi[1], STDOUT_FILENO);
+		// int fd_trial = open("/Users/ipuig-pa/Documents/05/05_Webserv_PERSONAL/www/cgi/test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		// dup2(fd_trial, STDOUT_FILENO);
+		// close (fd_trial);
 		dup2(pipFromCgi[1], STDOUT_FILENO);
 		close(pipFromCgi[0]);
 		close(pipFromCgi[1]);
@@ -47,7 +49,13 @@ bool RequestHandler::initCgi(Client& client)
 		av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
 		av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
 		av[2] = NULL;
+		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
 		std::vector<char*> envp = createEnv(client.getRequest(), client.getRequest().getPath(), client.getLocationConf()->getLocRoot());
+		// // LOG_DEBUG("printing envp");
+		// for (size_t i = 0; i < envp.size(); ++i) {
+		// 	// LOG_DEBUG("printing envp" + std::string(envp[0]));
+		// 	std::cout << "printing envp..." << envp[i] << std::endl;
+		// }
 		// char* av[] = { (char*)client.getRequest().getPath().c_str(), NULL };
 		if (execve(av[0], av, envp.data()) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m");
@@ -58,9 +66,6 @@ bool RequestHandler::initCgi(Client& client)
 		}
 	}
 	//parent
-
-	///waitpid???
-
 	client.setCgiPid(cgiPid);
 	client.setCgiActive(true);
 
@@ -85,29 +90,30 @@ bool RequestHandler::initCgi(Client& client)
 void RequestHandler::readCgiOutput(Client& client)
 {
 	char tmpBuff[BUFF_SIZE];
-	int output = client.getFromCgi();//read from the pipFromCgi
-	ssize_t bytes = read(output, tmpBuff, sizeof(tmpBuff));//check
+	ssize_t bytes = read(client.getFromCgi(), tmpBuff, BUFF_SIZE);//check
+	// std::cout << "bytes read from Cgi " + std::to_string(bytes) << std::endl;
 	if (bytes > 0) {
 		// client.getResponse().appendBodyBuffer(std::string(tmpBuff), bytes);
+		// std::cout << "READ: " + std::string(tmpBuff) << std::endl;
 		client.appendCgiOutputBuff(std::string(tmpBuff), bytes);
 	}
 	else if (bytes == 0) { //reach EOF or fail
-		close(output);
+		close(client.getFromCgi());
 		client.setFromCgi(-1);//close pip
 		client.setCgiActive(false); //finish flage
-		HttpResponse cgiRes = _convertToResponse(client.getCgiOutputBuff());
-		client.setCgiResponse(cgiRes);
+		client.setCgiResponse(_convertToResponse(client.getCgiOutputBuff()));
+		// std::cout << "FINAL BODY LENGTH: " << client.getResponse().getBodyLength() << std::endl;
 		// client.getResponse().setStatusCode(200);
 		// client.getResponse().setHeaderField("Content-Type", getMediaType(client.getRequest().getPath()));
 		// client.getResponse().setHeaderField("Content-Length", std::to_string(client.getResponse().getBodyBuffer().size()));
 		// client.getResponse().setState(READ);//check later
 		client.setState(SENDING_RESPONSE);
-		LOG_INFO("\033[31mCGI for client: " + std::to_string(client.getSocket()));
+		LOG_INFO("\033[31mCGI for client: " + std::to_string(client.getSocket()) + "\033[0m");
 		client.closeCgiFd(); //close and clean
 	}
 	else {
 		LOG_ERR("\033[31merror in reading CGI (pipe)\033[0m\n");
-		close(output);
+		close(client.getFromCgi());
 		client.setFromCgi(-1);//close pip
 		client.setCgiActive(false);
 		client.closeCgiFd();
@@ -176,19 +182,21 @@ std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::st
 	env.push_back("CONTENT_LENGTH=" + httpReq.getHeaderVal("Content-Length"));
 	env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
 	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
-	_convertFormat(_reqHeader);
-	std::string contentType = httpReq.getHeaderVal("Content-Type");
-	if (!contentType.empty()) {
-		env.push_back("CONTENT_TYPE=" + contentType);
-	}
-	std::string contentLen = httpReq.getHeaderVal("Content-Length");
-	if (!contentLen.empty()) {
-		env.push_back("CONTENT_LENGTH=" + contentLen);
-	}
-	// env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
-	// env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
+	// //SOME PROBLEM IN CONVERT FORMAT THAT CHANGES THE STANDARD OUTPUT!?!? WHY DO WE NEED THIS CONVERTED HEADERS IF WE HAVE ASSIGNED THEM BEFORE?!?!?!?
+	// _convertFormat(_reqHeader);
+	// LOG_DEBUG("printing envp 4");
+	// std::string contentType = httpReq.getHeaderVal("Content-Type");
+	// if (!contentType.empty()) {
+	// 	env.push_back("CONTENT_TYPE=" + contentType);
+	// }
+	// std::string contentLen = httpReq.getHeaderVal("Content-Length");
+	// if (!contentLen.empty()) {
+	// 	env.push_back("CONTENT_LENGTH=" + contentLen);
+	// }
+	env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
+	env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
-	return _convertToEnvp(env);
+	return (RequestHandler::_convertToEnvp(env));
 }
 
 std::vector<char*> RequestHandler::_convertToEnvp(std::vector<std::string>& envStr)
@@ -203,25 +211,29 @@ std::vector<char*> RequestHandler::_convertToEnvp(std::vector<std::string>& envS
 		_envp.push_back(const_cast<char*>(envStr[i].c_str()));
 	}
 	_envp.push_back(nullptr);
+	// for (size_t i = 0; i < _envp.size(); ++i) {
+	// 	std::cout << "printing envp..." << _envp[i] << std::endl;
+	// }
 	return _envp;
 }
 
-void RequestHandler::_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader)
-{
-	std::map<std::string, std::string, CaseInsensitiveCompare>::iterator iter;
-	for (iter = reqHeader.begin(); iter != reqHeader.end(); ++iter) {
-		std::string key = "HTTP_" + iter->first;
-		for (size_t i = 0; i < key.size(); ++i) {
-			if (key[i] == '-') {
-				key[i] = '_';
-			}
-			else {
-				key[i] = std::toupper(key[i]);
-			}
-		}
-		reqHeader[key] = iter->second;
-	}
-}
+// void RequestHandler::_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader)
+// {
+// 	std::map<std::string, std::string, CaseInsensitiveCompare>::iterator iter;
+// 	for (iter = reqHeader.begin(); iter != reqHeader.end(); ++iter) {
+// 		std::string key = "HTTP_" + iter->first;
+// 		LOG_DEBUG(key);
+// 		for (size_t i = 0; i < key.size(); ++i) {
+// 			if (key[i] == '-') {
+// 				key[i] = '_';
+// 			}
+// 			else {
+// 				key[i] = std::toupper(key[i]);
+// 			}
+// 		}
+// 		reqHeader[key] = iter->second;
+// 	}
+// }
 
 void RequestHandler::_cgiHeaderScope(const std::string& line, HttpResponse& response)
 {
@@ -296,7 +308,10 @@ HttpResponse RequestHandler::_convertToResponse(std::string cgiOutBuff)
 			content << line << "\n";
 		}
 	}
+	// std::cout << "CONTENT: " << content.str() << std::endl;
 	response.setBodyBuffer(content.str());
+	response.setBodyLength(content.str().length());
+	// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;
 	return response;
 }
 

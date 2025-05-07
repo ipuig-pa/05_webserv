@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 17:50:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 16:17:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void	RequestHandler::handleClientRead(Client &client)
 			if(client.getState() != READING_REQUEST)
 			{
 				client.setState(READING_REQUEST);
-				LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to READING request");
 			}
 			client.getTracker().setLastActivity();
 			if (!client.getRequest().isComplete())
@@ -45,20 +44,18 @@ void	RequestHandler::handleClientRead(Client &client)
 				if (client.getParser().httpParse())
 				{
 					client.setState(PROCESSING);
-					LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to PROCESSING request");
 				}
 			}
 		}
 		else if (bytesRead == 0)
 		{
 			client.setState(CONNECTION_CLOSED);
-			LOG_INFO("Client at socket " + std::to_string(client.getSocket()) + " change state to CONNECTION CLOSED");
 		}
 		//else
 			// bytesRead < 0: handle error during reading
 	}
 	if (client.getState() == PROCESSING) {
-			processRequest(client);			
+			processRequest(client);
 	}
 }
 // if (client.getState() == READING_CGI) {

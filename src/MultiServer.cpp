@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 12:12:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 16:46:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,6 @@ void	MultiServer::acceptNewConnection(Socket *listen_socket)
 	_poll.push_back(cli_sock_fd);
 }
 
-// void	MultiServer::handleConnectionClosed(???)
-// {
-
-// }
-
 void	MultiServer::eraseFromPoll(int fd)
 {
 	for (int i = getPoll().size() - 1; i > 0; i--) 
@@ -137,11 +132,13 @@ void	MultiServer::run()
 		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
 		for (int i = _poll.size() - 1; i >= 0; i--) {
-			LOG_DEBUG("poll found " + std::to_string(_poll.size()) + " events, being one of them fd " + std::to_string(_poll[i].fd));
+			// if (_poll.size() == 3)
+			// 	LOG_DEBUG("Fds in poll n. 3. Events: " + std::to_string(_poll[2].events) + " revents: " + std::to_string(_poll[2].revents));
+			// LOG_DEBUG("poll found " + std::to_string(_poll.size()) + " fds, being one of them fd " + std::to_string(_poll[i].fd));
 			if (_poll[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
 			{
 				LOG_INFO(std::to_string(_poll[i].fd) + " not ready");
-				continue;
+				// continue;
 			}
 			//get fd
 			int fd = _poll[i].fd;
@@ -150,25 +147,27 @@ void	MultiServer::run()
 			it_s = _sockets.find(fd);
 			if (it_s != _sockets.end())
 			{
-				LOG_DEBUG("it is a listening socket");
-				LOG_DEBUG("Listening socket fd " + std::to_string(fd) + 
-			  " events: " + std::to_string(_poll[i].events) + 
-			  " revents: " + std::to_string(_poll[i].revents));
+			// 	LOG_DEBUG("it is a listening socket");
+			// 	LOG_DEBUG("Listening socket fd " + std::to_string(fd) + 
+			//   " events: " + std::to_string(_poll[i].events) + 
+			//   " revents: " + std::to_string(_poll[i].revents));
 				if (_poll[i].revents & POLLIN)
 				{
 					LOG_DEBUG("listening socket ready");
 					MultiServer::acceptNewConnection(it_s->second);
-					// continue; //so start the loop againg, and check again poll, including this new client
 				}
+				continue; //so move to the next element in poll
 			}
+			// Check if this is a client socket and handle client sockets if it is
 			std::map<int, Client*>::iterator it_c;
 			it_c = _clients.find(fd);
-			// Check if this is a client socket and handle client sockets if it is
 			if (it_c != _clients.end())
 			{
-				if (_poll[i].revents & POLLIN) {
+				LOG_DEBUG("it is a client socket");
+				if (_poll[i].revents & POLLIN && (it_c->second->getState() == NEW_REQUEST || it_c->second->getState() == NEW_CONNECTION)) {
 					LOG_DEBUG("client socket ready to read");
 					req_hand.handleClientRead(*(it_c->second));
+					//push file fds to poll
 					int	file_fd = (it_c->second)->getFileFd();
 					if (file_fd != -1)
 					{
@@ -185,16 +184,6 @@ void	MultiServer::run()
 						LOG_INFO("Reading pipe end with fd " + std::to_string(it_c->second->getFromCgi()) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
 						_poll.push_back((struct pollfd) { it_c->second->getFromCgi(), POLLIN, 0 });
 					}
-					//After reading, set the client socket to POLLOUT
-					if (it_c->second->getState() == SENDING_RESPONSE)
-					{
-						for (size_t i = 0; i < _poll.size(); i++) {
-							if (_poll[i].fd == fd) {
-								_poll[i].events = POLLOUT;
-								break;
-							}
-						}
-					}
 					// if (it_c->second->getState() == CONNECTION_CLOSED)
 					// {
 					// 	close(fd);
@@ -202,6 +191,16 @@ void	MultiServer::run()
 					// 	eraseFromPoll(fd);
 					// }
 					// (it_c->second)->setState(SENDING_RESPONSE); // should have been done once processing is done
+				}
+				//After reading, set the client socket to POLLOUT
+				if (it_c->second->getState() == SENDING_RESPONSE)
+				{
+					for (size_t i = 0; i < _poll.size(); i++) {
+						if (_poll[i].fd == fd) {
+							_poll[i].events = POLLOUT;
+							break;
+						}
+					}
 				}
 				if (_poll[i].revents & (POLLIN | POLLOUT) && (it_c->second->getState() == CONNECTION_CLOSED))
 				{
@@ -229,6 +228,7 @@ void	MultiServer::run()
 			//todo: else if for CGI check
 			else
 			{
+				LOG_DEBUG("it is file or CGI pipe end");
 				if (_poll.data()[i].revents & POLLIN) {
 					LOG_DEBUG("file / CGI output ready to read");
 					it_c = _clients.begin();
@@ -238,6 +238,7 @@ void	MultiServer::run()
 						{
 							if (req_hand.handleFileRead(*(it_c->second)))
 								eraseFromPoll(fd);
+							break ;
 						}
 						else if (it_c->second->getFromCgi() == fd && it_c->second->getState() == READING_CGI)
 						{
@@ -245,6 +246,7 @@ void	MultiServer::run()
 							if (it_c->second->checkCgiActive() == false) {
 								eraseFromPoll(_poll[i].fd);
 							}
+							break ;
 						}
 						it_c++;
 					}
@@ -259,6 +261,7 @@ void	MultiServer::run()
 								eraseFromPoll(_poll[i].fd);
 								it_c->second->setState(READING_CGI);
 							}
+							break ;
 						}
 						it_c++;
 					}

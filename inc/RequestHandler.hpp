@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/07 10:57:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:39:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ public:
 	std::vector<char*> 	createEnv(HttpRequest& httpReq, const std::string& req_url, const std::string& rootPath);
 	std::vector<char*>	_convertToEnvp(std::vector<std::string>& envStr);
 	HttpResponse		_convertToResponse(std::string cgiOutBuff);
-	void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
+	// void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
 	void				_cgiHeaderScope(const std::string& line, HttpResponse& response);
 	std::string			_getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
 	std::string			_extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 12:08:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 16:27:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ private:
 	HttpResponse	&getResponse(void);
 	int				getSocket(void);
 	clientState		getState(void);
+	std::string		getStateString(clientState state);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
 	ServerConf		&getServerConf(void);
@@ -98,7 +99,7 @@ private:
 	void			prepareErrorResponse(int code);
 	
 	// bool			createCgiPip(bool postFlag);
-	void			setCgiResponse(const HttpResponse& response);//set the resonse with the return-val 'response' from cgi_handler
+	void			setCgiResponse(const HttpResponse response);//set the resonse with the return-val 'response' from cgi_handler
 	void			appendCgiOutputBuff(std::string buffer, size_t bytes);
 	std::string		getCgiOutputBuff();
 	void			setCgiBodyWrite(size_t size);

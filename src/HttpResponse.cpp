@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 17:47:52 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 16:42:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,11 @@ HttpResponse	&HttpResponse::operator=(const HttpResponse &other)
 	{
 		_status = other._status;
 		_header = other._header;
-		// _body_presence = other._body_presence;
-		// _body = other._body;
+		_body_length = other._body_length;
+		_body_buffer = other._body_buffer;
 		_state = other._state;
+		_bytes_read = other._bytes_read;
+		_bytes_sent = other._bytes_sent;
 	}
 	return *this;
 }
