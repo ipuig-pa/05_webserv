@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 13:18:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 10:57:33 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ private:
 	std::string	getPathFromUri(Client &client);
 	
 	
-	public:
+public:
 	RequestHandler();
 	~RequestHandler();
 	
@@ -61,6 +61,7 @@ private:
 	void				_cgiHeaderScope(const std::string& line, HttpResponse& response);
 	std::string			_getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
 	std::string			_extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
+	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
 };
 
 #endif

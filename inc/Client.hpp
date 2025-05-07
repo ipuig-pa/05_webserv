@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 17:46:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 12:08:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ private:
 	// bool				_checkCgiPost;
 	bool				_cgiActive;
 	// bool wrtFlag;
+
 	ConnectionTracker	_tracker;
 
 	// int clientFd; // choose between this or Socket object, otherwise it is redundant!

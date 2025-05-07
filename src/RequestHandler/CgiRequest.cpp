@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 18:25:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 12:13:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,21 @@
 
 bool RequestHandler::initCgi(Client& client)
 {
-	int pipFromCgi[2];
-	int pipToCgi[2];
+	int pipFromCgi[2] = {-1, -1};
+	int pipToCgi[2] = {-1, -1};
 
-	if (pipe(pipFromCgi) < 0 || (pipe(pipToCgi) && (client.getRequest().getMethod() == POST) < 0)) {
+	if (pipe(pipFromCgi) < 0 || (client.getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
 		LOG_ERR("\033[32mDEBUG messaga in pipe_CGI in requesthandler\033[0m");
-		client.prepareErrorResponse(500);
+		cleanupCgiPipe(pipFromCgi, pipToCgi);
+		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
 		//for_err(client);
 		LOG_ERR("\033[32mDEBUG messaga in fork_CGI in requesthandler\033[0m");
-		client.prepareErrorResponse(500);
+		cleanupCgiPipe(pipFromCgi, pipToCgi);
+		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
 	if (cgiPid == 0) {
@@ -49,10 +51,16 @@ bool RequestHandler::initCgi(Client& client)
 		// char* av[] = { (char*)client.getRequest().getPath().c_str(), NULL };
 		if (execve(av[0], av, envp.data()) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m");
+			close(STDOUT_FILENO);
+			if (client.getRequest().getMethod() == POST)
+				close(STDIN_FILENO);
 			exit(1); //exit on error
 		}
 	}
 	//parent
+
+	///waitpid???
+
 	client.setCgiPid(cgiPid);
 	client.setCgiActive(true);
 
@@ -65,9 +73,11 @@ bool RequestHandler::initCgi(Client& client)
 		close(pipToCgi[0]);
 		client.setToCgi(pipToCgi[1]);
 		client.setState(WRITING_CGI);
+		LOG_INFO("\033[31mClient state changed to WRITING_CGI\033[0m");
 	}
 	else {
 		client.setState(READING_CGI); //check later
+		LOG_INFO("\033[31mClient state changed to READING_CGI\033[0m");
 	}
 	return true;
 }
@@ -102,6 +112,7 @@ void RequestHandler::readCgiOutput(Client& client)
 		client.setCgiActive(false);
 		client.closeCgiFd();
 		client.prepareErrorResponse(500);
+		client.setState(SENDING_RESPONSE);
 	}
 }
 
@@ -244,7 +255,7 @@ std::string RequestHandler::_extSysPath(std::string& cgiExt)
 		return ("/usr/local/bin/python3");
 	}
 	else {
-		return ("for debugging, ext cant match");	
+		return ("for debugging, ext can't match");	
 	}
 }
 
@@ -310,3 +321,15 @@ HttpResponse RequestHandler::_convertToResponse(std::string cgiOutBuff)
 // 	}
 // 	return false; //close of all fd is in destructor
 // }
+
+void	RequestHandler::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
+{
+	if (pipFromCgi[0] != -1)
+		close(pipFromCgi[0]);
+	if (pipFromCgi[1] != -1)
+		close(pipFromCgi[1]);
+	if (pipToCgi[0] != -1)
+		close(pipToCgi[0]);
+	if (pipToCgi[1] != -1)
+		close(pipToCgi[1]);
+}

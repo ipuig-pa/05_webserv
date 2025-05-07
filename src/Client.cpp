@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 17:47:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 12:11:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,17 @@ Client::Client(int socket, ServerConf &default_conf)
 Client::~Client()
 {
 	delete (_error_handler);
+	if (_pipFromCgi != -1)
+		close(_pipFromCgi);
+	if (_pipToCgi != -1)
+		close(_pipToCgi);
+	//nort sure what we have to do with cgi pid to properly clean!>!?!?!?
+	int status;
+	if (waitpid(_cgiPid, &status, WNOHANG) == 0) {
+		LOG_WARN("CGI process did not terminate, sending SIGKILL");
+		kill(_cgiPid, SIGKILL);
+		waitpid(_cgiPid, &status, 0);
+	}
 	//_request ->change _currentConfig according to request header (find )
 	//_response
 }

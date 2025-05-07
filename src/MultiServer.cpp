@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/06 17:52:08 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 12:12:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,17 +118,6 @@ void	MultiServer::run()
 	{
 		LOG_DEBUG("Server running...");
 
-		//push cgi_fds to _poll
-		for (std::map<int, Client*>::iterator _it = _clients.begin(); _it != _clients.end(); ++_it)
-		{
-			if (_it->second->getState() == WRITING_CGI && _it->second->getToCgi() != -1) { //dup check needed??
-				_poll.push_back((struct pollfd) { _it->second->getToCgi(), POLLOUT, 0 });
-			}
-			else if (_it->second->getState() == READING_CGI && _it->second->getFromCgi() != -1) {
-				_poll.push_back((struct pollfd) { _it->second->getFromCgi(), POLLIN, 0 });
-			}
-		}
-		
 		// Setup pollfd structures for all active connections (timeout -1 (infinite) -> CHANGE IT SO it not blocks waiting for a fd to be ready!)
 		int ready = poll(_poll.data(), _poll.size(), -1);
 
@@ -148,8 +137,12 @@ void	MultiServer::run()
 		}
 		// Process ready descriptors (the ones that were ready when ready was created at the start of the loop). Doing in inverse order so to not affect the i with closed and removed fd
 		for (int i = _poll.size() - 1; i >= 0; i--) {
+			LOG_DEBUG("poll found " + std::to_string(_poll.size()) + " events, being one of them fd " + std::to_string(_poll[i].fd));
 			if (_poll[i].revents == 0) //fd is not ready for the event we are checking (e.g. reading POLLIN), so skip the fd and go to the next iteration
+			{
+				LOG_INFO(std::to_string(_poll[i].fd) + " not ready");
 				continue;
+			}
 			//get fd
 			int fd = _poll[i].fd;
 			// if it is a listening socket and it is ready, accept new clients
@@ -157,8 +150,13 @@ void	MultiServer::run()
 			it_s = _sockets.find(fd);
 			if (it_s != _sockets.end())
 			{
+				LOG_DEBUG("it is a listening socket");
+				LOG_DEBUG("Listening socket fd " + std::to_string(fd) + 
+			  " events: " + std::to_string(_poll[i].events) + 
+			  " revents: " + std::to_string(_poll[i].revents));
 				if (_poll[i].revents & POLLIN)
 				{
+					LOG_DEBUG("listening socket ready");
 					MultiServer::acceptNewConnection(it_s->second);
 					// continue; //so start the loop againg, and check again poll, including this new client
 				}
@@ -169,21 +167,23 @@ void	MultiServer::run()
 			if (it_c != _clients.end())
 			{
 				if (_poll[i].revents & POLLIN) {
-					if (_poll[i].fd == it_c->second->getSocket()) {
-						req_hand.handleClientRead(*(it_c->second));
-					}
-					else if (_poll[i].fd == it_c->second->getFromCgi()) {
-						req_hand.readCgiOutput(*it_c->second);
-						if (it_c->second->checkCgiActive() == false) {
-							eraseFromPoll(_poll[i].fd);
-						}
-					}
+					LOG_DEBUG("client socket ready to read");
+					req_hand.handleClientRead(*(it_c->second));
 					int	file_fd = (it_c->second)->getFileFd();
 					if (file_fd != -1)
 					{
 						LOG_INFO("File " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
 						struct pollfd file = {file_fd, POLLIN, 0};
 						_poll.push_back(file);
+					}
+					//push cgi_fds to _poll
+					if (it_c->second->getState() == WRITING_CGI && it_c->second->getToCgi() != -1) { //dup check needed??
+						LOG_INFO("Writing pipe end with fd " + std::to_string(it_c->second->getToCgi()) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
+						_poll.push_back((struct pollfd) { it_c->second->getToCgi(), POLLOUT, 0 });
+					}
+					else if (it_c->second->getState() == READING_CGI && it_c->second->getFromCgi() != -1) {
+						LOG_INFO("Reading pipe end with fd " + std::to_string(it_c->second->getFromCgi()) + " has been linked with client at socket " + std::to_string(it_c->second->getSocket()));
+						_poll.push_back((struct pollfd) { it_c->second->getFromCgi(), POLLIN, 0 });
 					}
 					//After reading, set the client socket to POLLOUT
 					if (it_c->second->getState() == SENDING_RESPONSE)
@@ -219,15 +219,8 @@ void	MultiServer::run()
 				}
 				// Handle writing to client
 				if (_poll[i].revents & POLLOUT) {
-					if (_poll[i].fd == it_c->second->getSocket()) {
-						req_hand.handleClientWrite(*(it_c->second));
-					} else if (_poll[i].fd == it_c->second->getToCgi()) {
-						if (req_hand.writeToCgi(*it_c->second)) {
-							eraseFromPoll(_poll[i].fd);
-							close(it_c->second->getToCgi());
-							it_c->second->setState(READING_CGI);
-						}
-					}
+					LOG_DEBUG("client socket ready to write");
+					req_hand.handleClientWrite(*(it_c->second));
 					if (it_c->second->getState() == NEW_REQUEST)
 						_poll[i].events = POLLIN;
 				}
@@ -237,12 +230,36 @@ void	MultiServer::run()
 			else
 			{
 				if (_poll.data()[i].revents & POLLIN) {
+					LOG_DEBUG("file / CGI output ready to read");
 					it_c = _clients.begin();
 					while (it_c != _clients.end())
 					{
 						if (it_c->second->getFileFd() == fd)
+						{
 							if (req_hand.handleFileRead(*(it_c->second)))
 								eraseFromPoll(fd);
+						}
+						else if (it_c->second->getFromCgi() == fd && it_c->second->getState() == READING_CGI)
+						{
+							req_hand.readCgiOutput(*it_c->second);
+							if (it_c->second->checkCgiActive() == false) {
+								eraseFromPoll(_poll[i].fd);
+							}
+						}
+						it_c++;
+					}
+				}
+				else if (_poll.data()[i].revents & POLLOUT && it_c->second->getState() == WRITING_CGI) {
+					LOG_DEBUG("cgi ready to write");
+					it_c = _clients.begin();
+					while (it_c != _clients.end())
+					{
+						if (it_c->second->getToCgi() == fd) {
+							if (req_hand.writeToCgi(*it_c->second)) {
+								eraseFromPoll(_poll[i].fd);
+								it_c->second->setState(READING_CGI);
+							}
+						}
 						it_c++;
 					}
 				}
@@ -260,6 +277,8 @@ void	MultiServer::run()
 void	MultiServer::checkTimeouts()
 {
 	time_t current_time = time(NULL);
+
+	// add cgi timeouts checking
 
 	for (auto it = _clients.begin(); it != _clients.end(); ) {
 		Client* client = it->second;
@@ -307,3 +326,33 @@ void	MultiServer::checkTimeouts()
 		}
 	}
 }
+
+
+// void MultiServer::checkCgiProcesses() {
+// 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
+// 		if (it->second->checkCgiActive() && it->second->getCgiPid() > 0) {
+// 			int status;
+// 			pid_t result = waitpid(it->second->getCgiPid(), &status, WNOHANG);
+			
+// 			if (result > 0) {
+// 				// CGI process has terminated
+// 				LOG_INFO("CGI process " + std::to_string(it->second->getCgiPid()) + " has terminated");
+// 				it->second->setCgiActive(false);
+				
+// 				// If we're not already done with CGI processing, clean up
+// 				if (it->second->getState() == WRITING_CGI || it->second->getState() == READING_CGI) {
+// 					// Clean up resources
+// 					cleanupCgiResources(it->second);
+// 					it->second->setState(SENDING_RESPONSE);
+// 				}
+// 			}
+// 			else if (result < 0) {
+// 				// Error occurred
+// 				LOG_ERR("Error waiting for CGI process: " + std::string(strerror(errno)));
+// 				it->second->setCgiActive(false);
+// 				cleanupCgiResources(it->second);
+// 				it->second->prepareErrorResponse(500);
+// 			}
+// 		}
+// 	}
+// }
