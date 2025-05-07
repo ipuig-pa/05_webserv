@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 17:16:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 18:03:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ bool RequestHandler::initCgi(Client& client)
 		av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
 		av[2] = NULL;
 		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
-		std::vector<char*> envp = createEnv(client.getRequest(), client.getRequest().getPath(), client.getLocationConf()->getLocRoot());
+		std::vector<char*> envp = createEnv(client.getRequest(), client.getRequest().getPath());
 		// // LOG_DEBUG("printing envp");
 		// for (size_t i = 0; i < envp.size(); ++i) {
 		// 	// LOG_DEBUG("printing envp" + std::string(envp[0]));
@@ -96,7 +96,7 @@ void RequestHandler::readCgiOutput(Client& client)
 	if (bytes > 0) {
 		// client.getResponse().appendBodyBuffer(std::string(tmpBuff), bytes);
 		tmpBuff[bytes] = '\0';
-		// std::cout << tmpBuff << std::endl;
+		// std::cout << "READ: " << tmpBuff << std::endl;
 		client.appendCgiOutputBuff(std::string(tmpBuff), bytes);
 	}
 	else if (bytes == 0) { //reach EOF or fail
@@ -168,21 +168,22 @@ bool RequestHandler::isCgiRequest(Client& client)
 	return false;
 }
 
-std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::string& req_url, const std::string& rootPath)
+std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_url)
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	env.push_back("REQUEST_METHOD=" + httpReq.getMthStr());
+	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMthStr()));
 	if (!httpReq.getQueryPart().empty()) {
-		env.push_back("QUERY_STRING=" + httpReq.getQueryPart());
+		env.push_back("QUERY_STRING=" + std::string(httpReq.getQueryPart()));
 	}
-	env.push_back("SERVER_PROTOCOL=" + httpReq.getVersion()); //HTTP/1.1
-	env.push_back("SCRIPT_NAME=" + req_url); //addr of executable
-	env.push_back("SCRIPT_FILENAME=" + rootPath + httpReq.getPath()); //_cgiPath
+	env.push_back("SERVER_PROTOCOL=" + std::string(httpReq.getVersion())); //HTTP/1.1
+	env.push_back("SCRIPT_NAME=" + std::string(req_url)); //addr of executable
+	env.push_back("SCRIPT_FILENAME=" + std::string(httpReq.getPath())); //_cgiPath ??? difference with script name??? it is printing the same???
 	env.push_back("PATH_INFO=place_holder");
-	env.push_back("CONTENT_TYPE=" + httpReq.getHeaderVal("Content-Type"));
-	env.push_back("CONTENT_LENGTH=" + httpReq.getHeaderVal("Content-Length"));
-	env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
+	env.push_back("CONTENT_TYPE=" + std::string(httpReq.getHeaderVal("Content-Type")));
+	env.push_back("CONTENT_LENGTH=" + std::string(httpReq.getHeaderVal("Content-Length")));
+	env.push_back("SERVER_NAME=webserv");
+	// env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
 	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
 	// //SOME PROBLEM IN CONVERT FORMAT THAT CHANGES THE STANDARD OUTPUT!?!? WHY DO WE NEED THIS CONVERTED HEADERS IF WE HAVE ASSIGNED THEM BEFORE?!?!?!?
 	// _convertFormat(_reqHeader);

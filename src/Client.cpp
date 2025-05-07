@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 16:23:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 18:00:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,7 @@ bool	Client::checkCgiActive()
 }
 void Client::appendCgiOutputBuff(std::string buffer, size_t bytes)
 {
-	if (_cgiBuffer.empty() == true) {
+	if (_cgiBuffer.empty()) {
 		_cgiBuffer = buffer;
 	}
 	else
