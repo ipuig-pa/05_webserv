@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   GetHeadRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 13:44:17 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 17:17:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ bool	RequestHandler::handleFileRead(Client &client)
 		size_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
 		if (bytesRead > 0)
 		{
+			buffer[bytesRead] = '\0';
 			std::string	buffer_str(buffer);
 			client.getResponse().appendBodyBuffer(buffer_str, bytesRead);
 			client.getResponse().setBytesRead(bytesRead);

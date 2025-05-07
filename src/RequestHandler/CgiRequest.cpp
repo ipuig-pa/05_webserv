@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 16:48:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 17:16:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,13 @@ bool RequestHandler::initCgi(Client& client)
 void RequestHandler::readCgiOutput(Client& client)
 {
 	char tmpBuff[BUFF_SIZE];
-	ssize_t bytes = read(client.getFromCgi(), tmpBuff, BUFF_SIZE);//check
+	ssize_t bytes = read(client.getFromCgi(), tmpBuff, sizeof(tmpBuff));//check
 	// std::cout << "bytes read from Cgi " + std::to_string(bytes) << std::endl;
+	// std::cout << tmpBuff << std::endl;
 	if (bytes > 0) {
 		// client.getResponse().appendBodyBuffer(std::string(tmpBuff), bytes);
-		// std::cout << "READ: " + std::string(tmpBuff) << std::endl;
+		tmpBuff[bytes] = '\0';
+		// std::cout << tmpBuff << std::endl;
 		client.appendCgiOutputBuff(std::string(tmpBuff), bytes);
 	}
 	else if (bytes == 0) { //reach EOF or fail
