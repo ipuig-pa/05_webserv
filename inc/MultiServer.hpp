@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/08 16:17:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 17:26:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ private:
 	std::map<int, Socket*>					_sockets; //maps each listening socket fd to the socket object
 	std::map<int, Client*>					_clients; //maps each client socket fd to the client object
 	TimeoutConf								_timeouts;
+	std::vector<int>						_to_close;
 
 	void						_init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
 	void						_acceptNewConnection(Socket *listen_socket);
@@ -37,8 +38,11 @@ private:
 	void						_handleClientSocket(int fd, Client *client, int i, RequestHandler &req_hand);
 	void						_handleInputFd(int fd, int i, RequestHandler &req_hand);
 	void						_handleOutputFd(int fd, int i, RequestHandler &req_hand);
+	void						_handleClosedConnections(void);
 	void						_closeClientConnection(Client *client);
+	void						_closeListeningSocket(Socket *socket);
 	void						_newFdsToPoll(Client *client);
+	void						_handlePollErr(int fd, int i);
 
 public:
 	MultiServer(std::vector<std::vector<ServerConf>> serv_config);

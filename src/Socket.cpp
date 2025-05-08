@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 16:04:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 20:07:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,4 +89,9 @@ ServerConf	&Socket::getConf(std::string name)
 			return (_conf[i]);
 	}
 	return (this->getDefaultConf());
+}
+
+std::vector<ServerConf>	&Socket::getConfVector()
+{
+	return _conf;
 }

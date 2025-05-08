@@ -9,13 +9,18 @@ OBJ_DIR = obj
 
 VPATH =	$(SRC_DIR):\
 		$(SRC_DIR)/conf:\
-		$(SRC_DIR)/RequestHandler
+		$(SRC_DIR)/RequestHandler:\
+		$(SRC_DIR)/Server
 
 SOURCES =	ReadConf.cpp \
 			ConfParser.cpp \
 			ServerConf.cpp \
 			LocationConf.cpp \
 			MultiServer.cpp \
+			PollManager.cpp \
+			ReadyFdHandler.cpp\
+			ConnectionHandler.cpp\
+			Timeouts.cpp\
 			Client.cpp \
 			Socket.cpp \
 			RequestHandler.cpp \
