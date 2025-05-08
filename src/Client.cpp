@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 18:00:47 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 15:10:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ Client::Client(int socket, ServerConf &default_conf)
 Client::~Client()
 {
 	delete (_error_handler);
+	if (_file_fd != -1)
+		close(_file_fd);
 	if (_pipFromCgi != -1)
 		close(_pipFromCgi);
 	if (_pipToCgi != -1)

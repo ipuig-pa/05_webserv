@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 11:50:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 16:17:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,29 +24,30 @@
 class MultiServer
 {
 private:
-	std::vector<std::vector<ServerConf>>	_serv_config; // int							_listen_socket; //maybe this should be just the fd of the socket class if server inherits from socket!?!?
+	std::vector<std::vector<ServerConf>>	_serv_config;
 	std::vector<struct pollfd>				_poll;
-	std::map<int, Socket*>					_sockets; //maps each socket fd to the object socket
-	std::map<int, Client*>					_clients;//int should be the fd of the client socket
+	std::map<int, Socket*>					_sockets; //maps each listening socket fd to the socket object
+	std::map<int, Client*>					_clients; //maps each client socket fd to the client object
 	TimeoutConf								_timeouts;
 
-	void	init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
-	void	acceptNewConnection(Socket *listen_socket);
+	void						_init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
+	void						_acceptNewConnection(Socket *listen_socket);
+	void						_checkTimeouts();
+	void						_eraseFromPoll(int fd);
+	void						_handleClientSocket(int fd, Client *client, int i, RequestHandler &req_hand);
+	void						_handleInputFd(int fd, int i, RequestHandler &req_hand);
+	void						_handleOutputFd(int fd, int i, RequestHandler &req_hand);
+	void						_closeClientConnection(Client *client);
+	void						_newFdsToPoll(Client *client);
 
 public:
-	MultiServer();
-	MultiServer(std::vector<std::vector<ServerConf> > serv_config);
+	MultiServer(std::vector<std::vector<ServerConf>> serv_config);
 	~MultiServer();
-//	void	entry(); // what is this?!?!?
 
 	std::vector<struct pollfd>	&getPoll(void);
 	std::map<int, Client*>		&getClients(void);
 
-	void		run();
-
-//	void	handleConnectionClosed(???);
-	void	checkTimeouts();
-	void	eraseFromPoll(int fd);
+	void						run();
 };
 
 #endif

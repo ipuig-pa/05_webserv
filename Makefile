@@ -11,7 +11,7 @@ VPATH =	$(SRC_DIR):\
 		$(SRC_DIR)/conf:\
 		$(SRC_DIR)/RequestHandler
 
-SOURCES =	ConfReader.cpp \
+SOURCES =	ReadConf.cpp \
 			ConfParser.cpp \
 			ServerConf.cpp \
 			LocationConf.cpp \

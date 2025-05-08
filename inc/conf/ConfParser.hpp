@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 13:17:49 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,30 +14,30 @@
 //extrac and populate data to serverConf
 //include getters of all 'var' (root/port/location [...])
 //nested block also need handle
-#ifndef PARSECONF_HPP
-#define PARSECONF_HPP
+#ifndef CONFPARSER_HPP
+#define CONFPARSER_HPP
 
 #include "webserv.hpp"
-#include "ConfReader.hpp"
+#include "ReadConf.hpp"
 #include "FileUtils.hpp"
 #include "ServerConf.hpp"
 
-class ParseConf
+class ConfParser
 {
 private:
-	std::vector<std::vector<ServerConf> > _servers; //vector of servers, has mutil 'server{}' with all para
+	std::vector<std::vector<ServerConf>> _servers; //vector of servers, has mutil 'server{}' with all para
 	std::vector<std::string> _single_server; //tokenized, vector of config for ONE sever
 	size_t _server_count; //make it size_t instead?!?!? (better to compare with size in for loops)
 	//type alias for categoryhandler
 	//'CategoryHandler' is the name for a PTR to a member funcion of this class
 	// bool _insideBlock;
-	typedef size_t (ParseConf::*CategoryHandler)(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf);
+	typedef size_t (ConfParser::*CategoryHandler)(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf);
 	//std::map that stores the mapping: from STR ("listen", "root") to functions
 	std::map<std::string, CategoryHandler> _handlers;
 	
 public:
-	ParseConf();
-	~ParseConf();
+	ConfParser();
+	~ConfParser();
 	//int testMain(const std::string& fileName); //main entry for whole read-parse-create process
 	//getter for test private attribute
 	std::vector<std::string>& getSrvBlock();
