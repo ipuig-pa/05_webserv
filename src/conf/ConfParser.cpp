@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/08 12:50:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 11:07:02 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,23 +33,6 @@ ConfParser::~ConfParser(){}
 // 	return (0);
 // }
 
-// bool ConfParser::_allDigit(const std::string& s)//return true if all digit
-// {
-// 	return std::all_of(s.begin(), s.end(), ::isdigit);
-// }
-
-// bool ConfParser::_hasSemicolon(const std::string& s)
-// {
-// 	if (!s.empty() && s.back() == ';')
-// 		return true;
-// 	return false;
-// }
-// std::string ConfParser::rmvSemicolon(const std::string& token)
-// {
-// 	if (!token.empty() && token.back() == ';')
-// 		return token.substr(0, token.size() - 1);
-// 	return token;
-// }
 
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ConfParser::_split(const std::vector<std::string>& tokens)
@@ -122,42 +105,28 @@ std::vector<std::string> ConfParser::tokenize(const std::string& srv_block)
 void ConfParser::_createServBlock()
 {
 	if (_single_server.size() != _server_count) //use size_t directly? //the number of svr_block != srv_count, throw error, is this check necessary???
-		throw std::runtime_error("Error: size not match.");
+		throw std::runtime_error("Error: size does not match.");
 	if (_handlers.empty())
 		_initHandler();
-	for (size_t i = 0; i < _single_server.size(); ++i)
-	{
+	for (size_t i = 0; i < _single_server.size(); ++i) {
 		std::vector<std::string> tokens = tokenize(_single_server[i]);
-		// for (size_t j = 0; j < tokens.size(); ++j)
-		// {
-		// 	if (tokens[j] == "server") {
-		// 		if (tokens[j + 1] != "{") {
-		// 			throw std::runtime_error("here is debug msg from ConfParser.cpp.\n");	
-		// 		}
-		// 		tokens = tokens.erase(j);
-		// 		tokens = tokens.substr(tokens.find_first_not_of(" \n\t")));
 		ServerConf servConf;
 		servConf = _addCategory(tokens);
 		size_t j = 0;
-		while(j < _servers.size())
-		{
-			if(_servers[j][0].getPort() == servConf.getPort())
-			{
+		while(j < _servers.size()) {
+			if(_servers[j][0].getPort() == servConf.getPort()) {
 				this->_servers[j].push_back(servConf);
 				break;
 			}
 			j++;
 		}
-		if (j == _servers.size())
-		{
+		if (j == _servers.size()) {
 			std::vector<ServerConf>	newPort;
 			newPort.push_back(servConf);
 			this->_servers.push_back(newPort);
 		}
-		// }
 	}
 		// servConf = parseToServ(tokens);
-	// }
 }
 std::vector<std::string>& ConfParser::getSrvBlock()
 {
@@ -170,28 +139,32 @@ std::vector<std::vector<ServerConf>> & ConfParser::getServers()
 //listen; server_name; host; root; CMBS; index; error_page; location; autoindex
 //use func pointer directing to sub-category
 //tok
+// bool default_auto = false; is it used?!
 ServerConf ConfParser::_addCategory(const std::vector<std::string>& tokens)
 {
 	ServerConf servConf;
 	bool _insideBlock = true;
-	// bool default_auto = false; is it used?!
-	for (size_t pos = 0; pos < tokens.size(); ++pos)
-	{
+	size_t pos = 0;
+	if (tokens[pos] == "server") {
+		pos++;
+		if (pos >= tokens.size() || tokens[pos] != "{") {
+			throw std::runtime_error("Error: '{' expected after 'server'\n");	
+		}
+	}
+	for (; pos < tokens.size(); ++pos) {
 		std::string _cate = tokens[pos];
-		if (_handlers.find(_cate) != _handlers.end()) //match found!
-		{
+		if (_handlers.find(_cate) != _handlers.end()) { //match found!
 			if (!_insideBlock && _cate != "location") {
 				throw std::runtime_error("Error: category after location block.");
 			}
 			CategoryHandler funcToCall = _handlers[_cate];
 			pos = (this->*funcToCall)(tokens, pos, servConf);
-			if (_cate == "location"){
+			if (_cate == "location") {
 				_insideBlock = false;
 			}
+		} else if (_cate != "{" && _cate != "}"){
+			throw std::runtime_error("Error: is problem happens here ? misplaced category: " + _cate);
 		}
-		// else if (_cate != "{" && _cate != "}"){
-		// 	throw std::runtime_error("Error: is problem happens here ? misplaced category: " + _cate);
-		// }
 	}
 	return servConf;
 }
