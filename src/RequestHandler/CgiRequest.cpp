@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 12:08:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 13:46:45 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,17 @@ bool RequestHandler::initCgi(Client& client)
 		av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
 		av[2] = NULL;
 		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
-		std::vector<char*> envp = createEnv(client.getRequest(), client.getRequest().getPath());
+		char** envp = createEnv(client.getRequest(), client.getRequest().getPath());
 		// // LOG_DEBUG("printing envp");
 		// for (size_t i = 0; i < envp.size(); ++i) {
 		// 	// LOG_DEBUG("printing envp" + std::string(envp[0]));
 		// 	std::cout << "printing envp..." << envp[i] << std::endl;
 		// }
 		// char* av[] = { (char*)client.getRequest().getPath().c_str(), NULL };
-		if (execve(av[0], av, envp.data()) == -1) {
+		if (execve(av[0], av, envp) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m");
 			close(STDOUT_FILENO);
+			_cleanEnvp(envp);
 			if (client.getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
 			exit(1); //exit on error
@@ -97,14 +98,14 @@ void RequestHandler::readCgiOutput(Client& client)
 {
 	char tmpBuff[BUFF_SIZE];
 	ssize_t bytes = read(client.getFromCgi(), tmpBuff, sizeof(tmpBuff));//check
-	// std::cout << "bytes read from Cgi " + std::to_string(bytes) << std::endl;
-	// std::cout << tmpBuff << std::endl;
+	std::cout << "\033[32mbytes read from Cgi (before bytes check) " + std::to_string(bytes) << std::endl;
+	std::cout << "tmpBuff is: \033[0m" << tmpBuff << std::endl;
 	if (bytes > 0) {
 		// client.getResponse().appendBodyBuffer(std::string(tmpBuff), bytes);
-		tmpBuff[bytes] = '\0';
+		// tmpBuff[bytes] = '\0';
 		// std::cout << "READ: " << tmpBuff << std::endl;
 		client.appendCgiOutputBuff(std::string(tmpBuff), bytes);
-		std::cout << "\033[31mCGI buff: \033[0m\n" << tmpBuff << std::endl;
+		std::cout << "\033[31mCGI buff in bytes > 0 block: \033[0m\n" << tmpBuff << std::endl;
 	}
 	else if (bytes == 0) { //reach EOF or fail
 		close(client.getFromCgi());
@@ -176,12 +177,12 @@ bool RequestHandler::validCgi(Client& client)
 	std::string cgiPath = client.getRequest().getPath();
 	if (FileUtils::_pathType(cgiPath) == -1) {
 		client.prepareErrorResponse(404);
-		std::cerr << "\033[31m path is: " << cgiPath << "\033[0m" << std::endl;
+		std::cerr << "\033[31mError in cgi path type. Path is: " << cgiPath << "\033[0m" << std::endl;
 		return false;
 	}
 	if (FileUtils::_isExec(cgiPath) == -1) {
 		client.prepareErrorResponse(403);
-		std::cout << "\033[31m path is: " << cgiPath << "\033[0m" << std::endl;
+		std::cout << "\033[31mError in cgi path not excutable. Path is: " << cgiPath << "\033[0m" << std::endl;
 		return false;
 	}
 	return true;
@@ -197,7 +198,7 @@ bool RequestHandler::isCgiRequest(Client& client)
 	return false;
 }
 
-std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_url)
+char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_url)
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
@@ -228,26 +229,52 @@ std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::st
 	env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
 	env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
-	return (RequestHandler::_convertToEnvp(env));
+	char** envp = _convertToEnvp(env);
+	return (envp);
 }
 
-std::vector<char*> RequestHandler::_convertToEnvp(std::vector<std::string>& envStr)
+char** RequestHandler::_convertToEnvp(std::vector<std::string>& envStr)
 {
-	// std::vector<std::string> _envStr;
-	std::vector<char*> _envp;
-	// std::map<std::string, std::string>::iterator iter;
-	// for (iter = _env.begin(); iter != _env.end(); ++iter) {
-	// 	_envStr.push_back(iter->first + "=" + iter->second);//create env-format string "key=value"
-	// }
+	char** _envp = new char*[envStr.size() + 1];
+
 	for (size_t i = 0; i < envStr.size(); ++i) {
-		_envp.push_back(const_cast<char*>(envStr[i].c_str()));
+		size_t len = envStr[i].size();
+		_envp[i] = new char[len + 1]; //null-term each directive
+		std::strncpy(_envp[i], envStr[i].c_str(), len);
+		_envp[i][len] = '\0';
+		std::cout << "envp[" << i <<"] = " << _envp[i] << std::endl;
 	}
-	_envp.push_back(nullptr);
-	// for (size_t i = 0; i < _envp.size(); ++i) {
-	// 	std::cout << "printing envp..." << _envp[i] << std::endl;
-	// }
+	_envp[envStr.size()] = nullptr;
+
 	return _envp;
 }
+
+void RequestHandler::_cleanEnvp(char** envp)
+{
+	if (envp) {
+		for (size_t i = 0; envp[i] != nullptr; ++i) {
+			delete[] envp[i];
+		}
+		delete[] envp;
+	}
+}
+
+// {
+// 	// std::vector<std::string> _envStr;
+// 	std::vector<char*> _envp;
+// 	// std::map<std::string, std::string>::iterator iter;
+// 	// for (iter = _env.begin(); iter != _env.end(); ++iter) {
+// 	// 	_envStr.push_back(iter->first + "=" + iter->second);//create env-format string "key=value"
+// 	// }
+// 	for (size_t i = 0; i < envStr.size(); ++i) {
+// 		_envp.push_back(const_cast<char*>(envStr[i].c_str()));
+// 	}
+// 	_envp.push_back(nullptr);
+// 	// for (size_t i = 0; i < _envp.size(); ++i) {
+// 	// 	std::cout << "printing envp..." << _envp[i] << std::endl;
+// 	// }
+// 	return _envp;
+// }
 
 // void RequestHandler::_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader)
 // {

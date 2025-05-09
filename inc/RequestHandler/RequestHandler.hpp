@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/07 17:39:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 13:43:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,9 @@ public:
 	bool				validCgi(Client& client);
 	// bool 		_forkErr(int& pip1, int& pip2);
 	bool				isCgiRequest(Client& client);
-	std::vector<char*> 	createEnv(HttpRequest& httpReq, const std::string& req_url);
-	std::vector<char*>	_convertToEnvp(std::vector<std::string>& envStr);
+	char**				createEnv(HttpRequest& httpReq, const std::string &req_url);
+	char**				_convertToEnvp(std::vector<std::string>& envStr);
+	void				_cleanEnvp(char** envp);
 	HttpResponse		_convertToResponse(std::string cgiOutBuff);
 	// void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
 	void				_cgiHeaderScope(const std::string& line, HttpResponse& response);
