@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 12:11:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 15:10:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ Client::Client(int socket, ServerConf &default_conf)
 Client::~Client()
 {
 	delete (_error_handler);
+	if (_file_fd != -1)
+		close(_file_fd);
 	if (_pipFromCgi != -1)
 		close(_pipFromCgi);
 	if (_pipToCgi != -1)
@@ -62,6 +64,20 @@ HttpResponse	&Client::getResponse(void)
 clientState	Client::getState(void)
 {
 	return (_state);
+}
+
+std::string	Client::getStateString(clientState state) {
+	switch (state) {
+		case NEW_CONNECTION: return "NEW_CONNECTION";
+		case NEW_REQUEST: return "NEW_REQUEST";
+		case READING_REQUEST: return "READING_REQUEST";
+		case PROCESSING: return "PROCESSING";
+		case READING_CGI: return "READING_CGI";
+		case WRITING_CGI: return "WRITING_CGI";
+		case SENDING_RESPONSE: return "SENDING_RESPONSE";
+		case CONNECTION_CLOSED: return "CONNECTION_CLOSED";
+		default: return "UNKNOWN_STATE";
+	}
 }
 
 ServerConf	&Client::getServerConf(void)
@@ -97,6 +113,9 @@ ConnectionTracker	&Client::getTracker(void)
 void	Client::setState(clientState state)
 {
 	_state = state;
+	LOG_INFO("Client at socket " + std::to_string(_socket) + " change state to " + Client::getStateString(state));
+	if (state == SENDING_RESPONSE)
+		this->_tracker.setResponseStart();
 }
 
 void	Client::setFileFd(int file_fd)
@@ -217,7 +236,7 @@ bool	Client::checkCgiActive()
 }
 void Client::appendCgiOutputBuff(std::string buffer, size_t bytes)
 {
-	if (_cgiBuffer.empty() == true) {
+	if (_cgiBuffer.empty()) {
 		_cgiBuffer = buffer;
 	}
 	else
@@ -236,7 +255,7 @@ size_t	Client::getCgiBodyWrite()
 	return _cgiBodywrite;
 }
 
-void	Client::setCgiResponse(const HttpResponse& Cgires)
+void	Client::setCgiResponse(const HttpResponse Cgires)
 {
 	this->_response = Cgires;
 }

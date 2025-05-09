@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 10:45:48 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/07 17:44:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 
 //FOR TESTING PURPOSE:
 HttpRequest::HttpRequest()
-	: _header(), _method(GET), _path(""), _version("HTTP1.1"), _body(""), _complete(false)
+	: _header(), _method(GET), _path(""), _queryPart(""), _version("HTTP1.1"), _body(""), _buffer(""), _complete(false)
 {
 	LOG_DEBUG("HttpRequest default constructor called");
 }

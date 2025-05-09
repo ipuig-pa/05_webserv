@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 13:40:08 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 09:04:23 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@
 #include "Logger.hpp"
 
 #define DEFAULT_CONF "config/default.conf"
-#define DEFAULT_CONF_STR std::string(DEFAULT_CONF)
 #define BUFF_SIZE 4096
 
 #endif

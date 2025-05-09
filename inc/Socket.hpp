@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:50:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/08 20:07:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,12 @@ public:
 	Socket(std::vector<ServerConf> &config);
 	~Socket();
 
-	int					getFd();
-	int					getPort();
-	struct sockaddr_in	getAddress();
-	ServerConf			&getDefaultConf();
-	ServerConf			&getConf(std::string name);
+	int						getFd();
+	int						getPort();
+	struct sockaddr_in		getAddress();
+	ServerConf				&getDefaultConf();
+	ServerConf				&getConf(std::string name);
+	std::vector<ServerConf>	&getConfVector();
 };
 
 #endif
