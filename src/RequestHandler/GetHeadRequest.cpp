@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/07 17:17:56 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 12:08:35 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,11 @@ void	RequestHandler::handleGetRequest(Client &client)
 		return ;
 	}
 	// Set non-blocking
-	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
-	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
+	if (fcntl(file_fd, F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("Failed to set non-bloking mode: " + std::string(strerror(errno)));
+	//set close-on-exec
+	if (fcntl(file_fd, F_SETFD, FD_CLOEXEC) == -1)
+		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 
 	client.getResponse().setStatusCode(200); //OK
 	client.getResponse().setHeaderField("Content-Type", getMediaType(path));

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 11:08:21 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 12:08:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ void	MultiServer::_openListeningSocket(std::vector<ServerConf> &serv_conf)
 	if (listen_fd < 0) {
 		throw std::runtime_error("Invalid socket file descriptor");
 	}
-	if (fcntl(listen_fd, F_SETFL, O_NONBLOCK) == -1) {
+	if (fcntl(listen_fd, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
-	}
-	fcntl(listen_fd, F_SETFL, O_NONBLOCK);
+	if (fcntl(listen_fd, F_SETFD, FD_CLOEXEC) == -1)
+		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 	struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
 	_poll.push_back(listen_pollfd);
 	_sockets.emplace(listen_fd, listen_socket);
@@ -54,10 +54,10 @@ void	MultiServer::_acceptNewConnection(Socket *listen_socket)
 	Client *client = new Client(cli_socket, listen_socket->getDefaultConf());
 	client->setServerConf(listen_socket->getConf(client->getRequest().getHeaderVal("Host")));
 	_clients.insert(std::pair<int, Client*>(cli_socket, client));
-	fcntl(cli_socket, F_SETFL, O_NONBLOCK);
-	if (fcntl(cli_socket, F_SETFL, O_NONBLOCK) == -1) {
+	if (fcntl(cli_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
-	}
+	if (fcntl(cli_socket, F_SETFD, FD_CLOEXEC) == -1)
+		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 	struct pollfd cli_sock_fd = {cli_socket, POLLIN, 0};
 	_poll.push_back(cli_sock_fd);
 }

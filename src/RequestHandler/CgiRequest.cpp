@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 09:05:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 12:08:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,12 +69,18 @@ bool RequestHandler::initCgi(Client& client)
 	client.setCgiPid(cgiPid);
 	client.setCgiActive(true);
 
-	//NON-BLOCKING
-	fcntl(pipFromCgi[0], F_SETFL, O_NONBLOCK); //read_end for parent
+	// set non-blocking and close-on-exec mode for read-end in parent
+	if (fcntl(pipFromCgi[0], F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
+	if (fcntl(pipFromCgi[0], F_SETFD, FD_CLOEXEC) == -1)
+		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 	close(pipFromCgi[1]);
 	client.setFromCgi(pipFromCgi[0]);
 	if (client.getRequest().getMethod() == POST) {
-		fcntl(pipToCgi[1], F_SETFL, O_NONBLOCK);
+		if (fcntl(pipToCgi[1], F_SETFL, O_NONBLOCK) == -1)
+			throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
+		if (fcntl(pipToCgi[1], F_SETFD, FD_CLOEXEC) == -1)
+			throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 		close(pipToCgi[0]);
 		client.setToCgi(pipToCgi[1]);
 		client.setState(WRITING_CGI);
