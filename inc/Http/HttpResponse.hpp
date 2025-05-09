@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:12:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:40:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ public:
 	void		setBytesSent(size_t bytes_sent);
 
 	//getters
-	// std::string	getHeader(const std::string& name);//needed?!!?
+	std::string	getHeader(const std::string& name);
 	responseState	getState(void) const;
 	size_t		getBodyLength(void) const;
 	size_t		getBytesRead(void);
@@ -62,7 +62,7 @@ public:
 
 	//methods
 	void		appendBodyBuffer(const std::string buffer, size_t bytes_read);
-	// std::string	toString() const; //needed?
+	std::string	toString() const; //needed?
 	std::string	statusToString() const;
 	std::string	headersToString() const;
 	void		checkMandatoryHeaders();

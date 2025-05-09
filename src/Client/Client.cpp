@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:35:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:51:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
+	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _tracker()
 {		
 	//_hasCgi = false;
 	_cgiActive = false;
@@ -35,7 +35,7 @@ Client::~Client()
 		close(_file_fd);
 	delete (_error_handler);
 	delete (_currentLocConf);
-	delete (_cgi);
+	//delete (_cgi);
 	//_request ->change _currentConfig according to request header (find )
 	//_response
 }

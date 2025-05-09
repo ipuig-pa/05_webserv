@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:14:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:40:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,10 @@ void	HttpResponse::setBytesSent(size_t bytes_sent)
 
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
-// std::string HttpResponse::getHeader(const std::string& name)
-// {
-// 	return _header.getVal(name);
-// }
+std::string HttpResponse::getHeader(const std::string& name)
+{
+	return _header.getVal(name);
+}
 
 responseState HttpResponse::getState(void) const
 {
@@ -133,15 +133,15 @@ void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
 }
 
 //needed???
-// std::string	HttpResponse::toString() const
-// {
-// 	std::stringstream	response;
+std::string	HttpResponse::toString() const
+{
+	std::stringstream	response;
 
-// 	response << _status.toString() << _header.toString() << "\r\n";
-// 	if (!_body_buffer.empty())
-// 		response << _body_buffer;
-// 	return response.str();
-// }
+	response << _status.toString() << _header.toString() << "\r\n";
+	if (!_body_buffer.empty())
+		response << _body_buffer;
+	return response.str();
+}
 
 std::string	HttpResponse::statusToString() const
 {
