@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 11:39:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 13:02:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 10:45:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,17 @@ private: //make it static attributes???
 	int	_keep_alive_timeout; // Max seconds to keep connection alive between requests
 	int	_read_timeout; // Max seconds to receive a complete request
 	int	_write_timeout; // Max seconds to send a complete response
+	int	_graceful_shutdown; // Max seconds to run in drain mode, where no new connections are accepted
 
 public:
 	TimeoutConf();
 	~TimeoutConf();
 
-	int	getConnection(void);
-	int	getKeepAlive(void);
-	int	getRead(void);
-	int	getWrite(void);
+	int	getConnection();
+	int	getKeepAlive();
+	int	getRead();
+	int	getWrite();
+	int	getGracefulShutdown();
 };
 
 #endif

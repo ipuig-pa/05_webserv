@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/08 17:26:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 11:07:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,11 @@ private:
 	std::map<int, Socket*>					_sockets; //maps each listening socket fd to the socket object
 	std::map<int, Client*>					_clients; //maps each client socket fd to the client object
 	TimeoutConf								_timeouts;
-	std::vector<int>						_to_close;
+	bool									_drain_mode;
+	time_t									_shutdown_time;
 
 	void						_init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
+	void						_openListeningSocket(std::vector<ServerConf> &serv_conf);
 	void						_acceptNewConnection(Socket *listen_socket);
 	void						_checkTimeouts();
 	void						_eraseFromPoll(int fd);

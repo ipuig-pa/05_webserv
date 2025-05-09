@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 09:09:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 11:10:21 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,34 +16,13 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
-	:_serv_config(serv_config), _timeouts()
+	:_serv_config(serv_config), _timeouts(), _drain_mode(false), _shutdown_time(-1)
 {
 	_init_sockets(_serv_config);
 }
 
-// MultiServer::~MultiServer()
-// {
-// 	struct stat sb;
-// 	std::map<int, Socket*>::iterator it_s;
-// 	std::map<int, Client*>::iterator it_c;
-
-// 	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
-// 		delete (it_s->second);
-
-// 	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
-// 		delete (it_c->second);
-
-// 	for(size_t i = 0; i < _poll.size(); ++i) {
-// 		if (fstat(_poll[i].fd, &sb) != -1) //allowed!?!?!? s
-// 			close(_poll[i].fd);
-// 		_eraseFromPoll(_poll[i].fd);
-// 	}
-// }
-
-/*-------------------Destrutor with more fd/pid handle------------------*/
 MultiServer::~MultiServer()
 {
-	struct stat sb;
 	std::map<int, Socket*>::iterator it_s;
 	std::map<int, Client*>::iterator it_c;
 
@@ -53,23 +32,13 @@ MultiServer::~MultiServer()
 			if (int fd = it_s->second->getFd() != -1) {
 				close(fd);
 			}
+			delete (it_s->second);
 		}
-		delete (it_s->second);
 	}
 	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
 	{
-		if (it_c->second) {
-			it_c->second->closeCgiFd();
-			if (int fd = it_c->second->getSocket() >= 0) {
-				close(fd);
-			}
-		}
-		delete (it_c->second);
-	}
-	for(size_t i = 0; i < _poll.size(); ++i)
-	{
-		if (fstat(_poll[i].fd, &sb) != -1)
-			close(_poll[i].fd);
+		if (it_c->second)
+			_closeClientConnection(it_c->second);
 	}
 	_poll.clear();
 	_clients.clear();
@@ -103,12 +72,12 @@ void	MultiServer::run()
 			break;
 		}
 
-		for (int i = _poll.size() - 1; i >= 0; i--) { //Doing in inverse order so to not affect the i with closed and removed fd
+		for (int i = _poll.size() - 1; i >= 0; i--) {
 			int fd = _poll[i].fd;
 
 			//listening socket case
 			if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end() && _poll[i].revents & POLLIN) {
-				LOG_DEBUG("Listening socket " + std::to_string(fd) + "is ready");
+				LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
 				MultiServer::_acceptNewConnection(it_s->second);
 			}
 			//client socket case

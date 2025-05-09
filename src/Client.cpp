@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/08 15:10:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 10:38:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,7 @@ void Client::closeCgiFd()
 	}
 	_pipFromCgi = -1;
 	_pipToCgi = -1;
+	//add cgi process handling!?!? KILL???
 }
 void Client::setFromCgi(int fd)
 {

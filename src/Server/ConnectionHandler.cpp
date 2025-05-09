@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/08 20:26:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 11:08:21 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,25 @@
 void	MultiServer::_init_sockets(std::vector<std::vector<ServerConf>> &serv_config)
 {
 	for(size_t i = 0; i < serv_config.size(); i++) {
-		Socket *listen_socket = new Socket(serv_config[i]);
-		int	listen_fd = listen_socket->getFd();
-		fcntl(listen_fd, F_SETFL, O_NONBLOCK);
-		struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
-		_poll.push_back(listen_pollfd);
-		_sockets.emplace(listen_fd, listen_socket);
-		LOG_INFO("Creating listening socket " + std::to_string(listen_socket->getFd()) + ", on " + listen_socket->getDefaultConf().getHost() + ":" + std::to_string(listen_socket->getPort()));
+		_openListeningSocket(serv_config[i]);
 	}
+}
+
+void	MultiServer::_openListeningSocket(std::vector<ServerConf> &serv_conf)
+{
+	Socket *listen_socket = new Socket(serv_conf);
+	int	listen_fd = listen_socket->getFd();
+	if (listen_fd < 0) {
+		throw std::runtime_error("Invalid socket file descriptor");
+	}
+	if (fcntl(listen_fd, F_SETFL, O_NONBLOCK) == -1) {
+		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
+	}
+	fcntl(listen_fd, F_SETFL, O_NONBLOCK);
+	struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
+	_poll.push_back(listen_pollfd);
+	_sockets.emplace(listen_fd, listen_socket);
+	LOG_INFO("Suceeded on opening listening socket " + std::to_string(listen_socket->getFd()) + ", on " + listen_socket->getDefaultConf().getHost() + ":" + std::to_string(listen_socket->getPort()));
 }
 
 void	MultiServer::_acceptNewConnection(Socket *listen_socket)
@@ -37,19 +48,22 @@ void	MultiServer::_acceptNewConnection(Socket *listen_socket)
 	int cli_socket = accept(listen_socket->getFd(), reinterpret_cast<sockaddr*>(&client_addr), &addr_len);
 	if (cli_socket == -1) {
 		LOG_ERR("Failed to accept client on socket " + std::to_string(listen_socket->getFd()));
+		throw std::runtime_error("Invalid socket file descriptor");
 		return ;
 	}
 	Client *client = new Client(cli_socket, listen_socket->getDefaultConf());
 	client->setServerConf(listen_socket->getConf(client->getRequest().getHeaderVal("Host")));
 	_clients.insert(std::pair<int, Client*>(cli_socket, client));
 	fcntl(cli_socket, F_SETFL, O_NONBLOCK);
+	if (fcntl(cli_socket, F_SETFL, O_NONBLOCK) == -1) {
+		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
+	}
 	struct pollfd cli_sock_fd = {cli_socket, POLLIN, 0};
 	_poll.push_back(cli_sock_fd);
 }
 
 void	MultiServer::_handleClosedConnections(void)
 {
-	std::map<int, Socket*>::iterator it_s;
 	std::map<int, Client*>::iterator it_c;
 	std::map<int, Client*>::iterator current;
 
@@ -64,6 +78,9 @@ void	MultiServer::_handleClosedConnections(void)
 		else
 			it_c++;
 	}
+	if (_drain_mode && _clients.empty()) {
+		runServer = false;
+	}
 }
 
 void	MultiServer::_closeClientConnection(Client *client)
@@ -74,8 +91,9 @@ void	MultiServer::_closeClientConnection(Client *client)
 		_eraseFromPoll(assoc_fd);
 		close(assoc_fd);
 	}
-	//close associated CGI Fd!!!!!!!!!!!!!
-	//TODO
+	//close associated CGI fd
+	client->closeCgiFd();
+	//add cgi process handling!?!? KILL???
 
 	//erase from _clients map
 	_clients.erase(client->getSocket());
@@ -90,42 +108,45 @@ void	MultiServer::_closeClientConnection(Client *client)
 	delete (client);
 }
 
-//CHECK CORRECT!?!?!? TRY CATCH BLOCK IS CORRECT??!?!
 void	MultiServer::_closeListeningSocket(Socket *socket)
 {
+	if (!socket)
+		return;
+
 	LOG_INFO("Closing listening socket " + std::to_string(socket->getFd()));
 	std::vector<ServerConf>	&conf = socket->getConfVector();
-
+	
+	int old_fd = socket->getFd();
 	//close fd
-	close(socket->getFd());
-
+	close(old_fd);
 	//remove from map
-	_sockets.erase(socket->getFd());
-
+	_sockets.erase(old_fd);
 	//remove from poll
-	_eraseFromPoll(socket->getFd());
-
+	_eraseFromPoll(old_fd);
 	//delete object
 	delete(socket);
 
+	//attempt to reopen listening socket
 	Socket *listen_socket = nullptr;
-	//attempt to recreate
 	try{
-		LOG_INFO("Attempting to recreate a new listening socket on " + conf[0].getHost() + ":" + std::to_string(conf[0].getPort()));
-		listen_socket = new Socket(conf);
-		int	listen_fd = listen_socket->getFd();
-		fcntl(listen_fd, F_SETFL, O_NONBLOCK);
-		struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
-		_poll.push_back(listen_pollfd);
-		_sockets.emplace(listen_fd, listen_socket);
-		LOG_INFO("Suceed to recreate listening socket " + std::to_string(listen_socket->getFd()) + ", on " + listen_socket->getDefaultConf().getHost() + ":" + std::to_string(listen_socket->getPort()));
+		LOG_INFO("Attempting to reopen a new listening socket on " + conf[0].getHost() + ":" + std::to_string(conf[0].getPort()));
+		_openListeningSocket(conf);
 	} catch(const std::exception& e) {
-		if (listen_socket)
+		LOG_ERR("Failed to reopen listening socket on " + conf[0].getHost() + ":" + std::to_string(conf[0].getPort()));
+		if (listen_socket){
+			//close fd
+			close(listen_socket->getFd());
+			//remove from map
+			_sockets.erase(listen_socket->getFd());
+			//remove from poll
+			_eraseFromPoll(listen_socket->getFd());
+			//delete object
 			delete listen_socket;
-		
+		}
 		if (_sockets.empty()) {
-			LOG_FATAL("No listening sockets remain - server cannot accept new connections");
-			runServer = false;  // Signal server to shut down
+			LOG_WARN("No listening sockets remain - server running in drain mode, new connections won't be accepted");
+			_drain_mode = true;
+			_shutdown_time = time(NULL) + _timeouts.getGracefulShutdown();
 		}
 	}
 }

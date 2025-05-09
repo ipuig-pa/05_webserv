@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:54:19 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/08 16:54:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 10:48:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,12 @@ void	MultiServer::_checkTimeouts()
 	time_t current_time = time(NULL);
 
 	// add cgi timeouts checking
+
+	// Graceful shutdown timeout in drain mode (Force shutdown even if clients are still connected)
+	if (_drain_mode && (current_time > _shutdown_time)) {
+		runServer = false;
+		return ;
+	}
 
 	for (auto it = _clients.begin(); it != _clients.end(); ) {
 		Client* client = it->second;
@@ -52,7 +58,7 @@ void	MultiServer::_checkTimeouts()
 			LOG_ERR("Keep-alive timeout for client at socket" + std::to_string(client->getSocket()));
 			should_close = true;
 		}
-		
+
 		if (should_close) {
 			// Send 408 Request Timeout if appropriate
 			if (client->getState() == READING_REQUEST) {
