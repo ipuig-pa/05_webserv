@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 11:10:21 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 15:53:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	MultiServer::run()
 			//listening socket case
 			if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end() && _poll[i].revents & POLLIN) {
 				LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
-				MultiServer::_acceptNewConnection(it_s->second);
+				_acceptNewConnection(it_s->second);
 			}
 			//client socket case
 			else if (std::map<int, Client*>::iterator it_c = _clients.find(fd); it_c != _clients.end())
@@ -91,7 +91,7 @@ void	MultiServer::run()
 			if (_poll[i].revents & (POLLERR | POLLHUP | POLLNVAL | POLLPRI))
 				_handlePollErr(fd, i);
 		}
-		MultiServer::_checkTimeouts();
+		_checkTimeouts();
 		_handleClosedConnections();
 	}
 	return ;

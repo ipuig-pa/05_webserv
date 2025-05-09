@@ -6,16 +6,17 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 16:42:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:14:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
+
 HttpResponse::HttpResponse()
 	:_status(), _header(), _body_length(0), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0)
 {
-	LOG_DEBUG("HttpResponse default constructor called");
 }
 
 HttpResponse::HttpResponse(const HttpResponse &other)
@@ -42,7 +43,8 @@ HttpResponse::~HttpResponse()
 {
 }
 
-//correctly implemented!?!?
+/*-------------ACCESSORS - SETTERS--------------------------------------------*/
+
 void	HttpResponse::setStatus(Status &status)
 {
 	_status = status;
@@ -53,25 +55,9 @@ void	HttpResponse::setStatusCode(int code)
 	_status = Status(code);
 }
 
-//correctly implemented!?!?
-void	HttpResponse::setHeader(Header &header)
-{
-	_header = header;
-}
-
 void	HttpResponse::setHeaderField(const std::string name, const std::string value)
 {
 	_header.set(name, value);
-}
-
-void	HttpResponse::setBytesRead(size_t bytes_read)
-{
-	_bytes_read += bytes_read;
-}
-
-void	HttpResponse::setBytesSent(size_t bytes_sent)
-{
-	_bytes_sent += bytes_sent;
 }
 
 void	HttpResponse::setBodyLength(size_t body_length)
@@ -84,38 +70,31 @@ void	HttpResponse::setBodyBuffer(const std::string buffer)
 	_body_buffer = buffer;
 }
 
-void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
-{
-	if (_body_buffer.empty())
-		_body_buffer = buffer;
-	else
-		_body_buffer.append(buffer, bytes_read);
-}
-
 void	HttpResponse::setState(responseState state)
 {
 	_state = state;
 }
 
-
-std::string HttpResponse::getHeader(const std::string& name)
+void	HttpResponse::setBytesRead(size_t bytes_read)
 {
-	return _header.getVal(name);
+	_bytes_read += bytes_read;
 }
+
+void	HttpResponse::setBytesSent(size_t bytes_sent)
+{
+	_bytes_sent += bytes_sent;
+}
+
+/*-------------ACCESSORS - GETTERS--------------------------------------------*/
+
+// std::string HttpResponse::getHeader(const std::string& name)
+// {
+// 	return _header.getVal(name);
+// }
 
 responseState HttpResponse::getState(void) const
 {
 	return _state;
-}
-
-size_t	HttpResponse::getBytesRead(void)
-{
-	return _bytes_read;
-}
-
-size_t	HttpResponse::getBytesSent(void)
-{
-	return	_bytes_sent;
 }
 
 size_t	HttpResponse::getBodyLength(void) const
@@ -133,15 +112,36 @@ Status		&HttpResponse::getStatus(void)
 	return _status;
 }
 
-std::string	HttpResponse::toString() const
+size_t	HttpResponse::getBytesRead(void)
 {
-	std::stringstream	response;
-
-	response << _status.toString() << _header.toString() << "\r\n";
-	if (!_body_buffer.empty())
-		response << _body_buffer;
-	return response.str();
+	return _bytes_read;
 }
+
+size_t	HttpResponse::getBytesSent(void)
+{
+	return	_bytes_sent;
+}
+
+/*-------------METHODS--------------------------------------------------------*/
+
+void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
+{
+	if (_body_buffer.empty())
+		_body_buffer = buffer;
+	else
+		_body_buffer.append(buffer, bytes_read);
+}
+
+//needed???
+// std::string	HttpResponse::toString() const
+// {
+// 	std::stringstream	response;
+
+// 	response << _status.toString() << _header.toString() << "\r\n";
+// 	if (!_body_buffer.empty())
+// 		response << _body_buffer;
+// 	return response.str();
+// }
 
 std::string	HttpResponse::statusToString() const
 {
@@ -154,6 +154,36 @@ std::string	HttpResponse::headersToString() const
 
 	header << _header.toString() << "\r\n";
 	return header.str();
+}
+
+void	HttpResponse::checkMandatoryHeaders()
+{
+	if (getHeader("Date").empty())
+	{
+		time_t now = time(nullptr);
+		struct tm *gmt = gmtime(&now);
+		char buffer[50];
+		strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
+		setHeaderField("Date", std::string(buffer));
+	}
+	if (getHeader("Server").empty())
+		setHeaderField("Server", "webserv");
+	if (getHeader("Content-Type").empty())
+		LOG_ERR("No Content-Type header is found in HttpResponse");
+	if (getHeader("Content-Length").empty())
+		setHeaderField("Content-Length", std::to_string(_body_length));
+	// also include Connection: keep-alive or close?
+}
+
+void	HttpResponse::reset()
+{
+	_status = Status();
+	_header = Header();
+	_body_length = 0;
+	_body_buffer = "";
+	_state = READING;
+	_bytes_read = 0;
+	_bytes_sent = 0;
 }
 
 //https://www.rfc-editor.org/rfc/rfc9110#media.type
@@ -183,23 +213,4 @@ std::string		getMediaType(const std::string path)
 	// Add more types if needed
 
 	return "application/octet-stream"; // Default binary type
-}
-
-void	HttpResponse::checkMandatoryHeaders()
-{
-	if (getHeader("Date").empty())
-	{
-		time_t now = time(nullptr);
-		struct tm *gmt = gmtime(&now);
-		char buffer[50];
-		strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
-		setHeaderField("Date", std::string(buffer));
-	}
-	if (getHeader("Server").empty())
-		setHeaderField("Server", "webserv");
-	if (getHeader("Content-Type").empty())
-		LOG_ERR("No Content-Type header is found in HttpResponse");
-	if (getHeader("Content-Length").empty())
-		setHeaderField("Content-Length", std::to_string(_body_length));
-	// also include Connection: keep-alive or close?
 }

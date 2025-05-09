@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 13:46:45 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 17:33:04 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ bool RequestHandler::initCgi(Client& client)
 		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
+	std::string cgiExtend = _getCgiExtension(client.getRequest().getUri());
+	std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	char* av[3];
+	av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
+	av[1] = const_cast<char*>(client.getRequest().getUri().c_str()); //script_name: www/cgi/simple.py
+	av[2] = NULL;
+	char** envp = createEnv(client.getRequest(), client.getRequest().getUri()); //store this envp somehow to be able to free it later
+
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
 		//for_err(client);
@@ -31,6 +39,7 @@ bool RequestHandler::initCgi(Client& client)
 		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
+	//chdir before execve to the location for relative paths to work properly!?!?
 	if (cgiPid == 0) {
 		// int fd_trial = open("/Users/ipuig-pa/Documents/05/05_Webserv_PERSONAL/www/cgi/test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		// dup2(fd_trial, STDOUT_FILENO);
@@ -43,14 +52,7 @@ bool RequestHandler::initCgi(Client& client)
 			close(pipToCgi[0]);
 			close(pipToCgi[1]);
 		}
-		std::string cgiExtend = _getCgiExtension(client.getRequest().getPath());
-		std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
-		char* av[3];
-		av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
-		av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
-		av[2] = NULL;
 		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
-		char** envp = createEnv(client.getRequest(), client.getRequest().getPath());
 		// // LOG_DEBUG("printing envp");
 		// for (size_t i = 0; i < envp.size(); ++i) {
 		// 	// LOG_DEBUG("printing envp" + std::string(envp[0]));
@@ -60,7 +62,6 @@ bool RequestHandler::initCgi(Client& client)
 		if (execve(av[0], av, envp) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m");
 			close(STDOUT_FILENO);
-			_cleanEnvp(envp);
 			if (client.getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
 			exit(1); //exit on error
@@ -190,7 +191,7 @@ bool RequestHandler::validCgi(Client& client)
 
 bool RequestHandler::isCgiRequest(Client& client)
 {
-	std::string tmp = client.getRequest().getPath();
+	std::string tmp = client.getRequest().getUri();
 	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
 		return true;
@@ -202,7 +203,7 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMthStr()));
+	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMethodStr()));
 	if (!httpReq.getQueryPart().empty()) {
 		env.push_back("QUERY_STRING=" + std::string(httpReq.getQueryPart()));
 	}
@@ -214,7 +215,7 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 	env.push_back("CONTENT_LENGTH=" + std::string(httpReq.getHeaderVal("Content-Length")));
 	env.push_back("SERVER_NAME=webserv");
 	// env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
-	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
+	// std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHeader();
 	// //SOME PROBLEM IN CONVERT FORMAT THAT CHANGES THE STANDARD OUTPUT!?!? WHY DO WE NEED THIS CONVERTED HEADERS IF WE HAVE ASSIGNED THEM BEFORE?!?!?!?
 	// _convertFormat(_reqHeader);
 	// LOG_DEBUG("printing envp 4");
@@ -229,6 +230,10 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 	env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
 	env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
+	// for (size_t i = 0; i < env.size(); ++i)
+	// {
+	// 	std::cout << "VECTOR." << i << ": " << env[i] << std::endl;
+	// }
 	char** envp = _convertToEnvp(env);
 	return (envp);
 }
@@ -317,6 +322,7 @@ void RequestHandler::_cgiHeaderScope(const std::string& line, HttpResponse& resp
 }
 
 //scalable function
+//SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
 std::string RequestHandler::_extSysPath(std::string& cgiExt)
 {
 	if (cgiExt == ".php") {

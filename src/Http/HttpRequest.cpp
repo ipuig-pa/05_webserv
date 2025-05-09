@@ -6,48 +6,28 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 17:44:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:02:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
-//implementation of httprequest, parser
 
-/**
- * HTTP msg contains:
- * 1️⃣ a request/response line
- * 2️⃣ headers
- * an empty line(CRLF or \r\n)
- * 3️⃣ message body (optional)
- *  HTTP-message   = start-line CRLF 
-                   *( field-line CRLF )
-                   CRLF
-                   [ message-body ]
-	1️⃣ start-line	= request-line / status-line
-		- request-line = method(token) request-target(URL) HTTP-version
-						GET /path/to/rsc/ HTTP/1.1 (method is case sensitive)
-		- status-line = HTTP-version status-code [ reason-phrase ] => response-line
-						HTTP/1.1 404 Not-Found
-	2️⃣ headers: both request/response can include headers, info wrt msg (content type, length)
-				Host: example.com
-				Content-Type: text/html
-				Content-Length: 256
-				cookies: xxxxxxx
-	\r\n
-	3️⃣ msg body:
-*/
-
-//FOR TESTING PURPOSE:
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 HttpRequest::HttpRequest()
-	: _header(), _method(GET), _path(""), _queryPart(""), _version("HTTP1.1"), _body(""), _buffer(""), _complete(false)
+	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _body(""), _complete(false)
 {
-	LOG_DEBUG("HttpRequest default constructor called");
 }
 
 HttpRequest::~HttpRequest()
 {
 }
 
+/*-------------ACCESSORS - SETTERS--------------------------------------------*/
+
+void HttpRequest::setHeaderField(const std::string name, const std::string value)
+{
+	this->_header.set(name, value);
+}
 
 void HttpRequest::setMethod(std::string s)
 {
@@ -67,11 +47,55 @@ void HttpRequest::setMethod(std::string s)
 		this->_method = INVALID;
 }
 
+void HttpRequest::setUri(const std::string uri)
+{
+	this->_uri = uri;
+}
+
+void HttpRequest::setPath(const std::string path)
+{
+	this->_path = path;
+}
+
+void HttpRequest::setQueryPart(const std::string s)
+{
+	this->_queryPart = s;
+}
+
+void HttpRequest::setVersion(const std::string s)
+{
+	this->_version = s;
+}
+
+void HttpRequest::setBody(const std::string body)
+{
+	this->_body = body;
+}
+
+void HttpRequest::setComplete(bool flag)
+{
+	this->_complete = flag;
+}
+
+/*-------------ACCESSORS - GETTERS--------------------------------------------*/
+
+std::string HttpRequest::getHeaderVal(const std::string& name) const
+{
+	return _header.getVal(name);
+}
+
+//Needed??
+// std::map<std::string, std::string, CaseInsensitiveCompare> HttpRequest::getHeader() const
+// {
+// 	return _header.getAll();
+// }
+
 int	HttpRequest::getMethod(void) const
 {
 	return (_method);
 }
-std::string	HttpRequest::getMthStr() const
+
+std::string	HttpRequest::getMethodStr() const
 {
 	if (_method == 0) {
 		return ("GET");
@@ -90,9 +114,9 @@ std::string	HttpRequest::getMthStr() const
 	}
 }
 
-void HttpRequest::setPath(const std::string url)
+std::string	&HttpRequest::getUri(void)
 {
-	this->_path = url; //the validity check to be add in creating interface
+	return _uri;
 }
 
 std::string	&HttpRequest::getPath(void)
@@ -100,45 +124,14 @@ std::string	&HttpRequest::getPath(void)
 	return _path;
 }
 
-void HttpRequest::setQueryPart(const std::string s)
-{
-	this->_queryPart = s;
-}
-
 std::string HttpRequest::getQueryPart() const
 {
 	return _queryPart;
 }
 
-void HttpRequest::setVersion(const std::string s)
-{
-	this->_version = s;
-}
-
-std::string HttpRequest::getVersion() const
+std::string &HttpRequest::getVersion()
 {
 	return _version;
-}
-
-//take from http response
-void HttpRequest::setHeaderField(const std::string name, const std::string value)
-{
-	this->_header.set(name, value);
-}
-
-std::string HttpRequest::getHeaderVal(const std::string& name) const
-{
-	return _header.getVal(name);
-}
-
-std::map<std::string, std::string, CaseInsensitiveCompare> HttpRequest::getHearderField() const
-{
-	return _header.getAll();	
-}
-
-void HttpRequest::setBody(const std::string body)
-{
-	this->_body = body;
 }
 
 std::string& HttpRequest::getBody()
@@ -146,15 +139,12 @@ std::string& HttpRequest::getBody()
 	return _body;
 }
 
-void HttpRequest::setComplete(bool flag)
-{
-	this->_complete = flag;
-}
-
 bool HttpRequest::isComplete()
 {
 	return _complete;
 }
+
+/*-------------METHODS--------------------------------------------------------*/
 
 /** IMPORTANT:
  * everytime a NEW Request comes, no need to do HttpRequest newRequest;
@@ -164,7 +154,9 @@ void HttpRequest::reset()
 {
 	_header = Header(); //call default cons
 	_method = INVALID;
+	_uri.clear();
 	_path.clear();
+	_queryPart.clear();
 	_version.clear();
 	_body.clear();
 	_complete = false;
