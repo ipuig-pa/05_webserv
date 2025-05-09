@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   FileUtils.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/04 13:40:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 12:26:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/FileUtils.hpp"
+#include "FileUtils.hpp"
 
 FileUtils::FileUtils() {}
 FileUtils::FileUtils(const std::string _path) : _pathofFile(_path) {}

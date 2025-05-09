@@ -1,16 +1,20 @@
 NAME = webserv
 
 CC = c++
-#CFLAGS = -Wall -Wextra -Werror -std=c++17 -Iinc -Iinc/conf
-CFLAGS = -Wall -Wextra -std=c++17 -Iinc -Iinc/conf
+#CFLAGS = -Wall -Wextra -std=c++17 -Iinc -Iinc/Config -Iinc/Server -Iinc/Client -Iinc/Http -Iinc/RequestHandler -Iinc/Cgi -Iinc/Misc 
+CFLAGS = -Wall -Wextra -Werror -std=c++17 -Iinc -Iinc/Config -Iinc/Server -Iinc/Client -Iinc/Http -Iinc/RequestHandler -Iinc/Cgi -Iinc/Misc 
 
 SRC_DIR = src
 OBJ_DIR = obj
 
 VPATH =	$(SRC_DIR):\
-		$(SRC_DIR)/conf:\
+		$(SRC_DIR)/Config:\
+		$(SRC_DIR)/Server:\
+		$(SRC_DIR)/Client:\
+		$(SRC_DIR)/Http:\
 		$(SRC_DIR)/RequestHandler:\
-		$(SRC_DIR)/Server
+		$(SRC_DIR)/Cgi:\
+		$(SRC_DIR)/Misc
 
 SOURCES =	ReadConf.cpp \
 			ConfParser.cpp \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiHandler.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:31:33 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 10:19:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 12:25:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "webserv.hpp"
 // #include "CgiChecker.hpp"
-#include "conf/ServerConf.hpp"
+#include "ServerConf.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "FileUtils.hpp"

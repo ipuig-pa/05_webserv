@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/01 14:15:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 12:26:21 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/CgiChecker.hpp"
-#include "../inc/conf/LocationConf.hpp"
+#include "CgiChecker.hpp"
+#include "LocationConf.hpp"
 
 bool CgiChecker::_checkCGI(LocationConf& loc)
 {

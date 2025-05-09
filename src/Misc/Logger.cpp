@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:14 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/30 13:52:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 12:12:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,14 @@ Logger::~Logger()
 	Logger::cleanup();
 }
 
-Logger& Logger::getInstance() {
+Logger& Logger::getInstance()
+{
 	static Logger instance;
 	return instance;
 }
 
-std::string Logger::getTimestamp() {
+std::string Logger::getTimestamp()
+{
 	auto now = std::time(nullptr);
 	std::tm* tm = std::localtime(&now);
 	std::stringstream ss;
@@ -54,7 +56,8 @@ std::string Logger::getTimestamp() {
 	return ss.str();
 }
 
-std::string Logger::levelToString(LogLevel level) {
+std::string Logger::levelToString(LogLevel level)
+{
 	switch (level) {
 		case DEBUG:		return "DEBUG";
 		case INFO:		return "INFO";
@@ -65,7 +68,8 @@ std::string Logger::levelToString(LogLevel level) {
 	}
 }
 
-void Logger::log(LogLevel level, const std::string &msg) {
+void Logger::log(LogLevel level, const std::string &msg)
+{
 	if (level < _level)
 		return;
 		
@@ -81,23 +85,28 @@ void Logger::log(LogLevel level, const std::string &msg) {
 		_log_file << log_message.str() << std::endl;
 }
 
-void Logger::debug(const std::string &msg) {
+void Logger::debug(const std::string &msg)
+{
 	log(DEBUG, msg);
 }
 
-void Logger::info(const std::string &msg){
+void Logger::info(const std::string &msg)
+{
 	log(INFO, msg);
 }
 
-void Logger::warning(const std::string &msg) {
+void Logger::warning(const std::string &msg)
+{
 	log(WARNING, msg);
 }
 
-void Logger::error(const std::string &msg) {
+void Logger::error(const std::string &msg)
+{
 	log(ERROR, msg);
 }
 
-void Logger::fatal(const std::string &msg) {
+void Logger::fatal(const std::string &msg)
+{
 	log(FATAL, msg);
 }
 
