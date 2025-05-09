@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 12:12:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:26:15 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,21 @@ MultiServer::~MultiServer()
 
 	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
 	{
+		if (it_s->second) {
+			if (int fd = it_s->second->getFd() != -1) {
+				close(fd);
+			}
+		}
 		delete (it_s->second);
 	}
-
 	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
 	{
+		if (it_c->second) {
+			it_c->second->closeCgiFd();
+			if (int fd = it_c->second->getSocket() >= 0) {
+				close(fd);
+			}
+		}
 		delete (it_c->second);
 	}
 	for(size_t i = 0; i < _poll.size(); ++i)
@@ -42,7 +52,32 @@ MultiServer::~MultiServer()
 		if (fstat(_poll[i].fd, &sb) != -1)
 			close(_poll[i].fd);
 	}
+	_poll.clear();
+	_clients.clear();
+	_sockets.clear();
 }
+
+// MultiServer::~MultiServer()
+// {
+// 	struct stat sb;
+// 	std::map<int, Socket*>::iterator it_s;
+// 	std::map<int, Client*>::iterator it_c;
+
+// 	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
+// 	{
+// 		delete (it_s->second);
+// 	}
+
+// 	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
+// 	{
+// 		delete (it_c->second);
+// 	}
+// 	for(size_t i = 0; i < _poll.size(); ++i)
+// 	{
+// 		if (fstat(_poll[i].fd, &sb) != -1)
+// 			close(_poll[i].fd);
+// 	}
+// }
 
 void	MultiServer::init_sockets(std::vector<std::vector<ServerConf>> &serv_config)
 {
@@ -242,6 +277,7 @@ void	MultiServer::run()
 						else if (it_c->second->getFromCgi() == fd && it_c->second->getState() == READING_CGI)
 						{
 							req_hand.readCgiOutput(*it_c->second);
+							std::cout << "\033[31mstage of reading cgi it reached in main loop\n";
 							if (it_c->second->checkCgiActive() == false) {
 								eraseFromPoll(_poll[i].fd);
 							}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 12:13:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/07 15:48:11 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,12 +90,30 @@ void RequestHandler::readCgiOutput(Client& client)
 	if (bytes > 0) {
 		// client.getResponse().appendBodyBuffer(std::string(tmpBuff), bytes);
 		client.appendCgiOutputBuff(std::string(tmpBuff), bytes);
+		std::cout << "\033[31mCGI buff: \033[0m\n" << tmpBuff << std::endl;
 	}
 	else if (bytes == 0) { //reach EOF or fail
 		close(output);
 		client.setFromCgi(-1);//close pip
 		client.setCgiActive(false); //finish flage
+		//[...] waitpid
+		int status;
+		pid_t retVal = waitpid(client.getCgiPid(), &status, WNOHANG);//WNOHANG: a flag, retval stands for states
+		if (retVal == -1) {
+			LOG_ERR("\033[31mwaitpid() in bytes=0 fail\033[0m");
+		} else if (retVal == 0) {
+			LOG_DEBUG("\033[31mchild process in CGI hasnt finished\033[0m");
+		} else {
+			if (WIFEXITED(status)) {
+				LOG_INFO("\033[31mCGI process: " + std::to_string(retVal) + " exit with:\033[0m" + std::to_string(WEXITSTATUS(status)));
+			} else if (WIFSIGNALED(status)) {
+				LOG_INFO("\033[31mCGI process: " + std::to_string(retVal) + " exit by signal:\033[0m" + std::to_string(WTERMSIG(status)));
+			}
+		}
+		client.setCgiPid(-1);
 		HttpResponse cgiRes = _convertToResponse(client.getCgiOutputBuff());
+		//debug message
+		std::cout << "\033[31mCGI Response: \033[0m\n" << cgiRes.toString() << std::endl;
 		client.setCgiResponse(cgiRes);
 		// client.getResponse().setStatusCode(200);
 		// client.getResponse().setHeaderField("Content-Type", getMediaType(client.getRequest().getPath()));
@@ -110,9 +128,14 @@ void RequestHandler::readCgiOutput(Client& client)
 		close(output);
 		client.setFromCgi(-1);//close pip
 		client.setCgiActive(false);
+		//waitpid
 		client.closeCgiFd();
 		client.prepareErrorResponse(500);
 		client.setState(SENDING_RESPONSE);
+		//on err
+		int status;
+		waitpid(client.getCgiPid(), &status, WNOHANG);
+		client.setCgiPid(-1);
 	}
 }
 
@@ -160,6 +183,7 @@ bool RequestHandler::isCgiRequest(Client& client)
 	return false;
 }
 
+//setenv()
 std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::string& req_url, const std::string& rootPath)
 {
 	std::vector<std::string> env;
@@ -175,16 +199,16 @@ std::vector<char*> RequestHandler::createEnv(HttpRequest& httpReq, const std::st
 	env.push_back("CONTENT_TYPE=" + httpReq.getHeaderVal("Content-Type"));
 	env.push_back("CONTENT_LENGTH=" + httpReq.getHeaderVal("Content-Length"));
 	env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
-	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
-	_convertFormat(_reqHeader);
-	std::string contentType = httpReq.getHeaderVal("Content-Type");
-	if (!contentType.empty()) {
-		env.push_back("CONTENT_TYPE=" + contentType);
-	}
-	std::string contentLen = httpReq.getHeaderVal("Content-Length");
-	if (!contentLen.empty()) {
-		env.push_back("CONTENT_LENGTH=" + contentLen);
-	}
+	// std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
+	// _convertFormat(_reqHeader);
+	// std::string contentType = httpReq.getHeaderVal("Content-Type");
+	// if (!contentType.empty()) {
+	// 	env.push_back("CONTENT_TYPE=" + contentType);
+	// }
+	// std::string contentLen = httpReq.getHeaderVal("Content-Length");
+	// if (!contentLen.empty()) {
+	// 	env.push_back("CONTENT_LENGTH=" + contentLen);
+	// }
 	// env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
 	// env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
