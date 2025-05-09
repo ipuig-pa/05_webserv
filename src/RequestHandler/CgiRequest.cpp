@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:33:04 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 18:13:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,11 @@ bool RequestHandler::initCgi(Client& client)
 	}
 	std::string cgiExtend = _getCgiExtension(client.getRequest().getUri());
 	std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	std::string scriptDir = _getScriptDir(client.getRequest().getPath());
+	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
 	av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
-	av[1] = const_cast<char*>(client.getRequest().getUri().c_str()); //script_name: www/cgi/simple.py
+	av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? for the moment whole path, but I think we need to chdir to root in location and just pass the uri here
 	av[2] = NULL;
 	char** envp = createEnv(client.getRequest(), client.getRequest().getUri()); //store this envp somehow to be able to free it later
 
@@ -39,7 +41,6 @@ bool RequestHandler::initCgi(Client& client)
 		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
-	//chdir before execve to the location for relative paths to work properly!?!?
 	if (cgiPid == 0) {
 		// int fd_trial = open("/Users/ipuig-pa/Documents/05/05_Webserv_PERSONAL/www/cgi/test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		// dup2(fd_trial, STDOUT_FILENO);
@@ -59,12 +60,16 @@ bool RequestHandler::initCgi(Client& client)
 		// 	std::cout << "printing envp..." << envp[i] << std::endl;
 		// }
 		// char* av[] = { (char*)client.getRequest().getPath().c_str(), NULL };
+		if (chdir(scriptDir.c_str()) != 0) {
+			std::cerr << "Failed to change to directory: " << scriptDir << " - " << strerror(errno) << std::endl;
+			exit(1); //allowed?!?!?
+		}
 		if (execve(av[0], av, envp) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m");
 			close(STDOUT_FILENO);
 			if (client.getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
-			exit(1); //exit on error
+			exit(1); //exit on error // allowed!?!?!?
 		}
 	}
 	//parent
@@ -412,4 +417,13 @@ void	RequestHandler::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 		close(pipToCgi[0]);
 	if (pipToCgi[1] != -1)
 		close(pipToCgi[1]);
+}
+
+std::string	RequestHandler::_getScriptDir(std::string &path)
+{
+	size_t pos = path.find_last_of('/');
+	if (pos == std::string::npos) {
+		return "."; // No directory in path, use current directory
+	}
+	return path.substr(0, pos);
 }

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 16:32:39 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 18:09:13 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ public:
 	std::string			_getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
 	std::string			_extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
 	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
+	std::string			_getScriptDir(std::string &path);
 };
 
 #endif

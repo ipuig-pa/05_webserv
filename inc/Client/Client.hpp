@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/07 16:27:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:54:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include "ErrorPageHandler.hpp"
 # include "LocationConf.hpp"
 # include "ConnectionTracker.hpp"
+// # include "CgiProcess.hpp"
 
 class ErrorPageHandler;
 
@@ -56,7 +57,9 @@ private:
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
 	ServerConf			&_currentServerConf; //idea: maybe create a upper class
 	LocationConf		*_currentLocConf;
+	// CgiProcess			*_cgi;
 	
+	//To move to cgi process class
 	int					_cgiPid;
 	int					_pipFromCgi;//read from cgi stdout
 	int					_pipToCgi; //for POST body -> stdin
