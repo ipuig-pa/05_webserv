@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/08 20:25:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 09:09:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,26 @@ MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
 	_init_sockets(_serv_config);
 }
 
+// MultiServer::~MultiServer()
+// {
+// 	struct stat sb;
+// 	std::map<int, Socket*>::iterator it_s;
+// 	std::map<int, Client*>::iterator it_c;
+
+// 	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
+// 		delete (it_s->second);
+
+// 	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
+// 		delete (it_c->second);
+
+// 	for(size_t i = 0; i < _poll.size(); ++i) {
+// 		if (fstat(_poll[i].fd, &sb) != -1) //allowed!?!?!? s
+// 			close(_poll[i].fd);
+// 		_eraseFromPoll(_poll[i].fd);
+// 	}
+// }
+
+/*-------------------Destrutor with more fd/pid handle------------------*/
 MultiServer::~MultiServer()
 {
 	struct stat sb;
@@ -28,16 +48,32 @@ MultiServer::~MultiServer()
 	std::map<int, Client*>::iterator it_c;
 
 	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
+	{
+		if (it_s->second) {
+			if (int fd = it_s->second->getFd() != -1) {
+				close(fd);
+			}
+		}
 		delete (it_s->second);
-
-	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
-		delete (it_c->second);
-
-	for(size_t i = 0; i < _poll.size(); ++i) {
-		if (fstat(_poll[i].fd, &sb) != -1) //allowed!?!?!? s
-			close(_poll[i].fd);
-		_eraseFromPoll(_poll[i].fd);
 	}
+	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
+	{
+		if (it_c->second) {
+			it_c->second->closeCgiFd();
+			if (int fd = it_c->second->getSocket() >= 0) {
+				close(fd);
+			}
+		}
+		delete (it_c->second);
+	}
+	for(size_t i = 0; i < _poll.size(); ++i)
+	{
+		if (fstat(_poll[i].fd, &sb) != -1)
+			close(_poll[i].fd);
+	}
+	_poll.clear();
+	_clients.clear();
+	_sockets.clear();
 }
 
 /*-------------ACCESSORS------------------------------------------------------*/
