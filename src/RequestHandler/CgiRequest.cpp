@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 13:46:45 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/09 15:24:19 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ bool RequestHandler::initCgi(Client& client)
 		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
+	std::string cgiExtend = _getCgiExtension(client.getRequest().getPath());
+	std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	char* av[3];
+	av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
+	av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
+	av[2] = NULL;
+	// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
+	char** envp = createEnv(client.getRequest(), client.getRequest().getPath());
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
 		//for_err(client);
@@ -43,14 +51,14 @@ bool RequestHandler::initCgi(Client& client)
 			close(pipToCgi[0]);
 			close(pipToCgi[1]);
 		}
-		std::string cgiExtend = _getCgiExtension(client.getRequest().getPath());
-		std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
-		char* av[3];
-		av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
-		av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
-		av[2] = NULL;
-		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
-		char** envp = createEnv(client.getRequest(), client.getRequest().getPath());
+		else {//debug
+			int devNull = open("/dev/null", O_RDONLY);
+			if (devNull >= 0) {
+				dup2(devNull, STDIN_FILENO);
+				close(devNull);
+			}
+		}
+		//debug
 		// // LOG_DEBUG("printing envp");
 		// for (size_t i = 0; i < envp.size(); ++i) {
 		// 	// LOG_DEBUG("printing envp" + std::string(envp[0]));
@@ -91,6 +99,8 @@ bool RequestHandler::initCgi(Client& client)
 		client.setState(READING_CGI); //check later
 		LOG_INFO("\033[31mClient state changed to READING_CGI\033[0m");
 	}
+	//debug
+	_cleanEnvp(envp);
 	return true;
 }
 
@@ -126,9 +136,10 @@ void RequestHandler::readCgiOutput(Client& client)
 			}
 		}
 		client.setCgiPid(-1);
+		std::cout << "\033[31mCGI buff in bytes=0 block: \033[0m\n" << tmpBuff << std::endl;
 		HttpResponse cgiRes = _convertToResponse(client.getCgiOutputBuff());
 		//debug message
-		std::cout << "\033[31mCGI Response: \033[0m\n" << cgiRes.toString() << std::endl;
+		LOG_DEBUG("\033[31mCGI Response: \033[0m\n" + cgiRes.toString());
 		client.setCgiResponse(cgiRes);
 		// client.getResponse().setStatusCode(200);
 		// client.getResponse().setHeaderField("Content-Type", getMediaType(client.getRequest().getPath()));
@@ -182,7 +193,8 @@ bool RequestHandler::validCgi(Client& client)
 	}
 	if (FileUtils::_isExec(cgiPath) == -1) {
 		client.prepareErrorResponse(403);
-		std::cout << "\033[31mError in cgi path not excutable. Path is: " << cgiPath << "\033[0m" << std::endl;
+		// LOG_ERR("\033[31mError in cgi path not excutable. Path is: \033[0m" + std::to_string(cgiPath));
+		// std::cout <<  << std::endl;
 		return false;
 	}
 	return true;
@@ -213,6 +225,7 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 	env.push_back("CONTENT_TYPE=" + std::string(httpReq.getHeaderVal("Content-Type")));
 	env.push_back("CONTENT_LENGTH=" + std::string(httpReq.getHeaderVal("Content-Length")));
 	env.push_back("SERVER_NAME=webserv");
+	env.push_back("REDIRECT_STATUS=200");
 	// env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
 	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
 	// //SOME PROBLEM IN CONVERT FORMAT THAT CHANGES THE STANDARD OUTPUT!?!? WHY DO WE NEED THIS CONVERTED HEADERS IF WE HAVE ASSIGNED THEM BEFORE?!?!?!?
@@ -226,8 +239,8 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 	// if (!contentLen.empty()) {
 	// 	env.push_back("CONTENT_LENGTH=" + contentLen);
 	// }
-	env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
-	env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
+	// env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
+	// env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
 	char** envp = _convertToEnvp(env);
 	return (envp);
@@ -242,7 +255,8 @@ char** RequestHandler::_convertToEnvp(std::vector<std::string>& envStr)
 		_envp[i] = new char[len + 1]; //null-term each directive
 		std::strncpy(_envp[i], envStr[i].c_str(), len);
 		_envp[i][len] = '\0';
-		std::cout << "envp[" << i <<"] = " << _envp[i] << std::endl;
+		// std::cout << "string from _convertEnv(): envp[" << i <<"] = " << _envp[i] << std::endl;
+		LOG_DEBUG("envp[" + std::to_string(i) + "] = " + _envp[i]);
 	}
 	_envp[envStr.size()] = nullptr;
 
@@ -369,8 +383,9 @@ HttpResponse RequestHandler::_convertToResponse(std::string cgiOutBuff)
 	}
 	// std::cout << "CONTENT: " << content.str() << std::endl;
 	response.setBodyBuffer(content.str());
+	std::cout << "\033[32mCGI body buffer is: " << response.getBodyBuffer() << "\n";
 	response.setBodyLength(content.str().length());
-	// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;
+	std::cout << "CONTENT-LENGTH: \033[0m" << content.str().length() << std::endl;
 	return response;
 }
 
