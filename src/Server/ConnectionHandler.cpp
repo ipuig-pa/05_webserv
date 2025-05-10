@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 16:33:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:28:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,14 @@ void	MultiServer::_closeClientConnection(Client *client)
 		_eraseFromPoll(assoc_fd);
 		close(assoc_fd);
 	}
+
 	//close associated CGI fd
-	client->getCgiProcess()->cleanCloseCgi();
-	delete (client->getCgiProcess());
-	client->setCgiProcess(nullptr); 
+	if (client->getCgiProcess())
+	{
+		client->getCgiProcess()->cleanCloseCgi();
+		delete (client->getCgiProcess());
+		client->setCgiProcess(nullptr);
+	}
 
 	//erase from _clients map
 	_clients.erase(client->getSocket());

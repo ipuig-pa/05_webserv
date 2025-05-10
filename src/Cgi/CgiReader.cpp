@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:05:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 18:01:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	CgiProcess::readCgiOutput()
 	else if (bytes_read == 0) { //reach EOF
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
 		_client->getResponse().setState(READ);
-		cleanCloseCgi();//close and clean
+		// cleanCloseCgi();//close and clean
 	}
 	else {
 		LOG_ERR("\033[31merror in reading CGI (pipe)\033[0m\n");
@@ -50,6 +50,7 @@ void	CgiProcess::_appendCgiOutputBuff(std::string buffer, size_t bytes)
 	}
 	else
 		_client->getResponse().appendBodyBuffer(buffer, bytes);
+	std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
 }
 
 void	CgiProcess::_cgiHeadersToResponse()
@@ -81,7 +82,7 @@ void	CgiProcess::_cgiHeadersToResponse()
 	}
 	_cgiBuffer = "";
 	_checkChunkedTransfer(response);
-	// std::cout << "CONTENT: " << content.str() << std::endl;
+	std::cout << "CONTENT: " << content.str() << std::endl;
 	response.appendBodyBuffer(content.str(), content.str().length());
 	response.setBodyLength(content.str().length());
 	// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;

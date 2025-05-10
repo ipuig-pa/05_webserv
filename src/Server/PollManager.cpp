@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 16:29:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:47:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	MultiServer::_newFdsToPoll(Client *client)
 			_poll.push_back((struct pollfd) { to_cgi, POLLOUT, 0 });
 		}
 		else if (client->getCgiProcess() && client->getCgiProcess()->getFromCgi()!= -1) {
-			int from_cgi = client->getCgiProcess()->getToCgi();
+			int from_cgi = client->getCgiProcess()->getFromCgi();
 			LOG_INFO("Reading pipe end with fd " + std::to_string(from_cgi) + " has been linked with client at socket " + std::to_string(client->getSocket()));
 			_poll.push_back((struct pollfd) { from_cgi, POLLIN, 0 });
 		}

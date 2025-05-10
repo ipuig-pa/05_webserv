@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:13:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:52:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,9 @@ void	MultiServer::_handleInputFd(int fd, RequestHandler &req_hand)
 		else if (it_c->second->getCgiProcess()->getFromCgi() == fd && it_c->second->getState() == READING_CGI) {
 			LOG_DEBUG("Cgi output " + std::to_string(fd) + " is ready to read");
 			it_c->second->getCgiProcess()->readCgiOutput();
+			std::cout << "RESPONSE: " << it_c->second->getResponse().getState() << it_c->second->getResponse().getBodyBuffer() << std::endl;
 			if (it_c->second->getCgiProcess()->isActive() == false) {
+				std::cout << "RESPONSE: " << it_c->second->getResponse().getState() << it_c->second->getResponse().getBodyBuffer() << std::endl;
 				_eraseFromPoll(fd);
 			}
 			break ;

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:14:07 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 18:10:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 CgiProcess::CgiProcess(Client *client)
-	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(-1), _cgiBuffer(""), _cgiActive(false), _headers_sent(false), _envp(nullptr)
+	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(42), _cgiBuffer(""), _cgiActive(false), _headers_sent(false), _envp(nullptr)
 {
 	_script_path = client->getRequest().getPath();
 }
@@ -78,7 +78,8 @@ bool CgiProcess::initCgi()
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
 	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
-	av[0] = const_cast<char*>(_getExtSysPath(scriptDir).c_str()); //usr/local/python3
+	av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
+	std::cout << av[0] << std::endl;
 	av[1] = const_cast<char*>(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
 	av[2] = NULL;
 	createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
@@ -113,7 +114,7 @@ bool CgiProcess::initCgi()
 			exit(1); //allowed?!?!?
 		}
 		if (execve(av[0], av, _envp) == -1) {
-			LOG_ERR("\033[31mfail in execve\033[0m");
+			LOG_ERR("\033[31mfail in execve\033[0m"); //this will be written in the child output, not in the normal terminal!!!!
 			close(STDOUT_FILENO);
 			if (_client->getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
@@ -139,12 +140,9 @@ bool CgiProcess::initCgi()
 		close(pipToCgi[0]);
 		_pipToCgi = pipToCgi[1];
 		_client->setState(WRITING_CGI);
-		LOG_INFO("\033[31m_Client state changed to WRITING_CGI\033[0m");
 	}
-	else {
+	else
 		_client->setState(READING_CGI); //check later
-		LOG_INFO("\033[31m_Client state changed to READING_CGI\033[0m");
-	}
 	return true;
 }
 
@@ -211,7 +209,7 @@ void	CgiProcess::cleanCloseCgi(void)
 	int status;
 	int result = waitpid(_cgiPid, &status, WNOHANG);
 	if (result == 0) {
-		LOG_WARN("CGI process " + std::to_string(_cgiPid)+ "linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
+		LOG_WARN("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
 		kill(_cgiPid, SIGTERM); 
 		usleep(100000); // 100ms as grace period
 		if (waitpid(_cgiPid, &status, WNOHANG) == 0)
@@ -220,16 +218,16 @@ void	CgiProcess::cleanCloseCgi(void)
 	}
 	if (result > 0) {
 		if (WIFEXITED(status)) {
-			LOG_INFO("\033[31mCGI process: " + std::to_string(result) + " exit with:\033[0m" + std::to_string(WEXITSTATUS(status)));
+			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with:\033[0m" + std::to_string(WEXITSTATUS(status)));
 		} else if (WIFSIGNALED(status)) {
-			LOG_INFO("\033[31mCGI process: " + std::to_string(result) + " exit by signal:\033[0m" + std::to_string(WTERMSIG(status)));
+			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal:\033[0m" + std::to_string(WTERMSIG(status)));
 		}
 		LOG_INFO("CGI process " + std::to_string(_cgiPid)+ "linked to client " + std::to_string(_client->getSocket()) + " has terminated");
 		_client->setState(SENDING_RESPONSE);
 	}
 	else if (result < 0) {
 		// Error occurred
-		LOG_ERR("Error waiting for CGI process: " + std::string(strerror(errno)));
+		LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
 		_client->sendErrorResponse(500);
 	}
 	_cgiActive = false;

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 16:57:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:56:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ Client::~Client()
 		close(_file_fd);
 	delete (_error_handler);
 	delete (_currentLocConf);
-	_cgi->cleanCloseCgi();
-	delete (_cgi);
+	if (_cgi) {
+		_cgi->cleanCloseCgi();
+		delete (_cgi);
+	}
 }
 
 HttpRequest	&Client::getRequest(void)
@@ -135,6 +137,7 @@ bool	Client::sendResponseChunk(void)
 	}
 	if (!_response.isChunked() && _response.getBodyLength() != 0)
 	{
+		std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (!_response.getBodyBuffer().empty())
 		{
 			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
@@ -154,6 +157,7 @@ bool	Client::sendResponseChunk(void)
 		// 	//error handling1??
 	}
 	if (_response.isChunked()){
+		std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (!_response.getBodyBuffer().empty()){
 			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
 			if (sent < 0)
