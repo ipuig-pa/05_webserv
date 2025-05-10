@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PostRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 13:44:57 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/10 12:09:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	RequestHandler::handlePostRequest(Client &client)
 	//check that directory exists and is writable
 	std::string directory = path.substr(0, path.find_last_of('/'));
 	if (access(directory.c_str(), W_OK) != 0) {
-		client.prepareErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403); // Forbidden
 		return;
 	}
 
@@ -28,7 +28,7 @@ void	RequestHandler::handlePostRequest(Client &client)
 	size_t contentLength = client.getRequest().getBody().size();
 	size_t maxBodySize = client.getServerConf().getMaxBodySize();
 	if (maxBodySize > 0 && contentLength > maxBodySize) {
-		client.prepareErrorResponse(413); // Payload Too Large
+		client.sendErrorResponse(413); // Payload Too Large
 		return;
 	}
 	
@@ -36,7 +36,7 @@ void	RequestHandler::handlePostRequest(Client &client)
 
 	if (!file.is_open()) {
 		// Failed to create file - return error response
-		client.prepareErrorResponse(500);
+		client.sendErrorResponse(500);
 		return ;
 	}
 	file << client.getRequest().getBody();

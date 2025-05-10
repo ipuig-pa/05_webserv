@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 16:59:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 16:13:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	RequestHandler::handleClientRead(Client &client)
 // }
 // if (isCgiRequest(client)) {
 // 	if (initCgi(client) == false) {
-// 		client.prepareErrorResponse(500);
+// 		client.sendErrorResponse(500);
 // 	}
 // 	else {
 // 		client.setState(READING_CGI);
@@ -76,21 +76,19 @@ void	RequestHandler::handleClientWrite(Client &client)
 	{
 		if (!client.sendResponseChunk())
 		//error handling??
-		std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
+			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
 	}
 	std::cout << "sent " << client.getResponse().getBytesSent() << ".\nStatus: " << client.getResponse().statusToString().length() << ".\nHeader: " << client.getResponse().headersToString().length() << ".\nBody: " << client.getResponse().getHeader("Content-Length") << std::endl;
-	
-	if (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() +  client.getResponse().getBodyLength()))
+	if (client.getResponse().getState() == READ && client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() + client.getResponse().getBytesRead()))
 	{
 		client.getResponse().setState(SENT);
 		if (client.getRequest().getHeaderVal("Connection") == "close")
-		{
 			client.setState(CONNECTION_CLOSED);
-		}
 		else
-		client.setState(NEW_REQUEST);
+			client.setState(NEW_REQUEST); 
 	}
 }
+
 // if (client.getState() == WRITING_CGI) {
 // 	if (writeToCgi(client)) {
 // 		client.setState(READING_CGI);

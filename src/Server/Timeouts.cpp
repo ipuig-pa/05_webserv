@@ -6,20 +6,17 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:54:19 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 10:48:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 16:46:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "MultiServer.hpp"
-
 
 /*-------------METHODS--------------------------------------------------------*/
 
 void	MultiServer::_checkTimeouts()
 {
 	time_t current_time = time(NULL);
-
-	// add cgi timeouts checking
 
 	// Graceful shutdown timeout in drain mode (Force shutdown even if clients are still connected)
 	if (_drain_mode && (current_time > _shutdown_time)) {
@@ -59,11 +56,19 @@ void	MultiServer::_checkTimeouts()
 			should_close = true;
 		}
 
+		// Check Cgi timeout
+		if (CgiProcess *cgi = client->getCgiProcess()){
+			if (cgi->isActive() && cgi->getCgiPid() > 0 &&
+			(current_time - client->getTracker().getCgiStart() > _timeouts.getCgi())) {
+			_handleCgiTimeout(client->getCgiProcess(), should_close);
+			}
+		}
+
 		if (should_close) {
 			// Send 408 Request Timeout if appropriate
 			if (client->getState() == READING_REQUEST) {
 				LOG_ERR("Preparing error code 408 for client at socket " + std::to_string(client->getSocket()));
-				client->prepareErrorResponse(408); // + close?!?!?
+				client->sendErrorResponse(408); // + close?!?!?
 			}
 			else {
 				client->setState(CONNECTION_CLOSED);
@@ -74,32 +79,52 @@ void	MultiServer::_checkTimeouts()
 	}
 }
 
+void	MultiServer::_handleCgiTimeout(CgiProcess *cgi, bool &should_close) {
+	if (!cgi->getHeadersSent()){
+		cgi->getClient()->sendErrorResponse(504); // "Gateway Timeout"
+	}
+	else if (cgi->getClient()->getResponse().isChunked()){
+		cgi->getClient()->getResponse().setState(READ); //to send the final chunk, handled in SendResponseChunk in Client
+		//clean???
+		//send a final chunk and close
+	}
+	else {
+		should_close = true; // For Content-Length encoding: Just close (the client will detect an incomplete response)
+	}
+	_eraseFromPoll(cgi->getFromCgi());
+	_eraseFromPoll(cgi->getToCgi());
+	cgi->cleanCloseCgi();
+	LOG_ERR("CGI timeout handling \"" + cgi->getScriptPath() + "\"");
+}
 
-// void MultiServer::checkCgiProcesses() {
-// 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
-// 		if (it->second->checkCgiActive() && it->second->getCgiPid() > 0) {
-// 			int status;
-// 			pid_t result = waitpid(it->second->getCgiPid(), &status, WNOHANG);
-			
-// 			if (result > 0) {
-// 				// CGI process has terminated
-// 				LOG_INFO("CGI process " + std::to_string(it->second->getCgiPid()) + " has terminated");
-// 				it->second->setCgiActive(false);
-				
-// 				// If we're not already done with CGI processing, clean up
-// 				if (it->second->getState() == WRITING_CGI || it->second->getState() == READING_CGI) {
-// 					// Clean up resources
-// 					cleanupCgiResources(it->second);
-// 					it->second->setState(SENDING_RESPONSE);
-// 				}
-// 			}
-// 			else if (result < 0) {
-// 				// Error occurred
-// 				LOG_ERR("Error waiting for CGI process: " + std::string(strerror(errno)));
-// 				it->second->setCgiActive(false);
-// 				cleanupCgiResources(it->second);
-// 				it->second->prepareErrorResponse(500);
-// 			}
-// 		}
-// 	}
-// }
+	// kill(cgi->getCgiPid(), SIGTERM);
+
+	// // 3. Give a brief grace period
+	// usleep(100000); // 100ms
+	
+	// // 4. Check if process exited with non-blocking waitpid
+	// int status;
+	// if (waitpid(cgi->getCgiPid(), &status, WNOHANG) == 0) {
+	// 	// Process still running, force kill
+	// 	kill(cgi->getCgiPid(), SIGKILL);
+		
+	// 	// Make sure it's really dead
+	// 	waitpid(cgi->getCgiPid(), NULL, 0);
+	// }
+
+	// //use cleanCloseCgi!!! (and combine with remove from poll!?!?)
+
+	// 	// 5. Clean up resources
+	// 	close(process->output_fd);
+	// 	removeFdFromPoll(process->output_fd);
+		
+	// 	// Free environment variables if needed
+	// 	if (process->env) {
+	// 		for (int i = 0; process->env[i]; i++) {
+	// 			free(process->env[i]);
+	// 		}
+	// 		delete[] process->env;
+	// 	}
+
+
+

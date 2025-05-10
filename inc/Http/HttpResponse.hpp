@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:40:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 16:11:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ private:
 	responseState	_state;
 	size_t			_bytes_read;
 	size_t			_bytes_sent;
+	bool			_chunked;
 
 public:
 	HttpResponse();
@@ -50,6 +51,7 @@ public:
 	void		setState(responseState state);
 	void		setBytesRead(size_t bytes_read);
 	void		setBytesSent(size_t bytes_sent);
+	void		setChunked(bool chunked);
 
 	//getters
 	std::string	getHeader(const std::string& name);
@@ -59,6 +61,7 @@ public:
 	size_t		getBytesSent(void);
 	std::string	getBodyBuffer(void);
 	Status		&getStatus(void);
+	bool		isChunked(void);
 
 	//methods
 	void		appendBodyBuffer(const std::string buffer, size_t bytes_read);

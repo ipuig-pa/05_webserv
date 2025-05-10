@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 15:53:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:11:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,9 +85,9 @@ void	MultiServer::run()
 				_handleClientSocket(fd, it_c->second, i, req_hand);
 			//file or cgi case
 			else if (_poll[i].revents & POLLIN)
-				_handleInputFd(fd, i, req_hand);
+				_handleInputFd(fd, req_hand);
 			else if (_poll[i].revents & POLLOUT)
-				_handleOutputFd(fd, i, req_hand);
+				_handleOutputFd(fd);
 			if (_poll[i].revents & (POLLERR | POLLHUP | POLLNVAL | POLLPRI))
 				_handlePollErr(fd, i);
 		}

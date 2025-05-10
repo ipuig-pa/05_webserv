@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 12:26:21 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 12:08:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ bool CgiChecker::_matchSize(LocationConf& loc)
 	}
 	return false;
 }
+
 
 //singularly check .php only
 // bool CgiChecker::_mapPathExtension(LocationConf& loc)

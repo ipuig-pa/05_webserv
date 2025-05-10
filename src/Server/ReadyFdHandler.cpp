@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/08 17:53:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:13:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHand
 	//handle reading from client
 	if (_poll[i].revents & POLLIN && (client->getState() == NEW_REQUEST || client->getState() == NEW_CONNECTION)) {
 
-		LOG_DEBUG("Client socket " + std::to_string(fd) + "is ready to read");
+		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to read");
 		req_hand.handleClientRead(*(client));
 		_newFdsToPoll(client);
 	}
@@ -29,7 +29,7 @@ void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHand
 	if (client->getState() == SENDING_RESPONSE && _poll[i].events == POLLIN) {
 		for (size_t i = 0; i < _poll.size(); i++) {
 			if (_poll[i].fd == fd) {
-				LOG_DEBUG("Client socket " + std::to_string(fd) + "is changed to POLLOUT");
+				LOG_DEBUG("Client socket " + std::to_string(fd) + " changed to POLLOUT");
 				_poll[i].events = POLLOUT;
 				break;
 			}
@@ -38,14 +38,14 @@ void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHand
 
 	//handle writing to client
 	if (_poll[i].revents & POLLOUT) {
-		LOG_DEBUG("Client socket " + std::to_string(fd) + "is ready to write");
+		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to write");
 		req_hand.handleClientWrite(*(client));
 		if (client->getState() == NEW_REQUEST)
 			_poll[i].events = POLLIN;
 	}
 }
 
-void	MultiServer::_handleInputFd(int fd, int i, RequestHandler &req_hand)
+void	MultiServer::_handleInputFd(int fd, RequestHandler &req_hand)
 {
 	std::map<int, Client*>::iterator it_c = _clients.begin();
 	while (it_c != _clients.end())
@@ -56,11 +56,11 @@ void	MultiServer::_handleInputFd(int fd, int i, RequestHandler &req_hand)
 				_eraseFromPoll(fd);
 			break ;
 		}
-		else if (it_c->second->getFromCgi() == fd && it_c->second->getState() == READING_CGI) {
+		else if (it_c->second->getCgiProcess()->getFromCgi() == fd && it_c->second->getState() == READING_CGI) {
 			LOG_DEBUG("Cgi output " + std::to_string(fd) + " is ready to read");
-			req_hand.readCgiOutput(*it_c->second);
-			if (it_c->second->checkCgiActive() == false) {
-				_eraseFromPoll(_poll[i].fd);
+			it_c->second->getCgiProcess()->readCgiOutput();
+			if (it_c->second->getCgiProcess()->isActive() == false) {
+				_eraseFromPoll(fd);
 			}
 			break ;
 		}
@@ -68,15 +68,15 @@ void	MultiServer::_handleInputFd(int fd, int i, RequestHandler &req_hand)
 	}
 }
 
-void	MultiServer::_handleOutputFd(int fd, int i, RequestHandler &req_hand)
+void	MultiServer::_handleOutputFd(int fd)
 {
 	std::map<int, Client*>::iterator it_c = _clients.begin();
 	while (it_c != _clients.end())
 	{
-		if (it_c->second->getToCgi() == fd && it_c->second->getState() == WRITING_CGI) {
+		if (it_c->second->getCgiProcess()->getToCgi() == fd && it_c->second->getState() == WRITING_CGI) {
 			LOG_DEBUG("Cgi input " + std::to_string(fd) + " is ready to be written");
-			if (req_hand.writeToCgi(*it_c->second)) {
-				_eraseFromPoll(_poll[i].fd);
+			if (it_c->second->getCgiProcess()->writeToCgi()) {
+				_eraseFromPoll(fd);
 				it_c->second->setState(READING_CGI);
 			}
 			break ;
