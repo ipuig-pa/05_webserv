@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/29 17:34:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 16:54:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,10 @@ bool HttpReqParser::_parseReqLine(HttpRequest &request)
 	
 	size_t questionSign = url.find('?');
 	if (questionSign != std::string::npos) { //url is: xxxxx?xxxxx format
-		request.setPath(url.substr(0, questionSign + 1));
+		request.setUri(url.substr(0, questionSign + 1));
 		request.setQueryPart(url.substr(questionSign + 1));
 	} else {
-		request.setPath(url);
+		request.setUri(url);
 	}
 	std::string tmp_v = "HTTP/1.1";
 	if (tmp_v.compare(ver) != 0)

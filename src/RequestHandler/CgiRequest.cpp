@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 15:24:19 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/10 09:32:50 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,16 @@ bool RequestHandler::initCgi(Client& client)
 		// client.prepareErrorResponse(500); // already done when it returns false in the processrequest
 		return false;
 	}
-	std::string cgiExtend = _getCgiExtension(client.getRequest().getPath());
+	std::string cgiExtend = _getCgiExtension(client.getRequest().getUri());
 	std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	std::string scriptDir = _getScriptDir(client.getRequest().getPath());
+	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
 	av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
-	av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py
+	av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? for the moment whole path, but I think we need to chdir to root in location and just pass the uri here
 	av[2] = NULL;
-	// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
-	char** envp = createEnv(client.getRequest(), client.getRequest().getPath());
+	char** envp = createEnv(client.getRequest(), client.getRequest().getUri()); //store this envp somehow to be able to free it later
+
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
 		//for_err(client);
@@ -51,7 +53,7 @@ bool RequestHandler::initCgi(Client& client)
 			close(pipToCgi[0]);
 			close(pipToCgi[1]);
 		}
-		else {//debug
+		else {//debug msaage, delete later
 			int devNull = open("/dev/null", O_RDONLY);
 			if (devNull >= 0) {
 				dup2(devNull, STDIN_FILENO);
@@ -65,13 +67,16 @@ bool RequestHandler::initCgi(Client& client)
 		// 	std::cout << "printing envp..." << envp[i] << std::endl;
 		// }
 		// char* av[] = { (char*)client.getRequest().getPath().c_str(), NULL };
+		if (chdir(scriptDir.c_str()) != 0) {
+			std::cerr << "Failed to change to directory: " << scriptDir << " - " << strerror(errno) << std::endl;
+			exit(1); //allowed?!?!?
+		}
 		if (execve(av[0], av, envp) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m");
 			close(STDOUT_FILENO);
-			_cleanEnvp(envp);
 			if (client.getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
-			exit(1); //exit on error
+			exit(1); //exit on error // allowed!?!?!?
 		}
 	}
 	//parent
@@ -202,7 +207,7 @@ bool RequestHandler::validCgi(Client& client)
 
 bool RequestHandler::isCgiRequest(Client& client)
 {
-	std::string tmp = client.getRequest().getPath();
+	std::string tmp = client.getRequest().getUri();
 	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
 		return true;
@@ -214,7 +219,7 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMthStr()));
+	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMethodStr()));
 	if (!httpReq.getQueryPart().empty()) {
 		env.push_back("QUERY_STRING=" + std::string(httpReq.getQueryPart()));
 	}
@@ -227,7 +232,7 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 	env.push_back("SERVER_NAME=webserv");
 	env.push_back("REDIRECT_STATUS=200");
 	// env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
-	std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHearderField();
+	// std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHeader();
 	// //SOME PROBLEM IN CONVERT FORMAT THAT CHANGES THE STANDARD OUTPUT!?!? WHY DO WE NEED THIS CONVERTED HEADERS IF WE HAVE ASSIGNED THEM BEFORE?!?!?!?
 	// _convertFormat(_reqHeader);
 	// LOG_DEBUG("printing envp 4");
@@ -242,6 +247,10 @@ char** RequestHandler::createEnv(HttpRequest& httpReq, const std::string &req_ur
 	// env.push_back("SERVER_PORT=8002"); //placeholder, should from ServerConf::getListen()
 	// env.push_back("REMOTE_ADDR=127.0.0.1"); //placeholder, use client::getSocket(), ip address of client, not sure necessary or not...
 	// "HTTP_COOKIES=httpReq.getHeaderVal("cookie"); optional, see do bonus or not
+	// for (size_t i = 0; i < env.size(); ++i)
+	// {
+	// 	std::cout << "VECTOR." << i << ": " << env[i] << std::endl;
+	// }
 	char** envp = _convertToEnvp(env);
 	return (envp);
 }
@@ -331,6 +340,7 @@ void RequestHandler::_cgiHeaderScope(const std::string& line, HttpResponse& resp
 }
 
 //scalable function
+//SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
 std::string RequestHandler::_extSysPath(std::string& cgiExt)
 {
 	if (cgiExt == ".php") {
@@ -421,4 +431,13 @@ void	RequestHandler::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 		close(pipToCgi[0]);
 	if (pipToCgi[1] != -1)
 		close(pipToCgi[1]);
+}
+
+std::string	RequestHandler::_getScriptDir(std::string &path)
+{
+	size_t pos = path.find_last_of('/');
+	if (pos == std::string::npos) {
+		return "."; // No directory in path, use current directory
+	}
+	return path.substr(0, pos);
 }

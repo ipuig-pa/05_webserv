@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 10:38:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/09 17:51:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 Client::Client(int socket, ServerConf &default_conf)
 	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _tracker()
-{
+{		
 	//_hasCgi = false;
 	_cgiActive = false;
 	_cgiPid = -1;
@@ -27,26 +27,15 @@ Client::Client(int socket, ServerConf &default_conf)
 	_pipFromCgi = -1;
 	// _cgiBodywrite = "";
 	_error_handler = new ErrorPageHandler(this);
-	//_request ->change _currentConfig according to request header (find )
-	//_response
 }
 
 Client::~Client()
 {
-	delete (_error_handler);
 	if (_file_fd != -1)
 		close(_file_fd);
-	if (_pipFromCgi != -1)
-		close(_pipFromCgi);
-	if (_pipToCgi != -1)
-		close(_pipToCgi);
-	//nort sure what we have to do with cgi pid to properly clean!>!?!?!?
-	int status;
-	if (waitpid(_cgiPid, &status, WNOHANG) == 0) {
-		LOG_WARN("CGI process did not terminate, sending SIGKILL");
-		kill(_cgiPid, SIGKILL);
-		waitpid(_cgiPid, &status, 0);
-	}
+	delete (_error_handler);
+	delete (_currentLocConf);
+	//delete (_cgi);
 	//_request ->change _currentConfig according to request header (find )
 	//_response
 }
@@ -116,6 +105,11 @@ void	Client::setState(clientState state)
 	LOG_INFO("Client at socket " + std::to_string(_socket) + " change state to " + Client::getStateString(state));
 	if (state == SENDING_RESPONSE)
 		this->_tracker.setResponseStart();
+	if (state == NEW_REQUEST) {
+		this->getParser().reset();
+		this->getRequest().reset();
+		this->getResponse().reset();
+	}
 }
 
 void	Client::setFileFd(int file_fd)
