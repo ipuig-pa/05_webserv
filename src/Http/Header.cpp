@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/05 17:46:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 09:46:11 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 Header::Header()
 {
-	LOG_DEBUG("Header default constructor called");
 }
 
 Header::Header(const Header &other)

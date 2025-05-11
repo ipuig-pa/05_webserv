@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 16:54:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 09:46:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 HttpReqParser::HttpReqParser(HttpRequest &request)
 	: _stage(REQ_LINE), _bodyLength(0), _buffer(""), _header_complete(false), _httpReq(request)
 {
-	LOG_DEBUG("HttpReqParser constructor called");
 }
 HttpReqParser::~HttpReqParser() {}
 

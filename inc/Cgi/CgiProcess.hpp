@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:05:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 10:54:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,9 @@ private:
 public:
 	CgiProcess(Client *client);
 	~CgiProcess();
+
+	//setters
+	void			setActive(bool active);
 
 	//getters
 	bool			isActive();

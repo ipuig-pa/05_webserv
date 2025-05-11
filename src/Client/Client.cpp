@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 17:56:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 11:02:28 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,13 @@ void	Client::setCgiProcess(CgiProcess *cgi)
 {
 	_cgi = cgi;
 }
+static std::string	getChunk(std::string buffer)
+{
+	std::stringstream ss;
+	ss << std::hex << buffer.size();
 
+	return (ss.str() + "\r\n" + buffer + "\r\n");
+}
 bool	Client::sendResponseChunk(void)
 {
 	if (_response.getBytesSent() == 0)
@@ -159,11 +165,12 @@ bool	Client::sendResponseChunk(void)
 	if (_response.isChunked()){
 		std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (!_response.getBodyBuffer().empty()){
-			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
+			std::string	chunk = getChunk(_response.getBodyBuffer());
+			size_t sent = send(_socket, chunk.c_str(), chunk.length(), 0);
 			if (sent < 0)
 				return false;
+			_response.setBytesSent(_response.getBodyBuffer().length());
 			_response.setBodyBuffer("");
-			_response.setBytesSent(sent);
 			return true;
 		}
 		if (_response.getState() == READ && _response.getBytesSent() == (_response.statusToString().length() + _response.headersToString().length() + _response.getBytesRead())){
@@ -193,6 +200,7 @@ void	Client::sendErrorResponse(int code)
 	LOG_ERR("Error " + std::to_string(code) + " occurred");
 	_response.setStatusCode(code);
 	_response.setBodyBuffer(_error_handler->generateErrorBody(code));
+	_response.setState(READ);
 	this->setState(SENDING_RESPONSE);
 }
 

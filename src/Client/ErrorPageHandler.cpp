@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/05 17:04:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 09:39:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 	if (!body.empty())
 	{
 		_client->getResponse().setBodyLength(body.length()); // or should read from there?
+		_client->getResponse().setBytesRead(body.length());
 		_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
 		_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
 		return (body);
@@ -49,6 +50,7 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 	if (status_code == 204 || status_code == 304)
 	{
 		_client->getResponse().setBodyLength(0);
+		_client->getResponse().setBytesRead(0);
 		return ("");
 	}	
 	else
@@ -72,6 +74,7 @@ std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 		<< "</html>";
 
 	_client->getResponse().setBodyLength(ss.str().length());
+	_client->getResponse().setBytesRead(ss.str().length());
 	_client->getResponse().setHeaderField("Content-Type", "text/html");
 	_client->getResponse().setHeaderField("Content-Length", std::to_string(ss.str().length()));
 	return ss.str();

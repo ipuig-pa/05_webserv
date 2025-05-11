@@ -6,11 +6,12 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 18:01:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 11:01:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
+#include "global.hpp"
 
 void	CgiProcess::readCgiOutput()
 {
@@ -27,6 +28,7 @@ void	CgiProcess::readCgiOutput()
 	}
 	else if (bytes_read == 0) { //reach EOF
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
+		LOG_DEBUG("Finish reading cgi output");
 		_client->getResponse().setState(READ);
 		// cleanCloseCgi();//close and clean
 	}
@@ -50,12 +52,12 @@ void	CgiProcess::_appendCgiOutputBuff(std::string buffer, size_t bytes)
 	}
 	else
 		_client->getResponse().appendBodyBuffer(buffer, bytes);
-	std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
+	// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
 }
 
 void	CgiProcess::_cgiHeadersToResponse()
 {
-	HttpResponse response = _client->getResponse();
+	HttpResponse &response = _client->getResponse();
 	response.setStatusCode(200); //set default, will be used if CGI didnt provide one
 	bool HeaderScope = true;
 	std::istringstream tmp(_cgiBuffer);
@@ -82,7 +84,6 @@ void	CgiProcess::_cgiHeadersToResponse()
 	}
 	_cgiBuffer = "";
 	_checkChunkedTransfer(response);
-	std::cout << "CONTENT: " << content.str() << std::endl;
 	response.appendBodyBuffer(content.str(), content.str().length());
 	response.setBodyLength(content.str().length());
 	// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;

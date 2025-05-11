@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 18:10:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 11:47:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@ CgiProcess::CgiProcess(Client *client)
 CgiProcess::~CgiProcess()
 {
 	cleanCloseCgi();
+}
+
+/*-------------ACCESSORS - SETTERS--------------------------------------------*/
+
+void	CgiProcess::setActive(bool active)
+{
+	_cgiActive = active;
 }
 
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
@@ -216,14 +223,14 @@ void	CgiProcess::cleanCloseCgi(void)
 			kill(_cgiPid, SIGKILL); 
 		waitpid(_cgiPid, &status, 0); //make sure it's really dead
 	}
-	if (result > 0) {
+	else if (result > 0) {
 		if (WIFEXITED(status)) {
-			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with:\033[0m" + std::to_string(WEXITSTATUS(status)));
+			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with: \033[0m" + std::to_string(WEXITSTATUS(status)));
 		} else if (WIFSIGNALED(status)) {
-			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal:\033[0m" + std::to_string(WTERMSIG(status)));
+			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal: \033[0m" + std::to_string(WTERMSIG(status)));
 		}
-		LOG_INFO("CGI process " + std::to_string(_cgiPid)+ "linked to client " + std::to_string(_client->getSocket()) + " has terminated");
-		_client->setState(SENDING_RESPONSE);
+		LOG_INFO("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " has terminated");
+		// _client->setState(SENDING_RESPONSE);
 	}
 	else if (result < 0) {
 		// Error occurred

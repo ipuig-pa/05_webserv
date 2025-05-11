@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:47:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 11:36:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,25 @@ void	MultiServer::_newFdsToPoll(Client *client)
 
 void	MultiServer::_handlePollErr(int fd, int i)
 {
+	std::map<int, Client*>::iterator it_c = _clients.begin();
+
 	if (_poll[i].revents & POLLHUP) {
+		for (it_c = _clients.begin(); it_c != _clients.end(); ++it_c) {
+			if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getFromCgi() == fd) {
+				LOG_DEBUG("CGI pipe end at " + std::to_string(fd) + " closed (POLLHUP)");
+				it_c->second->getCgiProcess()->setActive(false);
+				it_c->second->getResponse().setState(READ);
+				_eraseFromPoll(fd);
+				return ;
+			}
+		}
 		LOG_INFO("Client at socket " + std::to_string(fd) + " disconnected");
 	} else
 		LOG_ERR("Error on socket " + std::to_string(fd));
 	if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) {
 		_closeListeningSocket(it_s->second);
 		return ;
-	} else if (std::map<int, Client*>::iterator it_c = _clients.find(fd); it_c != _clients.end()){
+	} else if (it_c = _clients.find(fd); it_c != _clients.end()){
 		it_c->second->setState(CONNECTION_CLOSED);
 		return ;
 	} else if (fd != -1) {
