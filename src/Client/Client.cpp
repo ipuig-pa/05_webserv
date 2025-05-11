@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 11:02:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 13:28:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ bool	Client::sendResponseChunk(void)
 	}
 	if (!_response.isChunked() && _response.getBodyLength() != 0)
 	{
-		std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
+		// std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (!_response.getBodyBuffer().empty())
 		{
 			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
@@ -163,15 +163,16 @@ bool	Client::sendResponseChunk(void)
 		// 	//error handling1??
 	}
 	if (_response.isChunked()){
-		std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
+		// std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (!_response.getBodyBuffer().empty()){
+			// LOG_DEBUG("buffer is not empty");
 			std::string	chunk = getChunk(_response.getBodyBuffer());
 			size_t sent = send(_socket, chunk.c_str(), chunk.length(), 0);
 			if (sent < 0)
 				return false;
 			_response.setBytesSent(_response.getBodyBuffer().length());
 			_response.setBodyBuffer("");
-			return true;
+			// std::cout << chunk << std::endl;
 		}
 		if (_response.getState() == READ && _response.getBytesSent() == (_response.statusToString().length() + _response.headersToString().length() + _response.getBytesRead())){
 			size_t sent = send(_socket, "0\r\n\r\n", 5, 0);

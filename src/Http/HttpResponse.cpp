@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 16:11:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 12:41:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	HttpResponse::setState(responseState state)
 
 void	HttpResponse::setBytesRead(size_t bytes_read)
 {
-	_bytes_read = bytes_read;
+	_bytes_read = bytes_read; //needed? Add or set?!!?
 }
 
 void	HttpResponse::setBytesSent(size_t bytes_sent)
@@ -141,6 +141,7 @@ void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
 	else
 		_body_buffer.append(buffer, bytes_read);
 	_bytes_read += bytes_read;
+	_body_length += bytes_read;
 }
 
 //needed???

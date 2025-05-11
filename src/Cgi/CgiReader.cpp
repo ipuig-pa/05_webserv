@@ -6,21 +6,19 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 11:01:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 12:47:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
-#include "global.hpp"
 
 void	CgiProcess::readCgiOutput()
 {
 	char buffer[BUFF_SIZE];
 	ssize_t bytes_read = read(_pipFromCgi, buffer, sizeof(buffer));//check
-	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) << std::endl;
+	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
 	// std::cout << "buffer is: \033[0m" << buffer << std::endl;
 	if (bytes_read > 0) {
-		// _client->getResponse().appendBodyBuffer(std::string(buffer), bytes_read);
 		buffer[bytes_read] = '\0';
 		// std::cout << "READ: " << buffer << std::endl;
 		_appendCgiOutputBuff(std::string(buffer), bytes_read);
@@ -28,7 +26,8 @@ void	CgiProcess::readCgiOutput()
 	}
 	else if (bytes_read == 0) { //reach EOF
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
-		LOG_DEBUG("Finish reading cgi output");
+		std::cout << "reached EOF" << std::endl;
+		_cgiActive = false;
 		_client->getResponse().setState(READ);
 		// cleanCloseCgi();//close and clean
 	}

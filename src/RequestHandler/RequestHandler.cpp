@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 11:24:14 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 12:28:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,13 +70,15 @@ void	RequestHandler::handleClientWrite(Client &client)
 		//error handling??
 			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
 	}
-	// std::cout << "sent " << client.getResponse().getBytesSent() << ".\nStatus: " << client.getResponse().statusToString().length() << ".\nHeader: " << client.getResponse().headersToString().length() << ".\nBody: " << client.getResponse().getHeader("Content-Length") << "/" << client.getResponse().getBodyLength() << "/" << client.getResponse().getBytesRead() << std::endl;
+	std::cout << "sent " << client.getResponse().getBytesSent() << ".\nStatus: " << client.getResponse().statusToString().length() << ".\nHeader: " << client.getResponse().headersToString().length() << ".\nBody: " << client.getResponse().getHeader("Content-Length") << "/" << client.getResponse().getBodyLength() << "/" << client.getResponse().getBytesRead() << std::endl;
+	std::cout << "RESPO STATE: " << client.getResponse().getState() << std::endl;
 	if (client.getResponse().getState() == READ && (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() + client.getResponse().getBytesRead())))
 	{
 		client.getResponse().setState(SENT);
 		if (client.getRequest().getHeaderVal("Connection") == "close")
 			client.setState(CONNECTION_CLOSED);
 		else
+			// client.setState(CONNECTION_CLOSED);
 			client.setState(NEW_REQUEST); 
 	}
 }

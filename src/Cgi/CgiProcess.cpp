@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 11:47:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 12:15:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,6 +191,7 @@ std::string CgiProcess::_getExtSysPath(std::string	script_path)
 
 std::string	CgiProcess::_getScriptDir(std::string &path)
 {
+	std::cout << "PATH TO FIND SCRIPT DIR: " << path << std::endl;
 	size_t pos = path.find_last_of('/');
 	if (pos == std::string::npos) {
 		return "."; // No directory in path, use current directory
