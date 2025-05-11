@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 12:15:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:54:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ bool	CgiProcess::getHeadersSent(void)
 	return (_headers_sent);
 }
 
-std::string	&CgiProcess::getScriptPath()
+std::string	CgiProcess::getScriptPath()
 {
 	return (_script_path);
 }
@@ -189,7 +189,7 @@ std::string CgiProcess::_getExtSysPath(std::string	script_path)
 	}
 }
 
-std::string	CgiProcess::_getScriptDir(std::string &path)
+std::string	CgiProcess::_getScriptDir(std::string path)
 {
 	std::cout << "PATH TO FIND SCRIPT DIR: " << path << std::endl;
 	size_t pos = path.find_last_of('/');

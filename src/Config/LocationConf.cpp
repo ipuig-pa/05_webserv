@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 14:40:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:52:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ void LocationConf::setPathExMap(std::map<std::string, std::string>& pathExtend)
 }
 
 //getters
-const std::string& LocationConf::getLocPath() const
+const std::string LocationConf::getLocPath() const
 {
 	return this->_locPath;
 }
@@ -169,7 +169,7 @@ std::vector<std::string> LocationConf::getMethodStr() const
 	return methods;
 }
 
-const std::string& LocationConf::getLocRoot() const
+const std::string LocationConf::getLocRoot() const
 {
 	return this->_locRoot;
 }
@@ -185,7 +185,7 @@ bool LocationConf::getLocAuto() const
 {
 	return this->_locAuto;
 }
-const std::string& LocationConf::getReturn() const
+std::string LocationConf::getReturn() const
 {
 	return this->_returnUrl;
 }

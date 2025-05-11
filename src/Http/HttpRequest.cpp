@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:02:56 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:48:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,12 +114,12 @@ std::string	HttpRequest::getMethodStr() const
 	}
 }
 
-std::string	&HttpRequest::getUri(void)
+std::string	HttpRequest::getUri(void)
 {
 	return _uri;
 }
 
-std::string	&HttpRequest::getPath(void)
+std::string	HttpRequest::getPath(void)
 {
 	return _path;
 }
@@ -129,12 +129,12 @@ std::string HttpRequest::getQueryPart() const
 	return _queryPart;
 }
 
-std::string &HttpRequest::getVersion()
+std::string HttpRequest::getVersion()
 {
 	return _version;
 }
 
-std::string& HttpRequest::getBody()
+std::string HttpRequest::getBody()
 {
 	return _body;
 }

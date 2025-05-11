@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:02:44 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:49:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ public:
 	// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????
 	int				getMethod(void) const;
 	std::string		getMethodStr() const; //to get the string, not int from enum
-	std::string		&getUri(void);
-	std::string		&getPath(void);
+	std::string		getUri(void);
+	std::string		getPath(void);
 	std::string		getQueryPart() const;
-	std::string		&getVersion();
-	std::string		&getBody();
+	std::string		getVersion();
+	std::string		getBody();
 	bool			isComplete();
 
 	//method: reset status

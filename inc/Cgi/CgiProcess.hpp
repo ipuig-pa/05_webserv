@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 10:54:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:54:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ private:
 	void				_convertToEnvp(std::vector<std::string>& envStr);
 	void				_cleanEnvp(void);
 	std::string			_getExtSysPath(std::string script_path);
-	std::string		_getScriptDir(std::string &path);
+	std::string		_getScriptDir(std::string path);
 	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
 	void			_appendCgiOutputBuff(std::string buffer, size_t bytes);
 	void			_cgiHeadersToResponse();
@@ -55,7 +55,7 @@ public:
 	int				getFromCgi();
 	int				getToCgi();
 	bool			getHeadersSent();
-	std::string		&getScriptPath();
+	std::string		getScriptPath();
 
 	//methods
 	bool			initCgi(void);

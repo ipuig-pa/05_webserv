@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 16:40:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:49:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,14 @@ class LocationConf
 	void setPathExMap(std::map<std::string, std::string>& pathExtend);
 	
 	//getters
-	const std::string& getLocPath() const;
+	const std::string getLocPath() const;
 	bool getMethod(int method); //return a copy
 	std::vector<std::string> getMethodStr() const; //returns the allowed methods in a string form
-	const std::string& getLocRoot() const;
+	const std::string getLocRoot() const;
 	int getLocCMBS() const;
 	const std::string getLocIndex() const;
 	bool getLocAuto() const;
-	const std::string& getReturn() const;
+	std::string getReturn() const;
 	// const std::string& getCgiPath() const;
 	const std::vector<std::string>& getCgiSysPath() const;
 	// const std::string& getCgiExtension() const;

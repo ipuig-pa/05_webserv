@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 13:28:24 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 13:41:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ bool	Client::sendResponseChunk(void)
 		}
 		//error handling??
 	}
-	return false; //!?!?!?
+	return true; //!?!?!?
 	//else set it as already sent
 }
 
