@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:51:55 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 08:55:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ bool CgiChecker::_matchSize(LocationConf& loc)
 	}
 	return false;
 }
+
 
 //singularly check .php only
 // bool CgiChecker::_mapPathExtension(LocationConf& loc)

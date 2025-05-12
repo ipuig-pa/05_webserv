@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 16:28:26 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 14:51:18 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,10 @@ public:
 	int getPort() const;
 	int getCMBS() const;
 	bool getAutoIndex() const;
-	const std::string& getRoot() const;
-	const std::string& getHost() const; //at socket binding part, use getaddrindo() to resolve!
-	const std::string getIndex() const;
-	const std::string& getSrvName() const;
+	std::string getRoot() const;
+	std::string getHost() const; //at socket binding part, use getaddrindo() to resolve!
+	std::string getIndex() const;
+	std::string getSrvName() const;
 	const std::map<int, std::string>& getErrPage() const;
 	// const std::map<std::string, LocationConf>& getLocation() const;
 	// std::vector<std::string>& getErrPage() const;

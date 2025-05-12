@@ -6,13 +6,12 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 12:08:35 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 16:12:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-//INCLUDE HEAD REQUEST!? All general-purpose servers MUST support the methods GET and HEAD (RFC 9110)
 void	RequestHandler::handleGetRequest(Client &client)
 {
 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
@@ -20,11 +19,11 @@ void	RequestHandler::handleGetRequest(Client &client)
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {
-		client.prepareErrorResponse(404); // Not found
+		client.sendErrorResponse(404); // Not found
 		return ;
 	}
 	if (access(path.c_str(), R_OK) != 0) {
-		client.prepareErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403); // Forbidden
 		return ;
 	}
 	struct stat file_stat;
@@ -37,7 +36,7 @@ void	RequestHandler::handleGetRequest(Client &client)
 	int file_fd = open(path.c_str(), O_RDONLY);
 
 	if (file_fd == -1) {
-		client.prepareErrorResponse(404); // Not Found
+		client.sendErrorResponse(404); // Not Found
 		return ;
 	}
 	// Set non-blocking
@@ -134,7 +133,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 		handleDirectoryListing(client);
 	else {
 		// Directory listing is disabled and no index file exists
-		client.prepareErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403); // Forbidden
 	}
 }
 
@@ -150,7 +149,6 @@ bool	RequestHandler::handleFileRead(Client &client)
 			buffer[bytesRead] = '\0';
 			std::string	buffer_str(buffer);
 			client.getResponse().appendBodyBuffer(buffer_str, bytesRead);
-			client.getResponse().setBytesRead(bytesRead);
 			LOG_INFO(std::to_string(bytesRead) + " bytes read from file " + std::to_string(client.getFileFd()) + "linked to client " + std::to_string(client.getSocket()));
 			return (false);
 		}
@@ -167,51 +165,3 @@ bool	RequestHandler::handleFileRead(Client &client)
 	}
 	return(false);//check that we really want to keep it (return false) in this case
 }
-
-// void	RequestHandler::handleGetRequest(Client &client)
-// {
-// 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
-
-// 	std::string path = client.getRequest().getPath();
-
-// 	if (access(path.c_str(), F_OK) != 0) {
-// 		client.prepareErrorResponse(404); // Not found
-// 		return ;
-// 	}
-// 	if (access(path.c_str(), R_OK) != 0) {
-// 		client.prepareErrorResponse(403); // Forbidden
-// 		return ;
-// 	}
-// 	struct stat file_stat;
-// 	stat(path.c_str(), &file_stat);
-// 	if (S_ISDIR(file_stat.st_mode))
-// 	{
-// 		handleDirectoryRequest(client);
-// 		return ;
-// 	}
-// 	int file_fd = open(path.c_str(), O_RDONLY);
-
-// 	if (file_fd == -1) {
-// 		client.prepareErrorResponse(404); // Not Found
-// 		return ;
-// 	}
-// 	// Set non-blocking
-// 	int flags = fcntl(file_fd, F_GETFL, 0); //needed?? allowed???
-// 	fcntl(file_fd, F_SETFL, flags | O_NONBLOCK);
-
-// 	client.getResponse().setStatusCode(200); //OK
-// 	client.getResponse().setHeaderField("Content-Type", getMediaType(path));
-// 	client.getResponse().setHeaderField("Content-Length", std::to_string(file_stat.st_size));
-// 	if (client.getRequest().getMethod() == GET)
-// 	{
-// 		client.getResponse().setBodyLength(file_stat.st_size);
-// 		client.setFileFd(file_fd);
-// 		client.getResponse().setState(READING);
-// 	}
-// 	else if (client.getRequest().getMethod() == HEAD)
-// 	{
-// 		client.getResponse().setState(READ);
-// 		close(client.getFileFd());
-// 		client.setFileFd(-1);
-// 	}
-// }

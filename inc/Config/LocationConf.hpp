@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 13:12:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 08:55:24 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,14 +73,14 @@ class LocationConf
 	// void setExPathMap(std::string& cgiExtension, std::string& cgiSysPath);
 	
 	//getters
-	const std::string& getLocPath() const;
+	const std::string getLocPath() const;
 	bool getMethod(int method); //return a copy
 	std::vector<std::string> getMethodStr() const; //returns the allowed methods in a string form
-	const std::string& getLocRoot() const;
+	const std::string getLocRoot() const;
 	int getLocCMBS() const;
 	const std::string getLocIndex() const;
 	bool getLocAuto() const;
-	const std::string& getReturn() const;
+	std::string getReturn() const;
 	// const std::string& getCgiPath() const;
 	const std::vector<std::string>& getCgiSysPath() const;
 	// const std::string& getCgiExtension() const;

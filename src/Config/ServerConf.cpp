@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:41:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 08:55:51 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -427,16 +427,16 @@ int ServerConf::getCMBS() const {
 bool ServerConf::getAutoIndex() const {
 	return this->_srv_autoindex;
 }
-const std::string& ServerConf::getRoot() const {
+std::string ServerConf::getRoot() const {
 	return this->_root_dir;
 }
-const std::string& ServerConf::getHost() const {
+std::string ServerConf::getHost() const {
 	return this->_host;
 }
-const std::string ServerConf::getIndex() const {
+std::string ServerConf::getIndex() const {
 	return this->_index;
 }
-const std::string& ServerConf::getSrvName() const {
+std::string ServerConf::getSrvName() const {
 	return this->_server_name;
 }
 const std::map<int, std::string>& ServerConf::getErrPage() const {

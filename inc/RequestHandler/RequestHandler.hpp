@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 18:09:13 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 17:09:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,10 @@ private:
 	void		handleInvalidRequest(Client &client);
 	void		handleDirectoryRequest(Client &client);
 	void		handleDirectoryListing(Client &client);
+	void		_handleCgiRequest(Client &client);
 	std::string	getPathFromUri(Client &client);
-	
+	bool		checkAllowedMethod(Client &client);
+	bool				_isCgiRequest(Client& client);
 	
 public:
 	RequestHandler();
@@ -45,22 +47,15 @@ public:
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
 	void				handleFileWrite(Client &client); //client or fd or what?
-	
-	void				readCgiOutput(Client& client);
-	bool 				writeToCgi(Client& client);
-	bool				initCgi(Client& client);
+
 	bool				validCgi(Client& client);
 	// bool 		_forkErr(int& pip1, int& pip2);
-	bool				isCgiRequest(Client& client);
-	char**				createEnv(HttpRequest& httpReq, const std::string &req_url);
-	char**				_convertToEnvp(std::vector<std::string>& envStr);
-	void				_cleanEnvp(char** envp);
+
 	HttpResponse		_convertToResponse(std::string cgiOutBuff);
 	// void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
 	void				_cgiHeaderScope(const std::string& line, HttpResponse& response);
 	std::string			_getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
 	std::string			_extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
-	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
 	std::string			_getScriptDir(std::string &path);
 };
 

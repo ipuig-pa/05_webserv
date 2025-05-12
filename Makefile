@@ -41,9 +41,13 @@ SOURCES =	ReadConf.cpp \
 			ErrorPageHandler.cpp \
 			Header.cpp \
 			Status.cpp \
+			CgiChecker.cpp \
+			CgiProcess.cpp \
+			CgiEnv.cpp \
+			CgiReader.cpp \
+			CgiWriter.cpp \
 			TimeoutConf.cpp \
 			ConnectionTracker.cpp \
-			CgiChecker.cpp \
 			FileUtils.cpp \
 			Logger.cpp \
 			main.cpp

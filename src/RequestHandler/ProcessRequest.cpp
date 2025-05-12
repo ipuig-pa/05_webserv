@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 17:02:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 16:51:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,28 +23,12 @@ void	RequestHandler::processRequest(Client &client)
 
 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
 
-	bool method_allowed = false;
+	client.getRequest().setPath(getPathFromUri(client));
 
-	std::string path = getPathFromUri(client);
-	client.getRequest().setPath(path);
-
-	if (client.getLocationConf()) {
-		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
-		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
-			method_allowed = true;
-	}
-	else {
-		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
-			method_allowed = true;
-		}
-	}
+	bool method_allowed = checkAllowedMethod(client);
 	if (method_allowed) {
-		if (isCgiRequest(client) == true) {
-			LOG_INFO("\033[32mCGI Request recived\033[0m");
-			if (!initCgi(client)) {
-				LOG_DEBUG("\033[31mCGI init fail\033[0m");
-				client.prepareErrorResponse(500);
-			}
+		if (_isCgiRequest(client) == true) {
+			_handleCgiRequest(client);
 			return ;
 		} else {
 			(this->*handleMethod[client.getRequest().getMethod()])(client);
@@ -78,4 +62,21 @@ std::string	RequestHandler::getPathFromUri(Client &client)
 		relativePath = "/" + relativePath;
 	}
 	return locationRoot + relativePath;
+}
+
+bool	RequestHandler::checkAllowedMethod(Client &client)
+{
+	bool	method_allowed = false;
+
+	if (client.getLocationConf()) {
+		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
+		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
+			method_allowed = true;
+	}
+	else {
+		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
+			method_allowed = true;
+		}
+	}
+	return (method_allowed);
 }

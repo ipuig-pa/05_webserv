@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:51:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 13:41:20 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,8 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _tracker()
-{		
-	//_hasCgi = false;
-	_cgiActive = false;
-	_cgiPid = -1;
-	_pipToCgi = -1;
-	_pipFromCgi = -1;
-	// _cgiBodywrite = "";
+	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
+{
 	_error_handler = new ErrorPageHandler(this);
 }
 
@@ -35,9 +29,10 @@ Client::~Client()
 		close(_file_fd);
 	delete (_error_handler);
 	delete (_currentLocConf);
-	//delete (_cgi);
-	//_request ->change _currentConfig according to request header (find )
-	//_response
+	if (_cgi) {
+		_cgi->cleanCloseCgi();
+		delete (_cgi);
+	}
 }
 
 HttpRequest	&Client::getRequest(void)
@@ -117,6 +112,17 @@ void	Client::setFileFd(int file_fd)
 	_file_fd = file_fd;
 }
 
+void	Client::setCgiProcess(CgiProcess *cgi)
+{
+	_cgi = cgi;
+}
+static std::string	getChunk(std::string buffer)
+{
+	std::stringstream ss;
+	ss << std::hex << buffer.size();
+
+	return (ss.str() + "\r\n" + buffer + "\r\n");
+}
 bool	Client::sendResponseChunk(void)
 {
 	if (_response.getBytesSent() == 0)
@@ -127,21 +133,22 @@ bool	Client::sendResponseChunk(void)
 		
 		size_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
-		return false;
+			return false;
 		_response.setBytesSent(sent);
 		sent = send(_socket, headers.c_str(), headers.length(), 0);
 		if (sent < 0)
-		return false;
+			return false;
 		_response.setBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
-	if (_response.getBodyLength() != 0)
+	if (!_response.isChunked() && _response.getBodyLength() != 0)
 	{
+		// std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (!_response.getBodyBuffer().empty())
 		{
 			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
 			if (sent < 0)
-			return false;
+				return false;
 			_response.setBodyBuffer("");
 			_response.setBytesSent(sent);
 			return true;
@@ -155,7 +162,27 @@ bool	Client::sendResponseChunk(void)
 		// else
 		// 	//error handling1??
 	}
-	return false; //!?!?!?
+	if (_response.isChunked()){
+		// std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
+		if (!_response.getBodyBuffer().empty()){
+			// LOG_DEBUG("buffer is not empty");
+			std::string	chunk = getChunk(_response.getBodyBuffer());
+			size_t sent = send(_socket, chunk.c_str(), chunk.length(), 0);
+			if (sent < 0)
+				return false;
+			_response.setBytesSent(_response.getBodyBuffer().length());
+			_response.setBodyBuffer("");
+			// std::cout << chunk << std::endl;
+		}
+		if (_response.getState() == READ && _response.getBytesSent() == (_response.statusToString().length() + _response.headersToString().length() + _response.getBytesRead())){
+			size_t sent = send(_socket, "0\r\n\r\n", 5, 0);
+			if (sent < 0)
+				return false;
+			return true;
+		}
+		//error handling??
+	}
+	return true; //!?!?!?
 	//else set it as already sent
 }
 
@@ -169,107 +196,16 @@ void	Client::setLocationConf(LocationConf *conf)
 	_currentLocConf = conf;
 }
 
-void	Client::prepareErrorResponse(int code)
+void	Client::sendErrorResponse(int code)
 {
 	LOG_ERR("Error " + std::to_string(code) + " occurred");
 	_response.setStatusCode(code);
 	_response.setBodyBuffer(_error_handler->generateErrorBody(code));
+	_response.setState(READ);
+	this->setState(SENDING_RESPONSE);
 }
 
-void Client::setCgiPid(int pid)
+CgiProcess	*Client::getCgiProcess(void)
 {
-	_cgiPid = pid;
+	return (_cgi);
 }
-int	Client::getCgiPid()
-{
-	return _cgiPid;
-}
-void Client::closeCgiFd()
-{
-	if (_pipFromCgi != -1) {
-		close(_pipFromCgi);
-	}
-	if (_pipToCgi != -1) {
-		close(_pipToCgi);
-	}
-	_pipFromCgi = -1;
-	_pipToCgi = -1;
-	//add cgi process handling!?!? KILL???
-}
-void Client::setFromCgi(int fd)
-{
-	_pipFromCgi = fd;
-}
-int	Client::getFromCgi()
-{
-	return _pipFromCgi;
-}
-void Client::setToCgi(int fd)
-{
-	_pipToCgi = fd;
-}
-int	Client::getToCgi()
-{
-	return _pipToCgi;
-}
-
-// void	Client::setCgiPost(bool postFlg)
-// {
-// 	_checkCgiPost = postFlg;
-// }
-// bool	Client::getCgiPost()
-// {
-// 	return _checkCgiPost;
-// }
-void	Client::setCgiActive(bool flg)
-{
-	_cgiActive = flg;
-}
-bool	Client::checkCgiActive()
-{
-	return _cgiActive;
-}
-void Client::appendCgiOutputBuff(std::string buffer, size_t bytes)
-{
-	if (_cgiBuffer.empty()) {
-		_cgiBuffer = buffer;
-	}
-	else
-		_cgiBuffer.append(buffer, bytes);
-}
-std::string	Client::getCgiOutputBuff()
-{
-	return _cgiBuffer;
-}
-void Client::setCgiBodyWrite(size_t size)
-{
-	_cgiBodywrite = size;
-}
-size_t	Client::getCgiBodyWrite()
-{
-	return _cgiBodywrite;
-}
-
-void	Client::setCgiResponse(const HttpResponse Cgires)
-{
-	this->_response = Cgires;
-}
-
-// HttpResponse	&Client::getCgiResponse(void)
-// {
-// 	return (_cgiResponse);
-// }
-
-// bool	Client::checkCgiFlag()
-// {
-// 	return _hasCgi;
-// }
-
-// void	Client::setCgiFlag()
-// {
-// 	_hasCgi = true;
-// }
-// void	Client::resetCgiFlag(void)
-// {
-// 	_hasCgi = false;
-// }	

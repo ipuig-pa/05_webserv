@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:45:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 08:55:38 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ void LocationConf::setReturn(std::string s)
 // }
 
 //getters
-const std::string& LocationConf::getLocPath() const
+const std::string LocationConf::getLocPath() const
 {
 	return this->_locPath;
 }
@@ -224,7 +224,7 @@ std::vector<std::string> LocationConf::getMethodStr() const
 	return methods;
 }
 
-const std::string& LocationConf::getLocRoot() const
+const std::string LocationConf::getLocRoot() const
 {
 	return this->_locRoot;
 }
@@ -240,7 +240,7 @@ bool LocationConf::getLocAuto() const
 {
 	return this->_locAuto;
 }
-const std::string& LocationConf::getReturn() const
+std::string LocationConf::getReturn() const
 {
 	return this->_returnUrl;
 }

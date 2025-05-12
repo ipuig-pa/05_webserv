@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 12:08:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 11:23:03 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,14 +86,22 @@ void	MultiServer::_handleClosedConnections(void)
 void	MultiServer::_closeClientConnection(Client *client)
 {
 	//close associated file fd
-	int assoc_fd = client->getFileFd();
-	if (assoc_fd != -1) {
-		_eraseFromPoll(assoc_fd);
-		close(assoc_fd);
+	int file_fd = client->getFileFd();
+	if (file_fd != -1) {
+		_eraseFromPoll(file_fd);
+		close(file_fd);
 	}
+
 	//close associated CGI fd
-	client->closeCgiFd();
-	//add cgi process handling!?!? KILL???
+	if (CgiProcess *cgi = client->getCgiProcess())
+	{
+		if (cgi->getFromCgi() != -1)
+			_eraseFromPoll(cgi->getFromCgi());
+		if (cgi->getToCgi() != -1)
+			_eraseFromPoll(cgi->getToCgi());
+		delete (client->getCgiProcess());
+		client->setCgiProcess(nullptr);
+	}
 
 	//erase from _clients map
 	_clients.erase(client->getSocket());

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 12:00:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/06 13:04:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 16:53:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,11 @@ time_t	ConnectionTracker::getResponseStart(void)
 	return (_response_start);
 }
 
+time_t	ConnectionTracker::getCgiStart(void)
+{
+	return (_cgi_start);
+}
+
 void	ConnectionTracker::setConnectionStart(void)
 {
 	_connection_start = time(NULL);
@@ -49,4 +54,9 @@ void	ConnectionTracker::setLastActivity(void)
 void	ConnectionTracker::setResponseStart(void)
 {
 	_response_start = time(NULL);
+}
+
+void	ConnectionTracker::setCgiStart(void)
+{
+	_cgi_start = time(NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 17:40:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/11 12:41:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 HttpResponse::HttpResponse()
-	:_status(), _header(), _body_length(0), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0)
+	:_status(), _header(), _body_length(0), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0), _chunked(false)
 {
 }
 
@@ -77,12 +77,17 @@ void	HttpResponse::setState(responseState state)
 
 void	HttpResponse::setBytesRead(size_t bytes_read)
 {
-	_bytes_read += bytes_read;
+	_bytes_read = bytes_read; //needed? Add or set?!!?
 }
 
 void	HttpResponse::setBytesSent(size_t bytes_sent)
 {
-	_bytes_sent += bytes_sent;
+	_bytes_sent += bytes_sent; //needed? Add or set?!!?
+}
+
+void	HttpResponse::setChunked(bool chunked)
+{
+	_chunked = chunked;
 }
 
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
@@ -122,6 +127,11 @@ size_t	HttpResponse::getBytesSent(void)
 	return	_bytes_sent;
 }
 
+bool	HttpResponse::isChunked(void)
+{
+	return _chunked;
+}
+
 /*-------------METHODS--------------------------------------------------------*/
 
 void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
@@ -130,6 +140,8 @@ void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
 		_body_buffer = buffer;
 	else
 		_body_buffer.append(buffer, bytes_read);
+	_bytes_read += bytes_read;
+	_body_length += bytes_read;
 }
 
 //needed???
@@ -170,7 +182,7 @@ void	HttpResponse::checkMandatoryHeaders()
 		setHeaderField("Server", "webserv");
 	if (getHeader("Content-Type").empty())
 		LOG_ERR("No Content-Type header is found in HttpResponse");
-	if (getHeader("Content-Length").empty())
+	if (getHeader("Content-Length").empty() && !_chunked)
 		setHeaderField("Content-Length", std::to_string(_body_length));
 	// also include Connection: keep-alive or close?
 }

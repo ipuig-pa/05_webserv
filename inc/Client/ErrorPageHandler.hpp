@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 10:36:22 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/29 18:25:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 09:55:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "ServerConf.hpp"
 # include "Client.hpp"
+
 class Client;
 
 class ErrorPageHandler
