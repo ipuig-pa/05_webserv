@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 09:17:23 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 16:24:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/12 10:07:26 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,15 @@ class LocationConf;
 class CgiChecker
 {
 private:
-	static bool _hasCgiPara(LocationConf& loc);
-	static bool _validCgiIndex(LocationConf& loc);
+	static bool _hasCgiPara(const LocationConf& loc);
+	static bool _validCgiIndex(const LocationConf& loc);
 	static bool _validCgiPath(const std::vector<std::string>& _cgipath);
 	static bool _validExtension(const std::vector<std::string>& _cgiextend);
-	static bool _mapPathExtension(LocationConf& loc);
-	static bool _matchSize(LocationConf& loc);
+	// static bool _mapPathExtension(const LocationConf& loc);
+	static bool _matchSize(const LocationConf& loc);
 
 public:
-	static bool _checkCGI(LocationConf& loc);
+	static bool _checkCGI(const LocationConf& loc);
 };
 
 #endif

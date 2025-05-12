@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:55:24 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 09:57:37 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,12 @@ class LocationConf
 	void setReturn(std::string s);
 	
 	//CGI
-	void createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
+	void setPathExMap(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
+	//void createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
+	
 	bool isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath); //to check config file path, and assign the execuve path
 	void setCgiSysPath(std::vector<std::string> s);
 	void setCgiExtenion(std::vector<std::string> s);
-	// void setExPathMap(std::string& cgiExtension, std::string& cgiSysPath);
 	
 	//getters
 	const std::string getLocPath() const;

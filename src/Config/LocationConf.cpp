@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:55:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 11:53:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,23 +126,44 @@ void LocationConf::setCgiExtenion(std::vector<std::string> s)
 		std::cout << cgi_extension[i] << "\n";
 	}
 }
-void LocationConf::createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys)
+// void LocationConf::createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys)
+// {
+// 	if (ext.size() != cgiSys.size()) {
+// 		throw std::runtime_error("cgi unmatch!\n");
+// 	}
+// 	for (size_t i = 0; i < cgiSys.size(); ++i) {
+// 		_cgiExPathMap[ext[i]] = cgiSys[i];//creating map, ORDER MATTERS!
+// 	}
+// 	// for (auto it = getPathExMap().begin(); it != getPathExMap().end(); ++it) {
+// 	// 	// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
+// 	// 	std::cout << "\033[31mKey: " << it->first << ", Value: \033[0m" << it->second << std::endl;
+// 	// }
+// }
+void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std::vector<std::string>& cgiSys)
 {
-	if (ext.size() != cgiSys.size()) {
-		throw std::runtime_error("cgi unmatch!\n");
+	std::map<std::string, std::string> _path_extend;
+	for (size_t i = 0; i < _ext.size(); ++i) {
+		const std::string& ext = _ext[i];
+		for (size_t j = 0; j < cgiSys.size(); ++j)
+		{
+			if ((ext == ".php" || ext == "*.php") && (cgiSys[j].find("php") != std::string::npos)) {
+				_path_extend[".php"] = cgiSys[j];
+				LOG_DEBUG("Add PHP mapping: .php -> " + cgiSys[j]);
+			}
+			else if ((ext == ".py" || ext == "*.py") && (cgiSys[j].find("py") != std::string::npos)) {
+				_path_extend[".py"] = cgiSys[j];
+				LOG_DEBUG("Add Python mapping: .php -> " + cgiSys[j]);
+			}
+		}
 	}
-	for (size_t i = 0; i < cgiSys.size(); ++i) {
-		_cgiExPathMap[ext[i]] = cgiSys[i];//creating map, ORDER MATTERS!
-	}
-	// for (auto it = getPathExMap().begin(); it != getPathExMap().end(); ++it) {
-	// 	// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
-	// 	std::cout << "\033[31mKey: " << it->first << ", Value: \033[0m" << it->second << std::endl;
-	// }
+	this->_cgiExPathMap = _path_extend;
 }
+
 const std::map<std::string, std::string>& LocationConf::getPathExMap() const
 {
 	return this->_cgiExPathMap;
 }
+
 bool LocationConf::isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath)
 {
 	size_t pos = urlFromConf.rfind('.');//reverse find "xxx.py"
@@ -150,7 +171,7 @@ bool LocationConf::isValidExPathMap(const std::string& urlFromConf, std::string&
 		return false;
 	}
 	std::string ext = urlFromConf.substr(pos);//get ".php/.py"
-	std::cout << ext << "\n";
+	std::cout << ext << "\n";//debug message
 	std::map<std::string, std::string>::iterator it = _cgiExPathMap.find(ext);
 	// for (it = _cgiExPathMap.find(ext); it != _cgiExPathMap.end(); ++it) {
 		
@@ -163,13 +184,14 @@ bool LocationConf::isValidExPathMap(const std::string& urlFromConf, std::string&
 		// }
 		return false;
 	}
-	for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
-		std::cout << it_l->first << "\n";
-		std::cout << it_l->second << "\n";
-	}
+	// for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
+	// 	std::cout << it_l->first << "\n";
+	// 	std::cout << it_l->second << "\n";
+	// }
 	ConfSysPath = it->second;//pass the value for 'key'
 	return true;
 }
+
 void LocationConf::setLocIndex(std::string s)
 {
 	// _cleanLocTk(s);
@@ -189,10 +211,6 @@ void LocationConf::setReturn(std::string s)
 	// _cleanLocTk(s);
 	this->_returnUrl = s;
 }
-// void LocationConf::setPathExMap(std::map<std::string, std::string>& pathExtend)
-// {
-// 	this->_path_ext_match = pathExtend;
-// }
 
 //getters
 const std::string LocationConf::getLocPath() const

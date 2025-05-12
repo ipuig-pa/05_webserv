@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:55:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 10:38:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,12 +181,15 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
 	}
+	if (loc.getCgiExtension().size() != 0) {
+		loc.setPathExMap(loc.getCgiExtension(), loc.getCgiSysPath());
+	}
 	//debug message, remove later
 	std::map<std::string, std::string> _map = loc.getPathExMap();
 	for (auto it = _map.begin(); it != _map.end(); ++it) {
-		// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
-		std::cout << "\033[31mKey: " << it->first << " Value: \033[0m" << it->second << std::endl;
+		std::cout << "\033[31mKey: " << it->first << "\nValue: \033[0m" << it->second << std::endl;
 	}
+	
 	if (loc.getLocPath() == "/cgi") {
 		if (CgiChecker::_checkCGI(loc) != true) {
 			return ; //detailed error msg wrote in std::cerr alredy
@@ -237,7 +240,7 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 			throw std::runtime_error("Error: passed parameter in location is invalid" + _key);
 		}
 	}
-	locBlock.createCgiMatch(locBlock.getCgiExtension(), locBlock.getCgiSysPath());
+	//locBlock.createCgiMatch(locBlock.getCgiExtension(), locBlock.getCgiSysPath());
 	_wrapLocChecker(locBlock); //checks validity after parsing (cgi an static) and return err_msg
 }
 

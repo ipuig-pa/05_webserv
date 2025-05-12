@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 14:54:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/12 13:01:11 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,22 @@ bool CgiProcess::initCgi()
 {
 	int pipFromCgi[2] = {-1, -1};
 	int pipToCgi[2] = {-1, -1};
-
+	std::string cgiSysFromConf;
+	if (!_client->getLocationConf()->isValidExPathMap(_client->getRequest().getPath(), cgiSysFromConf)) {
+		LOG_ERR("\033[32mCGI request passed is invalid! (extension not in config file)\033[0m");
+		return false;
+	}
+	std::cout << "Corresponding cgi excutable path from config for CGI_ext is: "<< cgiSysFromConf << std::endl;
+	
+	LocationConf* locPTR = _client->getLocationConf();
+	if (locPTR != nullptr) {
+		if (!CgiChecker::_checkCGI(*locPTR)) {
+			return false;
+		}
+	} else {
+		//std::cerr << "Location{} block is NULL!\n";
+		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
+	}
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
 		LOG_ERR("\033[32mDEBUG messaga in pipe_CGI in requesthandler\033[0m");
 		cleanupCgiPipe(pipFromCgi, pipToCgi);
@@ -85,10 +100,17 @@ bool CgiProcess::initCgi()
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
 	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
-	av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
+	// av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
+	// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
+	av[0] = strdup(cgiSysFromConf.c_str());
 	std::cout << av[0] << std::endl;
-	av[1] = const_cast<char*>(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
+	// av[1] = const_cast<char*>(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
+	av[1] = strdup(_client->getRequest().getPath().c_str());
 	av[2] = NULL;
+	// std::vector<char*> av;
+	// av.push_back(strdup(cgiSysFromConf.c_str()));
+	// av.push_back(strdup(_client->getRequest().getPath().c_str()));
+	// av.push_back(NULL);
 	createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
 
 	pid_t cgiPid = fork();
@@ -125,10 +147,14 @@ bool CgiProcess::initCgi()
 			close(STDOUT_FILENO);
 			if (_client->getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
+			free(av[0]);
+			free(av[1]);
 			exit(1); //exit on error // allowed!?!?!?
 		}
 	}
 	//parent
+	// free(av[0]);
+	// free(av[1]);
 	_cgiPid = cgiPid;
 	_cgiActive = true;
 	_client->getTracker().setCgiStart();

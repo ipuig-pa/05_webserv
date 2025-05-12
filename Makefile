@@ -3,6 +3,7 @@ NAME = webserv
 CC = c++
 #CFLAGS = -Wall -Wextra -std=c++17 -Iinc -Iinc/Config -Iinc/Server -Iinc/Client -Iinc/Http -Iinc/RequestHandler -Iinc/Cgi -Iinc/Misc 
 CFLAGS = -Wall -Wextra -Werror -std=c++17 -Iinc -Iinc/Config -Iinc/Server -Iinc/Client -Iinc/Http -Iinc/RequestHandler -Iinc/Cgi -Iinc/Misc 
+# clang++ -g
 
 SRC_DIR = src
 OBJ_DIR = obj
