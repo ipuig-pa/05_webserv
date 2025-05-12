@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 12:26:21 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/12 08:51:55 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ bool CgiChecker::_mapPathExtension(LocationConf& loc)
 			}
 		}
 	}
-	loc.setPathExMap(_path_extend);
+	loc.setPathExMap(_path_extend);//check this setter
 	return !_path_extend.empty();
 }
 

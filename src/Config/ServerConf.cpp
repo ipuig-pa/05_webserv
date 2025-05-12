@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 16:29:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/12 08:41:46 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,10 +181,19 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
 	}
+	//debug message, remove later
+	std::map<std::string, std::string> _map = loc.getPathExMap();
+	for (auto it = _map.begin(); it != _map.end(); ++it) {
+		// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
+		std::cout << "\033[31mKey: " << it->first << " Value: \033[0m" << it->second << std::endl;
+	}
 	if (loc.getLocPath() == "/cgi") {
 		if (CgiChecker::_checkCGI(loc) != true) {
 			return ; //detailed error msg wrote in std::cerr alredy
 		}
+	// if (loc.getCgiExtension().size() != 0 && loc.getCgiSysPath().size() != 0) {
+	// 	loc.createCgiMatch();
+	// }
 	} else {
 		if (loc.getLocPath()[0] != '/') {
 			throw std::runtime_error("Error: path should start with '/'.");
@@ -228,6 +237,7 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 			throw std::runtime_error("Error: passed parameter in location is invalid" + _key);
 		}
 	}
+	locBlock.createCgiMatch(locBlock.getCgiExtension(), locBlock.getCgiSysPath());
 	_wrapLocChecker(locBlock); //checks validity after parsing (cgi an static) and return err_msg
 }
 
@@ -354,7 +364,7 @@ void ServerConf::parseCgiSysPath(LocationConf& loc, std::vector<std::string>& lo
 	while (++i < loc_tks.size())
 	{
 		if (_hasSemicolon(loc_tks[i])) {
-			rmvSemicolon(loc_tks[i]);
+			loc_tks[i] = rmvSemicolon(loc_tks[i]);
 			_cgiPath.push_back(loc_tks[i]);
 			break ;
 		}
@@ -365,6 +375,7 @@ void ServerConf::parseCgiSysPath(LocationConf& loc, std::vector<std::string>& lo
 			}
 		}
 	}
+	std::cout << "check semicolone romoved or not: path " << loc_tks[i] << "\n";
 	loc.setCgiSysPath(_cgiPath);
 }
 void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
@@ -376,7 +387,7 @@ void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& 
 	while (++i < loc_tks.size())
 	{
 		if (_hasSemicolon(loc_tks[i])) {
-			rmvSemicolon(loc_tks[i]);
+			loc_tks[i] = rmvSemicolon(loc_tks[i]);
 			_cgiExtend.push_back(loc_tks[i]);
 			break ;
 		}
@@ -387,6 +398,7 @@ void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& 
 			}
 		}
 	}
+	std::cout << "check semicolone romoved or not: extension" << loc_tks[i] << "\n";
 	loc.setCgiExtenion(_cgiExtend);
 }
 void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)

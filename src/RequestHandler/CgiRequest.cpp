@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 09:32:50 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/10 12:27:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,12 @@
 
 bool RequestHandler::initCgi(Client& client)
 {
+	std::string sysPathFromConf;
+	if (!client.getLocationConf()->isValidExPathMap(client.getRequest().getPath(), sysPathFromConf)) {
+		LOG_ERR("\033[32mCGI request passed is invalid! (not included in config file)\033[0m");
+		// std::cout << "\033[33mCGI request passed is invalid! (not included in config file)\033[0m" << std::endl;
+		return false;
+	}
 	int pipFromCgi[2] = {-1, -1};
 	int pipToCgi[2] = {-1, -1};
 
@@ -24,11 +30,11 @@ bool RequestHandler::initCgi(Client& client)
 		return false;
 	}
 	std::string cgiExtend = _getCgiExtension(client.getRequest().getUri());
-	std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
+	//std::string sysPath = _extSysPath(cgiExtend);//pathname + file being exec, the path to bin/bash/php
 	std::string scriptDir = _getScriptDir(client.getRequest().getPath());
 	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
-	av[0] = const_cast<char*>(sysPath.c_str()); //usr/local/python3
+	av[0] = const_cast<char*>(sysPathFromConf.c_str()); //usr/local/python3
 	av[1] = const_cast<char*>(client.getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? for the moment whole path, but I think we need to chdir to root in location and just pass the uri here
 	av[2] = NULL;
 	char** envp = createEnv(client.getRequest(), client.getRequest().getUri()); //store this envp somehow to be able to free it later
@@ -207,7 +213,8 @@ bool RequestHandler::validCgi(Client& client)
 
 bool RequestHandler::isCgiRequest(Client& client)
 {
-	std::string tmp = client.getRequest().getUri();
+	// std::string tmp = client.getRequest().getUri();
+	std::string tmp = client.getRequest().getPath();
 	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
 		return true;

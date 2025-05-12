@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 16:40:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/10 13:12:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class LocationConf
 	//for dynamic content
 	std::vector<std::string> cgi_sys_path; //run script to generate customized content
 	std::vector<std::string> cgi_extension; //for surfix to treat as CGI: .py; .php; ...
-	std::map<std::string, std::string> _path_ext_match;
+	std::map<std::string, std::string> _cgiExPathMap;//extension=sysPath map
 	bool _locAuto;
 	bool _autoflag; //flag to check repetition 
 	std::string _locIndex; //should be a vector? (there can be more that one index files??)
@@ -54,18 +54,23 @@ class LocationConf
 	// void setMethod(std::string s);
 	// bool _isAllowed(methodType _m) const;
 	bool _isSet() const;
+	//bool _isMethodSet() const;
 	void setMethod(std::vector<std::string>& s);
 	void setLocRoot(const std::string& s);
 	// void setLocCMBS(std::string s);
 	bool _cmbsSet() const;
 	void setLocCMBS(unsigned long long _size);
-	void setCgiSysPath(std::vector<std::string> s);
-	void setCgiExtenion(std::vector<std::string> s);
 	void setLocIndex(std::string s);
 	bool _autoSet() const;
 	void setLocAuto(bool _flag);
 	void setReturn(std::string s);
-	void setPathExMap(std::map<std::string, std::string>& pathExtend);
+	
+	//CGI
+	void createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
+	bool isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath); //to check config file path, and assign the execuve path
+	void setCgiSysPath(std::vector<std::string> s);
+	void setCgiExtenion(std::vector<std::string> s);
+	// void setExPathMap(std::string& cgiExtension, std::string& cgiSysPath);
 	
 	//getters
 	const std::string& getLocPath() const;
@@ -80,6 +85,7 @@ class LocationConf
 	const std::vector<std::string>& getCgiSysPath() const;
 	// const std::string& getCgiExtension() const;
 	const std::vector<std::string>& getCgiExtension() const;
+	
 	const std::map<std::string, std::string>& getPathExMap() const;
 
 	//clean

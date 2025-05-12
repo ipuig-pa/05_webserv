@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/05 14:40:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/12 08:45:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ LocationConf::LocationConf()
 	_methodSet = false;
 	_cmbsFlag = false;
 	_locCMBS = 1024*2;
-	// cgi_path = "";
+	// cgi_sys_path = "";
 	// cgi_extension = "";
 	_locAuto = false;
 	_autoflag = false;
@@ -52,6 +52,11 @@ bool LocationConf::_isSet() const
 {
 	return _methodSet;
 }
+// bool LocationConf::isMethodSet() const
+// {
+// 	return _methodSet;
+// }
+
 void LocationConf::setMethod(std::vector<std::string>& s)
 {
 	this->_methods[GET] = false;
@@ -110,10 +115,60 @@ void LocationConf::setCgiSysPath(std::vector<std::string> s)
 		}
 	}
 	this->cgi_sys_path = s;
+	for (size_t i = 0; i < cgi_sys_path.size(); ++i) {
+		std::cout << cgi_sys_path[i] << "\n";
+	}
 }
 void LocationConf::setCgiExtenion(std::vector<std::string> s)
 {
 	this->cgi_extension = s;
+	for (size_t i = 0; i < cgi_extension.size(); ++i) {
+		std::cout << cgi_extension[i] << "\n";
+	}
+}
+void LocationConf::createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys)
+{
+	if (ext.size() != cgiSys.size()) {
+		throw std::runtime_error("cgi unmatch!\n");
+	}
+	for (size_t i = 0; i < cgiSys.size(); ++i) {
+		_cgiExPathMap[ext[i]] = cgiSys[i];//creating map, ORDER MATTERS!
+	}
+	// for (auto it = getPathExMap().begin(); it != getPathExMap().end(); ++it) {
+	// 	// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
+	// 	std::cout << "\033[31mKey: " << it->first << ", Value: \033[0m" << it->second << std::endl;
+	// }
+}
+const std::map<std::string, std::string>& LocationConf::getPathExMap() const
+{
+	return this->_cgiExPathMap;
+}
+bool LocationConf::isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath)
+{
+	size_t pos = urlFromConf.rfind('.');//reverse find "xxx.py"
+	if (pos == std::string::npos) {
+		return false;
+	}
+	std::string ext = urlFromConf.substr(pos);//get ".php/.py"
+	std::cout << ext << "\n";
+	std::map<std::string, std::string>::iterator it = _cgiExPathMap.find(ext);
+	// for (it = _cgiExPathMap.find(ext); it != _cgiExPathMap.end(); ++it) {
+		
+	// }
+	if (it == _cgiExPathMap.end()) {
+		std::cout << "the extension from client is not stored in location block" << "\n";
+		// for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
+		// 	std::cout << it_l->first << "\n";
+		// 	std::cout << it_l->second << "\n";
+		// }
+		return false;
+	}
+	for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
+		std::cout << it_l->first << "\n";
+		std::cout << it_l->second << "\n";
+	}
+	ConfSysPath = it->second;//pass the value for 'key'
+	return true;
 }
 void LocationConf::setLocIndex(std::string s)
 {
@@ -134,10 +189,10 @@ void LocationConf::setReturn(std::string s)
 	// _cleanLocTk(s);
 	this->_returnUrl = s;
 }
-void LocationConf::setPathExMap(std::map<std::string, std::string>& pathExtend)
-{
-	this->_path_ext_match = pathExtend;
-}
+// void LocationConf::setPathExMap(std::map<std::string, std::string>& pathExtend)
+// {
+// 	this->_path_ext_match = pathExtend;
+// }
 
 //getters
 const std::string& LocationConf::getLocPath() const
@@ -189,6 +244,7 @@ const std::string& LocationConf::getReturn() const
 {
 	return this->_returnUrl;
 }
+
 // const std::string& LocationConf::getCgiPath() const;
 const std::vector<std::string>& LocationConf::getCgiSysPath() const
 {
@@ -199,10 +255,11 @@ const std::vector<std::string>& LocationConf::getCgiExtension() const
 {
 	return this->cgi_extension;
 }
-const std::map<std::string, std::string>& LocationConf::getPathExMap() const
-{
-	return this->_path_ext_match;
-}
+
+// const std::map<std::string, std::string>& LocationConf::getPathExMap() const
+// {
+// 	// return this->_path_ext_match;
+// }
 
 std::string	LocationConf::getErrPageCode(int status_code)
 {
