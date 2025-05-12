@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/12 13:01:11 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 15:19:12 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,6 @@ bool CgiProcess::initCgi()
 {
 	int pipFromCgi[2] = {-1, -1};
 	int pipToCgi[2] = {-1, -1};
-	std::string cgiSysFromConf;
-	if (!_client->getLocationConf()->isValidExPathMap(_client->getRequest().getPath(), cgiSysFromConf)) {
-		LOG_ERR("\033[32mCGI request passed is invalid! (extension not in config file)\033[0m");
-		return false;
-	}
-	std::cout << "Corresponding cgi excutable path from config for CGI_ext is: "<< cgiSysFromConf << std::endl;
 	
 	LocationConf* locPTR = _client->getLocationConf();
 	if (locPTR != nullptr) {
@@ -100,17 +94,16 @@ bool CgiProcess::initCgi()
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
 	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
-	// av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
+	//av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
 	// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
-	av[0] = strdup(cgiSysFromConf.c_str());
-	std::cout << av[0] << std::endl;
-	// av[1] = const_cast<char*>(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
-	av[1] = strdup(_client->getRequest().getPath().c_str());
+	// av[0] = strdup(cgiSysFromConf.c_str());
+	av[0] = const_cast<char*>(_getExtSysPath(*_client).c_str());
+	std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
+	av[1] = const_cast<char*>(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
+	// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
+	std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
+	// av[1] = strdup(_client->getRequest().getPath().c_str());
 	av[2] = NULL;
-	// std::vector<char*> av;
-	// av.push_back(strdup(cgiSysFromConf.c_str()));
-	// av.push_back(strdup(_client->getRequest().getPath().c_str()));
-	// av.push_back(NULL);
 	createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
 
 	pid_t cgiPid = fork();
@@ -131,6 +124,13 @@ bool CgiProcess::initCgi()
 			close(pipToCgi[0]);
 			close(pipToCgi[1]);
 		}
+		// else {//debug point for php case, just try this
+		// 	int devNull = open("/dev/null", O_RDONLY);
+        //     if (devNull >= 0) {
+        //         dup2(devNull, STDIN_FILENO);
+        //         close(devNull);
+        //     }
+		// }
 		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
 		// // LOG_DEBUG("printing envp");
 		// for (size_t i = 0; i < envp.size(); ++i) {
@@ -147,14 +147,12 @@ bool CgiProcess::initCgi()
 			close(STDOUT_FILENO);
 			if (_client->getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
-			free(av[0]);
-			free(av[1]);
+			// free(av[0]);
+			// free(av[1]);
 			exit(1); //exit on error // allowed!?!?!?
 		}
 	}
 	//parent
-	// free(av[0]);
-	// free(av[1]);
 	_cgiPid = cgiPid;
 	_cgiActive = true;
 	_client->getTracker().setCgiStart();
@@ -195,24 +193,33 @@ void	CgiProcess::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 
 //scalable function
 //SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
-std::string CgiProcess::_getExtSysPath(std::string	script_path)
+// std::string CgiProcess::_getExtSysPath(std::string	script_path)
+std::string	CgiProcess::_getExtSysPath(Client& client)
 {
 	std::string	cgiExt = "";
 
-	size_t pos = script_path.rfind('.');
-	if (pos != std::string::npos)
-		cgiExt = script_path.substr(pos); //eg: ".php"
-
+	size_t pos = client.getRequest().getUri().rfind('.');
+	if (pos != std::string::npos) {
+		cgiExt = client.getRequest().getUri().substr(pos); //eg: ".php"	
+	}
 	//Get from config file!!!
+	std::map<std::string, std::string> _pair = client.getLocationConf()->getPathExMap();
 	if (cgiExt == ".php") {
-		return ("/usr/bin/php");
+		std::map<std::string, std::string>::iterator it = _pair.find(".php");
+		if (it != _pair.end()) {
+			return (it->second);
+		}
 	}
 	else if (cgiExt == ".py") {
-		return ("/usr/local/bin/python3");
+		std::map<std::string, std::string>::iterator it = _pair.find(".py");
+		if (it != _pair.end()) {
+			return (it->second);
+		}
 	}
 	else {
-		return ("for debugging, ext can't match");	
+		LOG_ERR("\033[31mcannot find corresponding excutable path for the extension passed.\033[0m");
 	}
+	return cgiExt;
 }
 
 std::string	CgiProcess::_getScriptDir(std::string path)

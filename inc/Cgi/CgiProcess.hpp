@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 14:54:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/12 14:37:40 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ private:
 	void				createEnv(HttpRequest& httpReq, const std::string &req_url);
 	void				_convertToEnvp(std::vector<std::string>& envStr);
 	void				_cleanEnvp(void);
-	std::string			_getExtSysPath(std::string script_path);
+	// std::string			_getExtSysPath(std::string script_path);
+	std::string			_getExtSysPath(Client& client);
 	std::string		_getScriptDir(std::string path);
 	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
 	void			_appendCgiOutputBuff(std::string buffer, size_t bytes);

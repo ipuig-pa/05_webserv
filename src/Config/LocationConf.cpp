@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 11:53:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/12 15:02:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@ LocationConf::LocationConf()
 	_methodSet = false;
 	_cmbsFlag = false;
 	_locCMBS = 1024*2;
-	// cgi_sys_path = "";
-	// cgi_extension = "";
 	_locAuto = false;
 	_autoflag = false;
 	_locIndex = "";
@@ -126,19 +124,6 @@ void LocationConf::setCgiExtenion(std::vector<std::string> s)
 		std::cout << cgi_extension[i] << "\n";
 	}
 }
-// void LocationConf::createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys)
-// {
-// 	if (ext.size() != cgiSys.size()) {
-// 		throw std::runtime_error("cgi unmatch!\n");
-// 	}
-// 	for (size_t i = 0; i < cgiSys.size(); ++i) {
-// 		_cgiExPathMap[ext[i]] = cgiSys[i];//creating map, ORDER MATTERS!
-// 	}
-// 	// for (auto it = getPathExMap().begin(); it != getPathExMap().end(); ++it) {
-// 	// 	// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
-// 	// 	std::cout << "\033[31mKey: " << it->first << ", Value: \033[0m" << it->second << std::endl;
-// 	// }
-// }
 void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std::vector<std::string>& cgiSys)
 {
 	std::map<std::string, std::string> _path_extend;
@@ -152,7 +137,7 @@ void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std:
 			}
 			else if ((ext == ".py" || ext == "*.py") && (cgiSys[j].find("py") != std::string::npos)) {
 				_path_extend[".py"] = cgiSys[j];
-				LOG_DEBUG("Add Python mapping: .php -> " + cgiSys[j]);
+				LOG_DEBUG("Add Python mapping: .py -> " + cgiSys[j]);
 			}
 		}
 	}
@@ -164,33 +149,6 @@ const std::map<std::string, std::string>& LocationConf::getPathExMap() const
 	return this->_cgiExPathMap;
 }
 
-bool LocationConf::isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath)
-{
-	size_t pos = urlFromConf.rfind('.');//reverse find "xxx.py"
-	if (pos == std::string::npos) {
-		return false;
-	}
-	std::string ext = urlFromConf.substr(pos);//get ".php/.py"
-	std::cout << ext << "\n";//debug message
-	std::map<std::string, std::string>::iterator it = _cgiExPathMap.find(ext);
-	// for (it = _cgiExPathMap.find(ext); it != _cgiExPathMap.end(); ++it) {
-		
-	// }
-	if (it == _cgiExPathMap.end()) {
-		std::cout << "the extension from client is not stored in location block" << "\n";
-		// for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
-		// 	std::cout << it_l->first << "\n";
-		// 	std::cout << it_l->second << "\n";
-		// }
-		return false;
-	}
-	// for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
-	// 	std::cout << it_l->first << "\n";
-	// 	std::cout << it_l->second << "\n";
-	// }
-	ConfSysPath = it->second;//pass the value for 'key'
-	return true;
-}
 
 void LocationConf::setLocIndex(std::string s)
 {
@@ -226,7 +184,7 @@ bool LocationConf::getMethod(int method)
 std::vector<std::string> LocationConf::getMethodStr() const
 {
 	std::vector<std::string> methods;
-
+	
 	if (_methods[GET]) {
 		methods.push_back("GET");
 	}
@@ -274,15 +232,46 @@ const std::vector<std::string>& LocationConf::getCgiExtension() const
 	return this->cgi_extension;
 }
 
-// const std::map<std::string, std::string>& LocationConf::getPathExMap() const
-// {
-// 	// return this->_path_ext_match;
-// }
-
 std::string	LocationConf::getErrPageCode(int status_code)
 {
 	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
 	if (it != _error_page.end())
-		return it->second;
+	return it->second;
 	return "";
 }
+	
+	// bool LocationConf::isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath)
+	// {
+		// 	size_t pos = urlFromConf.rfind('.');//reverse find "xxx.py"
+		// 	if (pos == std::string::npos) {
+			// 		return false;
+			// 	}
+			// 	std::string ext = urlFromConf.substr(pos);//get ".php/.py"
+			// 	std::cout << "extension from config is: (msg from isvalidCgi() check): " << ext << "\n";//debug message
+			// 	std::map<std::string, std::string>::iterator it = _cgiExPathMap.find(ext);
+			
+			// 	if (it == _cgiExPathMap.end()) {
+				// 		std::cout << "the extension from client is not stored in location block" << "\n";
+				// 		return false;
+				// 	}
+				// 	// for (std::map<std::string, std::string>::iterator it_l; it_l != _cgiExPathMap.end(); ++it_l) {
+					// 	// 	std::cout << it_l->first << "\n";
+					// 	// 	std::cout << it_l->second << "\n";
+					// 	// }
+					// 	ConfSysPath = it->second;//pass the value for 'key'
+					// 	std::cout << "sys path from config is: (msg from isvalidCgi() check): " << ConfSysPath << "\n";
+					// 	return true;
+					// }
+	// void LocationConf::createCgiMatch(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys)
+	// {
+		// 	if (ext.size() != cgiSys.size()) {
+			// 		throw std::runtime_error("cgi unmatch!\n");
+			// 	}
+			// 	for (size_t i = 0; i < cgiSys.size(); ++i) {
+				// 		_cgiExPathMap[ext[i]] = cgiSys[i];//creating map, ORDER MATTERS!
+				// 	}
+					// 	// for (auto it = getPathExMap().begin(); it != getPathExMap().end(); ++it) {
+					// 	// 	// LOG_INFO("\033[31mKey: " + it->first + ", Value: \033[0m" + it->second);
+					// 	// 	std::cout << "\033[31mKey: " << it->first << ", Value: \033[0m" << it->second << std::endl;
+					// 	// }
+					// }
