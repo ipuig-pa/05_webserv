@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 15:02:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/13 12:11:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void LocationConf::setMethod(std::vector<std::string>& s)
 	}
 	this->_methodSet = true;
 }
-void LocationConf::setLocRoot(const std::string& s)
+void LocationConf::setLocRoot(std::string s)
 {
 	if (FileUtils::_pathType(s) != 3) {
 		throw std::runtime_error("Error: invalid root of location at setter stage: " + s);

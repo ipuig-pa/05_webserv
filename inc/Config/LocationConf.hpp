@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 09:57:37 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/13 11:45:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class LocationConf
 	bool _isSet() const;
 	//bool _isMethodSet() const;
 	void setMethod(std::vector<std::string>& s);
-	void setLocRoot(const std::string& s);
+	void setLocRoot(std::string s);
 	// void setLocCMBS(std::string s);
 	bool _cmbsSet() const;
 	void setLocCMBS(unsigned long long _size);

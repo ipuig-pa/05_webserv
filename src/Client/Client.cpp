@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 13:41:20 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/13 12:07:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ Client::~Client()
 	if (_file_fd != -1)
 		close(_file_fd);
 	delete (_error_handler);
-	delete (_currentLocConf);
 	if (_cgi) {
 		_cgi->cleanCloseCgi();
 		delete (_cgi);

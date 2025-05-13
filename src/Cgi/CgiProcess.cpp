@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/12 15:19:12 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/13 12:12:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,15 +97,17 @@ bool CgiProcess::initCgi()
 	//av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
 	// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
 	// av[0] = strdup(cgiSysFromConf.c_str());
-	av[0] = const_cast<char*>(_getExtSysPath(*_client).c_str());
-	std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
-	av[1] = const_cast<char*>(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
+	av[0] = strdup(_getExtSysPath(_client).c_str());
+	// std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
+	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
 	// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
-	std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
+	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 	// av[1] = strdup(_client->getRequest().getPath().c_str());
 	av[2] = NULL;
 	createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
+	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 
+	// std::cout << "about to INIT CGI" << std::endl;
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
 		LOG_ERR("\033[32mDEBUG messaga in fork_CGI in requesthandler\033[0m"); //runtime error or LOG_ERR?!?!?
@@ -113,7 +115,7 @@ bool CgiProcess::initCgi()
 		return false;
 	}
 	if (cgiPid == 0) {
-		// int fd_trial = open("/Users/ipuig-pa/Documents/05/05_Webserv_PERSONAL/www/cgi/test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		// int fd_trial = open("/Users/ipuig-pa/Documents/05/05_Webserv_PERSONAL/www/cgi/test2.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		// dup2(fd_trial, STDOUT_FILENO);
 		// close (fd_trial);
 		dup2(pipFromCgi[1], STDOUT_FILENO);
@@ -142,17 +144,23 @@ bool CgiProcess::initCgi()
 			std::cerr << "Failed to change to directory: " << scriptDir << " - " << strerror(errno) << std::endl;
 			exit(1); //allowed?!?!?
 		}
+		// LOG_DEBUG(std::string(av[1]));
+		// write(STDERR_FILENO, "Child av[1]: ", 13);
+		// write(STDERR_FILENO, av[1], strlen(av[1]));
+		// write(STDERR_FILENO, "\n", 1);
 		if (execve(av[0], av, _envp) == -1) {
 			LOG_ERR("\033[31mfail in execve\033[0m"); //this will be written in the child output, not in the normal terminal!!!!
 			close(STDOUT_FILENO);
 			if (_client->getRequest().getMethod() == POST)
 				close(STDIN_FILENO);
-			// free(av[0]);
-			// free(av[1]);
+			free(av[0]);
+			free(av[1]);
 			exit(1); //exit on error // allowed!?!?!?
 		}
 	}
 	//parent
+	free(av[0]);
+	free(av[1]);
 	_cgiPid = cgiPid;
 	_cgiActive = true;
 	_client->getTracker().setCgiStart();
@@ -194,31 +202,23 @@ void	CgiProcess::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 //scalable function
 //SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
 // std::string CgiProcess::_getExtSysPath(std::string	script_path)
-std::string	CgiProcess::_getExtSysPath(Client& client)
+std::string	CgiProcess::_getExtSysPath(Client* client)
 {
 	std::string	cgiExt = "";
 
-	size_t pos = client.getRequest().getUri().rfind('.');
+	size_t pos = client->getRequest().getUri().rfind('.');
 	if (pos != std::string::npos) {
-		cgiExt = client.getRequest().getUri().substr(pos); //eg: ".php"	
+		cgiExt = client->getRequest().getUri().substr(pos); //eg: ".php"	
 	}
-	//Get from config file!!!
-	std::map<std::string, std::string> _pair = client.getLocationConf()->getPathExMap();
-	if (cgiExt == ".php") {
-		std::map<std::string, std::string>::iterator it = _pair.find(".php");
-		if (it != _pair.end()) {
-			return (it->second);
-		}
-	}
-	else if (cgiExt == ".py") {
-		std::map<std::string, std::string>::iterator it = _pair.find(".py");
-		if (it != _pair.end()) {
-			return (it->second);
-		}
-	}
-	else {
+	std::cout << "CGI EXT: " << cgiExt << std::endl;
+	//Get from config file!!! 
+	//should we restrict the cgi we are handling?!?!??
+	std::map<std::string, std::string> _pair = client->getLocationConf()->getPathExMap();
+	std::map<std::string, std::string>::iterator it = _pair.find(cgiExt);
+	if (it != _pair.end())
+		return (it->second);
+	else
 		LOG_ERR("\033[31mcannot find corresponding excutable path for the extension passed.\033[0m");
-	}
 	return cgiExt;
 }
 

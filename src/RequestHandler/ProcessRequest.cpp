@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 16:51:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/13 12:10:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ std::string	RequestHandler::getPathFromUri(Client &client)
 	if (!relativePath.empty() && relativePath[0] != '/') {
 		relativePath = "/" + relativePath;
 	}
+	// std::string final = locationRoot + relativePath;
+	// std::cout << "LOC ROOT: " << locationRoot << " OR " << location->getLocRoot() << " OR " << config.getRoot() <<std::endl;
 	return locationRoot + relativePath;
 }
 
