@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 12:39:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/13 14:22:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,9 +72,13 @@ void	MultiServer::run()
 			break;
 		}
 
+		// std::cout << "POLL data " << _poll.data() << std::endl;
+		// std::cout << "POLL revents " << _poll.size() << std::endl;
+
 		for (int i = _poll.size() - 1; i >= 0; i--) {
 			int fd = _poll[i].fd;
 
+			// std::cout << "POLL revents[" << i << "]: " << _poll[i].fd << std::endl;
 			//listening socket case
 			if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end() && _poll[i].revents & POLLIN) {
 				LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/12 14:14:16 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/13 13:40:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void	CgiProcess::_convertToEnvp(std::vector<std::string>& envStr)
 		_envp[i] = new char[len + 1]; //null-term each directive
 		std::strncpy(_envp[i], envStr[i].c_str(), len);
 		_envp[i][len] = '\0';
-		std::cout << "envp[" << i <<"] = " << _envp[i] << std::endl;
+		// std::cout << "envp[" << i <<"] = " << _envp[i] << std::endl;
 	}
 	_envp[envStr.size()] = nullptr;
 }

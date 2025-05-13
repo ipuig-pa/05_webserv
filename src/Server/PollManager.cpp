@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 12:52:09 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/13 14:20:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	MultiServer::_newFdsToPoll(Client *client)
 			LOG_INFO("Writing pipe end with fd " + std::to_string(to_cgi) + " has been linked with client at socket " + std::to_string(client->getSocket()));
 			_poll.push_back((struct pollfd) { to_cgi, POLLOUT, 0 });
 		}
-		else if (client->getCgiProcess() && client->getCgiProcess()->getFromCgi()!= -1) {
+		if (client->getCgiProcess()->getFromCgi()!= -1) {
 			int from_cgi = client->getCgiProcess()->getFromCgi();
 			LOG_INFO("Reading pipe end with fd " + std::to_string(from_cgi) + " has been linked with client at socket " + std::to_string(client->getSocket()));
 			_poll.push_back((struct pollfd) { from_cgi, POLLIN, 0 });
@@ -51,7 +51,7 @@ void	MultiServer::_newFdsToPoll(Client *client)
 
 void	MultiServer::_handlePollErr(int fd, int i)
 {
-	std::map<int, Client*>::iterator it_c = _clients.begin();
+	std::map<int, Client*>::iterator it_c;
 
 	if (_poll[i].revents & POLLHUP) {
 		for (it_c = _clients.begin(); it_c != _clients.end(); ++it_c) {
