@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/13 12:07:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 19:21:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // }
 
 Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
+	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
 {
 	_error_handler = new ErrorPageHandler(this);
 }
@@ -53,12 +53,15 @@ std::string	Client::getStateString(clientState state) {
 	switch (state) {
 		case NEW_CONNECTION: return "NEW_CONNECTION";
 		case NEW_REQUEST: return "NEW_REQUEST";
+		case CONTINUE_REQUEST: return "CONTINUE_REQUEST";
 		case READING_REQUEST: return "READING_REQUEST";
 		case PROCESSING: return "PROCESSING";
 		case READING_CGI: return "READING_CGI";
 		case WRITING_CGI: return "WRITING_CGI";
 		case SENDING_RESPONSE: return "SENDING_RESPONSE";
+		case SENDING_CONTINUE: return "SENDING_CONTINUE";
 		case CONNECTION_CLOSED: return "CONNECTION_CLOSED";
+		case BOUNCED: return "BOUNCED";
 		default: return "UNKNOWN_STATE";
 	}
 }
@@ -99,11 +102,16 @@ void	Client::setState(clientState state)
 	LOG_INFO("Client at socket " + std::to_string(_socket) + " change state to " + Client::getStateString(state));
 	if (state == SENDING_RESPONSE)
 		this->_tracker.setResponseStart();
-	if (state == NEW_REQUEST) {
+	else if (state == NEW_REQUEST) {
 		this->getParser().reset();
 		this->getRequest().reset();
 		this->getResponse().reset();
 	}
+}
+
+size_t	Client::getMaxBodySize(void)
+{
+	return (_max_body_size);
 }
 
 void	Client::setFileFd(int file_fd)
@@ -185,6 +193,16 @@ bool	Client::sendResponseChunk(void)
 	//else set it as already sent
 }
 
+bool	Client::sendContinue(void)
+{
+	const char* response = "HTTP/1.1 100 Continue\r\n\r\n";
+	size_t sent = send(_socket, response, strlen(response), 0);
+	if (sent < 0)
+		return false;
+	return true;
+}
+
+
 void	Client::setServerConf(ServerConf &conf)
 {
 	_currentServerConf = conf;
@@ -207,4 +225,16 @@ void	Client::sendErrorResponse(int code)
 CgiProcess	*Client::getCgiProcess(void)
 {
 	return (_cgi);
+}
+
+void	Client::defineMaxBodySize(void)
+{
+	// TO IMPLEMENT!!!!! GET MAX BODY SIZE IN LOCATION CONF!!!
+	// if (_currentLocConf && !(_currentLocConf->getMaxBodySize() != -1))
+	// 	_max_body_size = _currentLocConf->getMaxBodySize();
+	// else 
+	if (_currentServerConf.getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
+		_max_body_size = _currentServerConf.getMaxBodySize();
+	else
+		_max_body_size = DEFAULT_MAX_CLIENT_BODY;
 }

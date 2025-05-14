@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 14:48:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 16:29:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,11 @@ void HttpRequest::setVersion(const std::string s)
 void HttpRequest::setBody(const std::string body)
 {
 	this->_body = body;
+}
+
+void HttpRequest::appendBody(const std::string chunk, size_t length)
+{
+	_body.append(chunk, length);
 }
 
 void HttpRequest::setComplete(bool flag)

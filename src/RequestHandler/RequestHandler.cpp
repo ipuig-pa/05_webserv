@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 12:28:00 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 19:16:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,11 @@ void	RequestHandler::handleClientRead(Client &client)
 	// LOG_DEBUG("Reading client request...");
 	// processRequest(client);
 
-	if (client.getState() == NEW_CONNECTION || client.getState() == NEW_REQUEST || client.getState() == READING_REQUEST)
+	if (client.getState() == NEW_CONNECTION || client.getState() == NEW_REQUEST || client.getState() == READING_REQUEST || client.getState() == CONTINUE_REQUEST)
 	{
-		ssize_t bytesRead = read(client.getSocket(), buffer, sizeof(buffer));
+		ssize_t bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
 		std::cout << "already read " << bytesRead << "bytes." << std::endl;
+		std::cout << buffer << std::endl;
 		if (bytesRead > 0) {
 			if(client.getState() != READING_REQUEST)
 				client.setState(READING_REQUEST);
@@ -35,14 +36,16 @@ void	RequestHandler::handleClientRead(Client &client)
 			if (!client.getRequest().isComplete()) {
 				std::string	buffer_str(buffer);
 				client.getParser().appendBuffer(buffer_str, bytesRead);
-				if (client.getParser().httpParse())
+				if (client.getParser().httpParse(client))
 					client.setState(PROCESSING);
 			}
 		}
 		else if (bytesRead == 0)
 			client.setState(CONNECTION_CLOSED);
-		//else
-			// bytesRead < 0: handle error during reading
+		else if (bytesRead == -1) {
+			LOG_ERR("Failed to receive data from client at socket " + std::to_string(client.getSocket()) + ": " + std::string(strerror(errno)));
+			client.setState(CONNECTION_CLOSED);
+		}// bytesRead < 0: handle error during reading
 	}
 	if (client.getState() == PROCESSING) {
 			processRequest(client);
@@ -70,6 +73,14 @@ void	RequestHandler::handleClientWrite(Client &client)
 		//error handling??
 			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
 	}
+	if (client.getState() == SENDING_CONTINUE)
+	{
+		if (!client.sendContinue())
+		//error handling??
+			std::cerr << "Error sending continue" << std::endl; // change to proper behaviour
+		client.setState(CONTINUE_REQUEST);
+		return ;
+	}
 	std::cout << "sent " << client.getResponse().getBytesSent() << ".\nStatus: " << client.getResponse().statusToString().length() << ".\nHeader: " << client.getResponse().headersToString().length() << ".\nBody: " << client.getResponse().getHeader("Content-Length") << "/" << client.getResponse().getBodyLength() << "/" << client.getResponse().getBytesRead() << std::endl;
 	std::cout << "RESPO STATE: " << client.getResponse().getState() << std::endl;
 	if (client.getResponse().getState() == READ && (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() + client.getResponse().getBytesRead())))
@@ -79,7 +90,7 @@ void	RequestHandler::handleClientWrite(Client &client)
 			client.setState(CONNECTION_CLOSED);
 		else
 			// client.setState(CONNECTION_CLOSED);
-			client.setState(NEW_REQUEST); 
+			client.setState(NEW_REQUEST);
 	}
 }
 

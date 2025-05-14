@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/13 14:22:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 18:41:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	MultiServer::run()
 		}
 		_checkTimeouts();
 		// _checkCgi(); //ADD THIS FUNCTION TO MONITOR PERIODICALLY CGI STATE (Waitpid)
-		_handleClosedConnections();
+		_handleConnections();
 	}
 	return ;
 }

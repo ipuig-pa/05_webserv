@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:36 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:08:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/13 14:39:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,12 @@ bool CgiProcess::writeToCgi(void)
 		LOG_ERR("\033[31mfail to write to CGI stdin\033[0m");
 		return false;
 	}
-	close(_pipToCgi);
-	_pipToCgi = -1;
-	LOG_INFO("\033[31mCGI POST request for client: \033[0m" + std::to_string(_client->getSocket()));
-	return true;
+	else if (bodyWrt == cgi_body.size() && _client->getRequest().isComplete())
+	{
+		close(_pipToCgi);
+		_pipToCgi = -1;
+		LOG_INFO("\033[31mCGI POST request for client: \033[0m" + std::to_string(_client->getSocket()));
+		return true;
+	}
+	return false;
 }

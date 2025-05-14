@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 14:49:00 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 13:10:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ public:
 	void	setQueryPart(const std::string s);
 	void	setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
 	void	setBody(const std::string body);
+	void	appendBody(const std::string chunk, size_t length);
 	void	setComplete(bool flag); //flag for finsihing parsing or not
 	
 	//getters

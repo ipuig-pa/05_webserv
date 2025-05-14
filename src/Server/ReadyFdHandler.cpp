@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 12:29:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 18:53:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,11 @@
 void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHandler &req_hand)
 {
 	//handle reading from client
-	if (_poll[i].revents & POLLIN && (client->getState() == NEW_REQUEST || client->getState() == NEW_CONNECTION)) {
+	if (_poll[i].revents & POLLIN && (client->getState() == NEW_REQUEST || client->getState() == NEW_CONNECTION || client->getState() == CONTINUE_REQUEST)) {
 
 		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to read");
 		req_hand.handleClientRead(*(client));
 		_newFdsToPoll(client);
-	}
-
-	//change to writing mode
-	if (client->getState() == SENDING_RESPONSE && _poll[i].events == POLLIN) {
-		for (size_t i = 0; i < _poll.size(); i++) {
-			if (_poll[i].fd == fd) {
-				LOG_DEBUG("Client socket " + std::to_string(fd) + " changed to POLLOUT");
-				_poll[i].events = POLLOUT;
-				break;
-			}
-		}
 	}
 
 	//handle writing to client
