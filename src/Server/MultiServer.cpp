@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 18:41:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 15:55:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,21 +77,29 @@ void	MultiServer::run()
 
 		for (int i = _poll.size() - 1; i >= 0; i--) {
 			int fd = _poll[i].fd;
-
+	
 			// std::cout << "POLL revents[" << i << "]: " << _poll[i].fd << std::endl;
-			//listening socket case
-			if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end() && _poll[i].revents & POLLIN) {
-				LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
-				_acceptNewConnection(it_s->second);
+			if (_poll[i].revents & POLLIN) { //ready for reading / receiving
+				if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listenint socket case
+					LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
+					_acceptNewConnection(it_s->second);
+				}
+				else if(std::map<int, Client*>::iterator it_c = _clients.find(fd); it_c != _clients.end()) { //client socket case
+					LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to read");
+					req_hand.handleClientRead(*(it_c->second));
+					_newFdsToPoll(it_c->second);
+				}
+				else //file or cgi case
+					_handleInputFd(fd, req_hand);
 			}
-			//client socket case
-			else if (std::map<int, Client*>::iterator it_c = _clients.find(fd); it_c != _clients.end())
-				_handleClientSocket(fd, it_c->second, i, req_hand);
-			//file or cgi case
-			else if (_poll[i].revents & POLLIN)
-				_handleInputFd(fd, req_hand);
-			else if (_poll[i].revents & POLLOUT)
-				_handleOutputFd(fd);
+			else if (_poll[i].revents & POLLOUT) { //ready for writing / sending
+				if (std::map<int, Client*>::iterator it_c = _clients.find(fd); it_c != _clients.end()) { //client socket case
+					LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to write");
+					req_hand.handleClientWrite(*(it_c->second));
+				}
+				else //file or cgi case
+					_handleOutputFd(fd);
+			}
 			if (_poll[i].revents & (POLLERR | POLLHUP | POLLNVAL | POLLPRI))
 				_handlePollErr(fd, i);
 		}

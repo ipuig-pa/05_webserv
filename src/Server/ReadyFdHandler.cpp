@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 10:06:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 15:54:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,6 @@
 
 
 /*-------------METHODS--------------------------------------------------------*/
-
-void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHandler &req_hand)
-{
-	//handle reading from client
-	if (_poll[i].revents & POLLIN) { // && (client->getState() == NEW_REQUEST || client->getState() == NEW_CONNECTION || client->getState() == READING_REQUEST || client->getState() == CONTINUE_REQUEST)) {
-
-		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to read");
-		req_hand.handleClientRead(*(client));
-		_newFdsToPoll(client);
-	}
-
-	//handle writing to client
-	if (_poll[i].revents & POLLOUT) {
-		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to write");
-		req_hand.handleClientWrite(*(client));
-	}
-}
 
 void	MultiServer::_handleInputFd(int fd, RequestHandler &req_hand)
 {
