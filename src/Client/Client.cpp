@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 19:21:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 15:15:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,10 @@ ConnectionTracker	&Client::getTracker(void)
 
 void	Client::setState(clientState state)
 {
-	_state = state;
-	LOG_INFO("Client at socket " + std::to_string(_socket) + " change state to " + Client::getStateString(state));
+	if (_state != state) {
+		_state = state;
+		LOG_INFO("Client at socket " + std::to_string(_socket) + " change state to " + Client::getStateString(state));
+	}
 	if (state == SENDING_RESPONSE)
 		this->_tracker.setResponseStart();
 	else if (state == NEW_REQUEST) {
@@ -123,12 +125,22 @@ void	Client::setCgiProcess(CgiProcess *cgi)
 {
 	_cgi = cgi;
 }
-static std::string	getChunk(std::string buffer)
+static std::vector<char>	getChunk(const std::vector<char> &buffer)
 {
 	std::stringstream ss;
 	ss << std::hex << buffer.size();
+	std::string sizeHex = ss.str();
 
-	return (ss.str() + "\r\n" + buffer + "\r\n");
+	std::vector<char> chunk;
+	chunk.reserve(sizeHex.length() + 2 + buffer.size() + 2);
+	chunk.insert(chunk.begin(), sizeHex.begin(), sizeHex.end());
+	chunk.push_back('\r');
+	chunk.push_back('\n');
+	chunk.insert(chunk.end(), buffer.begin(), buffer.end());
+	chunk.push_back('\r');
+	chunk.push_back('\n');
+	
+	return chunk;
 }
 bool	Client::sendResponseChunk(void)
 {
@@ -151,12 +163,12 @@ bool	Client::sendResponseChunk(void)
 	if (!_response.isChunked() && _response.getBodyLength() != 0)
 	{
 		// std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
-		if (!_response.getBodyBuffer().empty())
+		if (_response.getBodyBuffer().size() != 0)
 		{
-			size_t sent = send(_socket, _response.getBodyBuffer().c_str(), _response.getBodyBuffer().length(), 0);
+			size_t sent = send(_socket, _response.getBodyBuffer().data(), _response.getBodyBuffer().size(), 0);
 			if (sent < 0)
 				return false;
-			_response.setBodyBuffer("");
+			_response.clearBodyBuffer();
 			_response.setBytesSent(sent);
 			return true;
 		}
@@ -171,14 +183,14 @@ bool	Client::sendResponseChunk(void)
 	}
 	if (_response.isChunked()){
 		// std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
-		if (!_response.getBodyBuffer().empty()){
+		if (_response.getBodyBuffer().size() != 0){
 			// LOG_DEBUG("buffer is not empty");
-			std::string	chunk = getChunk(_response.getBodyBuffer());
-			size_t sent = send(_socket, chunk.c_str(), chunk.length(), 0);
+			std::vector<char>	chunk = getChunk(_response.getBodyBuffer());
+			size_t sent = send(_socket, chunk.data(), chunk.size(), 0);
 			if (sent < 0)
 				return false;
-			_response.setBytesSent(_response.getBodyBuffer().length());
-			_response.setBodyBuffer("");
+			_response.setBytesSent(_response.getBodyBuffer().size());
+			_response.clearBodyBuffer();
 			// std::cout << chunk << std::endl;
 		}
 		if (_response.getState() == READ && _response.getBytesSent() == (_response.statusToString().length() + _response.headersToString().length() + _response.getBytesRead())){
@@ -217,7 +229,9 @@ void	Client::sendErrorResponse(int code)
 {
 	LOG_ERR("Error " + std::to_string(code) + " occurred");
 	_response.setStatusCode(code);
-	_response.setBodyBuffer(_error_handler->generateErrorBody(code));
+	std::string error_page = _error_handler->generateErrorBody(code);
+	std::vector<char> error_vector(error_page.begin(), error_page.end());
+	_response.setBodyBuffer(error_vector);
 	_response.setState(READ);
 	this->setState(SENDING_RESPONSE);
 }

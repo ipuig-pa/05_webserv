@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 19:46:13 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 15:30:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 #include "Client.hpp"
 
 HttpReqParser::HttpReqParser(HttpRequest &request)
-	: _stage(REQ_LINE), _bodyLength(0), _buffer(""), _header_complete(false), _chunked(false), _chunk_complete(false), _chunk_size(0), _httpReq(request)
+	: _stage(REQ_LINE), _bodyLength(0), _buffer(), _header_complete(false), _chunked(false), _chunk_complete(false), _chunk_size(0), _httpReq(request)
 {
+	_buffer.reserve(BUFF_SIZE);
 }
 HttpReqParser::~HttpReqParser() {}
 
@@ -58,23 +59,45 @@ std::string	HttpReqParser::_getPathFromUri(Client &client)
 	return locationRoot + relativePath;
 }
 
+std::vector<char>::const_iterator	HttpReqParser::_findEndOfLine()
+{
+	static const std::vector<char> pattern = {'\r', '\n'};
+
+	auto end_it = std::search(_buffer.begin(), _buffer.end(), 
+						  pattern.begin(), pattern.end());
+
+	return (end_it);
+}
+
+std::string	HttpReqParser::_takeLine()
+{
+	auto end_it = _findEndOfLine();
+	if (end_it == _buffer.end()) {
+		LOG_ERR("PARSE_Error: invalid request line. can't find '\\r\\n'");
+		_stage = PARSE_ERROR;
+		return "";
+	}
+	LOG_DEBUG("\\r\\n found in position " + std::to_string(end_it - _buffer.begin()));
+	size_t line_length = std::distance(_buffer.cbegin(), end_it);
+	std::string cur_line((_buffer.begin()), (_buffer.begin() + line_length));
+	_buffer.erase(_buffer.begin(), end_it + 2);
+	return (cur_line);
+}
+
 void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
 {
+	LOG_DEBUG("PARSING REQ LINE");
 	std::string method;
 	std::string url;
 	std::string ver;
-	size_t end = _buffer.find("\r\n");
-	if (end == std::string::npos) {
-		LOG_ERR("PARSE_Error: invalid request line. can't find '\\r\\n'");
-		_stage = PARSE_ERROR;
+
+	std::string cur_line = _takeLine();
+	if (_stage == PARSE_ERROR)
 		return ;
-	}
-	std::string cur_line = _buffer.substr(0, end);
-	_buffer.erase(0, end + 2); // erase until xxxx \r\n
+
 	std::istringstream tmp(cur_line);
 	tmp >> method >> url >> ver;
-	if (method.empty() || url.empty() || ver.empty())
-	{
+	if (method.empty() || url.empty() || ver.empty()) {
 		std::cerr << "PARSE_Error: invalid request line. should be M U V";
 		_stage = PARSE_ERROR;
 		return ;
@@ -85,12 +108,10 @@ void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
 	if (questionSign != std::string::npos) { //url is: xxxxx?xxxxx format
 		request.setUri(url.substr(0, questionSign + 1));
 		request.setQueryPart(url.substr(questionSign + 1));
-	} else {
+	} else
 		request.setUri(url);
-	}
 	std::string tmp_v = "HTTP/1.1";
-	if (tmp_v.compare(ver) != 0)
-	{
+	if (tmp_v.compare(ver) != 0) {
 		std::cerr << "PARSE_Error: invalid HTTP version";
 		_stage = PARSE_ERROR;
 		return ;
@@ -121,125 +142,111 @@ bool HttpReqParser::_singleHeaderLine(HttpRequest &request, const std::string& c
 
 void HttpReqParser::_parseHeader(HttpRequest &request, Client &client)
 {
+	LOG_DEBUG("PARSING HEADERS");
 	while (_stage == HEADERS) {
-		LOG_DEBUG(_buffer);
-		size_t end = _buffer.find("\r\n");
-		std::cout << "\\r\\n FOUND IN POS: " << end << std::endl;
-		if (end == std::string::npos) {
-			LOG_ERR("PARSE_Error: invalid header. can't find '\\r\\n'");
-			_stage = PARSE_ERROR;
-		}
-		else if (end > 0) {
-			std::string cur_line = _buffer.substr(0, end);
-			_buffer.erase(0, end + 2);
+		std::string cur_line = _takeLine();
+		if (_stage == PARSE_ERROR)
+			return ;
+		if (!cur_line.empty()) {
 			if (!_singleHeaderLine(request, cur_line)) {
 				_stage = PARSE_ERROR;
 			}
 		}
-		else if (end == 0) {
-			std::cout << "END OF HEADERS FOUND" << std::endl;
-			_buffer.erase(0, 2);										 // erase empty line (\r\n count as 2)
-			std::string _content = request.getHeaderVal("Content-Length"); // case sensitive or not?
-			if (_content.empty()) {
-				if (request.getHeaderVal("Transfer-Encoding") == "chunked") {
-					_chunked = true;
-					_stage = BODY;
-					_chunk_complete = false;
-					size_t end = _buffer.find("\r\n");
-					if (end != std::string::npos)
-						_chunk_complete = true;
-					LOG_DEBUG("it will be a chunked request " + std::to_string(_chunked) + "with the _chunk_complete set to " + std::to_string(_chunk_complete));
-					LOG_DEBUG(_buffer);
-					if (request.getHeaderVal("Expect") == "100-continue") {
-						client.setState(SENDING_CONTINUE);
-						_buffer.clear();
-					}
-				}
-				else { // no body part, this request finished
-					LOG_WARN("Content-Length header or Transfer-encoding:chunked was not found in HttpRequest. No body considered");
-					_stage = FINISH;
-					request.setComplete(true);
-				}
-			}
-			else {
-				try {
-					_bodyLength = std::stoul(_content);
-					if (_bodyLength > 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
-						_stage = BODY;
-						if (request.getHeaderVal("Expect") == "100-continue") {
-							client.setState(SENDING_CONTINUE);
-							_buffer.clear();
-						}
-						return ;
-					}
-					else if (_bodyLength > client.getMaxBodySize()) {
-						client.sendErrorResponse(413); //Payload Too Large
-						_stage = PARSE_ERROR;
-					}
-					else if (_bodyLength < 0)
-						_stage = PARSE_ERROR;
-				}
-				catch (const std::exception& e) {
-					LOG_ERR("PARSE_Error: invalid Content-Length value");
-					_stage = PARSE_ERROR;
-				}
-			}
+		else if (cur_line.empty()) {
+			_prepareBodyParsing(request, client);
 		}
 	}
 }
 
+void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
+{
+	std::string _content_len = request.getHeaderVal("Content-Length"); // case sensitive or not?
+	if (_content_len.empty()) {
+		if (request.getHeaderVal("Transfer-Encoding") == "chunked") {
+			_chunked = true;
+			_stage = BODY;
+			_checkChunkCompletion();
+			LOG_DEBUG("it will be a chunked request " + std::to_string(_chunked) + "with the _chunk_complete set to " + std::to_string(_chunk_complete));
+			if (request.getHeaderVal("Expect") == "100-continue") {
+				client.setState(SENDING_CONTINUE);
+				_buffer.clear();
+			}
+		}
+		else { // no body part, this request finished
+			LOG_WARN("Content-Length header or Transfer-encoding:chunked was not found in HttpRequest. No body considered");
+			_stage = FINISH;
+			request.setComplete(true);
+		}
+	}
+	else {
+		try {
+			_bodyLength = std::stoul(_content_len);
+			if (_bodyLength > 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
+				_stage = BODY;
+				if (request.getHeaderVal("Expect") == "100-continue") {
+					client.setState(SENDING_CONTINUE);
+					_buffer.clear();
+				}
+				return ;
+			}
+			else if (_bodyLength > client.getMaxBodySize())
+				client.sendErrorResponse(413); //Payload Too Large
+			_stage = PARSE_ERROR;
+		}
+		catch (const std::exception& e) {
+			LOG_ERR("PARSE_Error: invalid Content-Length value");
+			_stage = PARSE_ERROR;
+		}
+	}
+}
+
+
 bool	HttpReqParser::_parseChunkSize(Client &client)
 {
-	_chunk_complete = false;
-	size_t end = _buffer.find("\r\n");
+	auto end_it = _findEndOfLine();
 	
-	LOG_DEBUG("ABOUT TO PROCESS CHUNK SIZE:" + _buffer);
-	if (end != std::string::npos) {
-		std::istringstream iss(_buffer.substr(0, end));
+	std::string buffer_str(_buffer.begin(), _buffer.end()); //DELETE, JUST TO PRINT TESTING
+	LOG_DEBUG("ABOUT TO PROCESS CHUNK SIZE:" + buffer_str);
+	if (end_it == _buffer.end()) {
+		LOG_ERR("PARSE_Error: no \"\\r\\n\" found in Chunk size");
+		_stage = PARSE_ERROR;
+	}
+	else {
+		std::istringstream iss(_takeLine());
 		iss >> std::hex >> _chunk_size;
 		if (iss.fail()) {
 			LOG_ERR("PARSE_Error: invalid Hex format in chunk size");
 			_stage = PARSE_ERROR;
 			return false;
 		}
-		_buffer.erase(0, end + 2);
-	}
-	else {
-		LOG_ERR("PARSE_Error: no \"\\r\\n\" found in Chunk size");
-		_stage = PARSE_ERROR;
 	}
 	LOG_DEBUG("CHUNK SIZE: " + std::to_string(_chunk_size));
 	if (_chunk_size == 0) {
 		_buffer.clear();
 		return true;
 	}
-	end = _buffer.find("\r\n"); //should I also look for /n?
-	if (end != std::string::npos){
-		_chunk_complete = true;
-		LOG_DEBUG("CHUNK REALLY COMPLETE");
-	}
 	else if (_bodyLength + _chunk_size > client.getMaxBodySize())
 		client.sendErrorResponse(413); //Payload Too Large
-	LOG_DEBUG("CHUNK NOT COMPLETE");
+	_checkChunkCompletion();
 	return false;
 }
 
 void	HttpReqParser::_parseChunk(HttpRequest &request)
 {
-	_chunk_complete = false;
-
-	LOG_DEBUG("ABOUT TO PROCESS CHUNK:" + _buffer);
-	size_t end = _buffer.find("\r\n");
-	if (end != std::string::npos) {
-		std::string	tmp_buffer = _buffer.substr(0, end);
-		if (!(tmp_buffer.size() == _chunk_size)) {
+	std::string buffer_str(_buffer.begin(), _buffer.end()); //DELETE, JUST TO PRINT TESTING
+	LOG_DEBUG("ABOUT TO PROCESS CHUNK SIZE:" + buffer_str);
+	auto end_it = _findEndOfLine();
+	if (end_it != _buffer.end()) {
+		size_t chunk_length = std::distance(_buffer.cbegin(), end_it);
+		if (!(chunk_length == _chunk_size)) {
 			LOG_ERR("PARSE_Error: chunk size non matching");
 			_stage = PARSE_ERROR;
 		}
-		request.appendBody(tmp_buffer, _chunk_size);
-		_buffer.erase(0, end + 2); // \r\n also erased
+		request.appendBody(_buffer, _chunk_size);
+		_buffer.erase(_buffer.begin(), end_it + 2);
 		_bodyLength += _chunk_size;
 		_chunk_size = 0;
+		_checkChunkCompletion();
 		return ;
 	}
 	LOG_ERR("PARSE_Error: no \"\\r\\n\" found in Chunk");
@@ -281,17 +288,44 @@ void	HttpReqParser::_parseBody(HttpRequest &request, Client &client)
 	}
 }
 
-void	HttpReqParser::appendBuffer(const std::string data, size_t length)
+void	HttpReqParser::_checkHeaderCompletion()
 {
-	if (_buffer.empty())
-		_buffer = data;
-	_buffer.append(data, length);
-	size_t end = _buffer.find("\r\n\r\n");
-	if (end != std::string::npos)
+	static const std::vector<char> pattern = {'\r', '\n', '\r', '\n'};
+
+	auto it = std::search(_buffer.begin(), _buffer.end(), 
+						  pattern.begin(), pattern.end());
+	
+	if (it != _buffer.end())
 		_header_complete = true;
-	end = _buffer.find("\r\n");
-	if (end != std::string::npos)
+}
+
+void	HttpReqParser::_checkChunkCompletion()
+{
+	auto it = _findEndOfLine();
+	if (it != _buffer.end())
 		_chunk_complete = true;
+	else
+		_chunk_complete = false;
+}
+
+void	HttpReqParser::appendBuffer(const std::vector<char> &new_data)
+{
+	if (_buffer.size() + new_data.size() > DEFAULT_MAX_CLIENT_BODY) {
+		throw 413;
+		return ;
+	}
+	if (_buffer.capacity() < _buffer.size() + new_data.size())
+		_buffer.reserve(_buffer.size() + new_data.size());
+	_buffer.insert(_buffer.end(), new_data.begin(), new_data.end());
+	
+	if (!_header_complete) {
+		_checkHeaderCompletion();
+	}
+	if (!_chunk_complete) {
+		_checkChunkCompletion();
+	}
+	std::string buffer_str(_buffer.begin(), _buffer.end()); //TO TEST
+	LOG_DEBUG("AFTER APPENDING TO BUFFER: " + buffer_str + "HEADER COMPLETION SET TO: " + std::to_string(_header_complete) + " CHUNK COMPLETION SET TO: " + std::to_string(_chunk_complete));
 }
 
 void HttpReqParser::reset()

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 12:41:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:51:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 HttpResponse::HttpResponse()
-	:_status(), _header(), _body_length(0), _body_buffer(""), _state(READING), _bytes_read(0), _bytes_sent(0), _chunked(false)
+	:_status(), _header(), _body_length(0), _body_buffer(), _state(READING), _bytes_read(0), _bytes_sent(0), _chunked(false)
 {
 }
 
@@ -65,9 +65,14 @@ void	HttpResponse::setBodyLength(size_t body_length)
 	_body_length = body_length;
 }
 
-void	HttpResponse::setBodyBuffer(const std::string buffer)
+void	HttpResponse::setBodyBuffer(const std::vector<char> &buffer)
 {
 	_body_buffer = buffer;
+}
+
+void	HttpResponse::clearBodyBuffer()
+{
+	_body_buffer.clear();
 }
 
 void	HttpResponse::setState(responseState state)
@@ -107,7 +112,7 @@ size_t	HttpResponse::getBodyLength(void) const
 	return _body_length;
 }
 
-std::string	HttpResponse::getBodyBuffer(void)
+std::vector<char>	&HttpResponse::getBodyBuffer(void)
 {
 	return _body_buffer;
 }
@@ -134,25 +139,13 @@ bool	HttpResponse::isChunked(void)
 
 /*-------------METHODS--------------------------------------------------------*/
 
-void	HttpResponse::appendBodyBuffer(const std::string buffer, size_t bytes_read)
+void	HttpResponse::appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read)
 {
-	if (_body_buffer.empty())
-		_body_buffer = buffer;
-	else
-		_body_buffer.append(buffer, bytes_read);
+	if (_body_buffer.capacity() < _body_buffer.size() + bytes_read)
+		_body_buffer.reserve(_body_buffer.size() + bytes_read);
+	_body_buffer.insert(_body_buffer.end(), buffer.begin(), buffer.begin() + bytes_read);
 	_bytes_read += bytes_read;
 	_body_length += bytes_read;
-}
-
-//needed???
-std::string	HttpResponse::toString() const
-{
-	std::stringstream	response;
-
-	response << _status.toString() << _header.toString() << "\r\n";
-	if (!_body_buffer.empty())
-		response << _body_buffer;
-	return response.str();
 }
 
 std::string	HttpResponse::statusToString() const
@@ -192,7 +185,7 @@ void	HttpResponse::reset()
 	_status = Status();
 	_header = Header();
 	_body_length = 0;
-	_body_buffer = "";
+	_body_buffer.clear();
 	_state = READING;
 	_bytes_read = 0;
 	_bytes_sent = 0;

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 16:12:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 12:44:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,13 +142,11 @@ bool	RequestHandler::handleFileRead(Client &client)
 	LOG_DEBUG("Reading file " + std::to_string(client.getFileFd()) + " ...");
 	if (client.getResponse().getState() == READING)
 	{
-		char buffer[BUFF_SIZE]; //Adjust buffer size
-		size_t bytesRead = read(client.getFileFd(), buffer, sizeof(buffer));
-		if (bytesRead > 0)
-		{
-			buffer[bytesRead] = '\0';
-			std::string	buffer_str(buffer);
-			client.getResponse().appendBodyBuffer(buffer_str, bytesRead);
+		std::vector<char> buffer(BUFF_SIZE); //Adjust buffer size
+		size_t bytesRead = read(client.getFileFd(), buffer.data(), sizeof(buffer));
+		if (bytesRead > 0) {
+			buffer.resize(bytesRead);
+			client.getResponse().appendBodyBuffer(buffer, bytesRead);
 			LOG_INFO(std::to_string(bytesRead) + " bytes read from file " + std::to_string(client.getFileFd()) + "linked to client " + std::to_string(client.getSocket()));
 			return (false);
 		}

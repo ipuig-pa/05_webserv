@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/13 10:39:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 12:51:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ private:
 	int			_pipFromCgi;//read from cgi stdout
 	int			_pipToCgi; //for POST body -> stdin
 	int			_cgiPid;
-	std::string	_cgiBuffer;
+	std::vector<char>	_cgiBuffer;
 	bool		_cgiActive;
 	bool		_headers_sent;
 	std::string	_script_path;
@@ -38,10 +38,11 @@ private:
 	std::string			_getExtSysPath(Client *client);
 	std::string		_getScriptDir(std::string path);
 	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
-	void			_appendCgiOutputBuff(std::string buffer, size_t bytes);
+	void			_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes);
 	void			_cgiHeadersToResponse();
 	void			_addHeaderToResponse(const std::string& line, HttpResponse& response);
 	void			_checkChunkedTransfer(HttpResponse &response);
+	bool			_checkHeaderCompletion();
 
 public:
 	CgiProcess(Client *client);

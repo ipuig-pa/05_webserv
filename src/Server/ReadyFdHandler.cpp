@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/14 18:53:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 10:06:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHandler &req_hand)
 {
 	//handle reading from client
-	if (_poll[i].revents & POLLIN && (client->getState() == NEW_REQUEST || client->getState() == NEW_CONNECTION || client->getState() == CONTINUE_REQUEST)) {
+	if (_poll[i].revents & POLLIN) { // && (client->getState() == NEW_REQUEST || client->getState() == NEW_CONNECTION || client->getState() == READING_REQUEST || client->getState() == CONTINUE_REQUEST)) {
 
 		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to read");
 		req_hand.handleClientRead(*(client));
@@ -29,8 +29,6 @@ void	MultiServer::_handleClientSocket(int fd, Client *client, int i, RequestHand
 	if (_poll[i].revents & POLLOUT) {
 		LOG_DEBUG("Client socket " + std::to_string(fd) + " is ready to write");
 		req_hand.handleClientWrite(*(client));
-		if (client->getState() == NEW_REQUEST)
-			_poll[i].events = POLLIN;
 	}
 }
 

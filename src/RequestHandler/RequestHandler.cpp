@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/14 19:16:17 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:45:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ RequestHandler::~RequestHandler(){}
 
 void	RequestHandler::handleClientRead(Client &client)
 {
-	char buffer[BUFF_SIZE]; //Adjust buffer size
+	std::vector<char> buffer(BUFF_SIZE); //Adjust buffer size
 
 	// (void) client; // FOR TESTING
 	// LOG_DEBUG("Reading client request...");
@@ -26,18 +26,23 @@ void	RequestHandler::handleClientRead(Client &client)
 
 	if (client.getState() == NEW_CONNECTION || client.getState() == NEW_REQUEST || client.getState() == READING_REQUEST || client.getState() == CONTINUE_REQUEST)
 	{
-		ssize_t bytesRead = recv(client.getSocket(), buffer, sizeof(buffer), 0);
-		std::cout << "already read " << bytesRead << "bytes." << std::endl;
-		std::cout << buffer << std::endl;
+		client.setState(READING_REQUEST);
+		ssize_t bytesRead = recv(client.getSocket(), buffer.data(), sizeof(buffer), 0);
 		if (bytesRead > 0) {
-			if(client.getState() != READING_REQUEST)
-				client.setState(READING_REQUEST);
+			buffer.resize(bytesRead);
+			LOG_DEBUG("READ: " + std::to_string(bytesRead) + ": " + std::string(buffer.data()));
+			std::cout << "already read " << bytesRead << "bytes." << std::endl;
+			std::cout << buffer.data() << std::endl;
 			client.getTracker().setLastActivity();
 			if (!client.getRequest().isComplete()) {
-				std::string	buffer_str(buffer);
-				client.getParser().appendBuffer(buffer_str, bytesRead);
-				if (client.getParser().httpParse(client))
-					client.setState(PROCESSING);
+				try {
+					client.getParser().appendBuffer(buffer);
+					if (client.getParser().httpParse(client))
+						client.setState(PROCESSING);
+				}
+				catch(int error_code) {
+					client.sendErrorResponse(error_code); //413: Request entity too large
+				}
 			}
 		}
 		else if (bytesRead == 0)

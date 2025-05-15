@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 16:30:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 11:52:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,14 @@ enum reqStage {
 
 class HttpReqParser {
 private:
-	reqStage	_stage;
-	size_t		_bodyLength;
-	std::string	_buffer;
-	bool		_header_complete;
-	bool		_chunked;
-	bool		_chunk_complete;
-	size_t		_chunk_size;
-	HttpRequest	&_httpReq;
+	reqStage			_stage;
+	size_t				_bodyLength;
+	std::vector<char>	_buffer;
+	bool				_header_complete;
+	bool				_chunked;
+	bool				_chunk_complete;
+	size_t				_chunk_size;
+	HttpRequest			&_httpReq;
 
 	std::string	_getPathFromUri(Client &client);
 	void _parseReqLine(HttpRequest& request, Client &client);
@@ -44,6 +44,11 @@ private:
 	bool _singleHeaderLine(HttpRequest& request, const std::string& curLine);
 	bool	_parseChunkSize(Client &client);
 	void	_parseChunk(HttpRequest &request);
+	void	_checkHeaderCompletion();
+	void	_checkChunkCompletion();
+	std::vector<char>::const_iterator	_findEndOfLine();
+	std::string	_takeLine();
+	void	_prepareBodyParsing(HttpRequest &request, Client &client);
 	
 
 public:
@@ -52,7 +57,7 @@ public:
 	
 	void reset();
 	bool httpParse(Client &client);
-	void	appendBuffer(const std::string data, size_t length);
+	void	appendBuffer(const std::vector<char> &new_data);
 
 	//setter
 	// bool _setFinish(bool _flag);

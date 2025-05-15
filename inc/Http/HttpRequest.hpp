@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 13:10:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 12:36:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ private:
 	std::string	_path; //absolute path
 	std::string _queryPart;
 	std::string _version;
-	std::string	_body;
+	std::vector<char>	_body;
 	bool		_complete;
 
 public:
@@ -48,8 +48,8 @@ public:
 	void	setPath(const std::string path);
 	void	setQueryPart(const std::string s);
 	void	setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
-	void	setBody(const std::string body);
-	void	appendBody(const std::string chunk, size_t length);
+	void	setBody(const std::vector<char> &body);
+	void	appendBody(const std::vector<char> &chunk, size_t length);
 	void	setComplete(bool flag); //flag for finsihing parsing or not
 	
 	//getters
@@ -61,7 +61,7 @@ public:
 	std::string		getPath(void);
 	std::string		getQueryPart() const;
 	std::string		getVersion();
-	std::string		getBody();
+	std::vector<char>		&getBody();
 	bool			isComplete();
 
 	//method: reset status

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 16:11:17 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:17:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ private:
 	Status			_status;
 	Header			_header;
 	size_t			_body_length;
-	std::string		_body_buffer;
+	std::vector<char>		_body_buffer;
 	responseState	_state;
 	size_t			_bytes_read;
 	size_t			_bytes_sent;
@@ -47,7 +47,8 @@ public:
 	void		setStatusCode(int code);
 	void		setHeaderField(const std::string name, const std::string value);
 	void		setBodyLength(size_t body_length);
-	void		setBodyBuffer(const std::string buffer);
+	void		setBodyBuffer(const std::vector<char> &buffer);
+	void		clearBodyBuffer();
 	void		setState(responseState state);
 	void		setBytesRead(size_t bytes_read);
 	void		setBytesSent(size_t bytes_sent);
@@ -59,13 +60,12 @@ public:
 	size_t		getBodyLength(void) const;
 	size_t		getBytesRead(void);
 	size_t		getBytesSent(void);
-	std::string	getBodyBuffer(void);
+	std::vector<char>	&getBodyBuffer(void);
 	Status		&getStatus(void);
 	bool		isChunked(void);
 
 	//methods
-	void		appendBodyBuffer(const std::string buffer, size_t bytes_read);
-	std::string	toString() const; //needed?
+	void		appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read);
 	std::string	statusToString() const;
 	std::string	headersToString() const;
 	void		checkMandatoryHeaders();

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 12:09:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:39:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,6 @@ void	RequestHandler::handlePostRequest(Client &client)
 		return;
 	}
 
-	//check we do not overflow size limits
-	size_t contentLength = client.getRequest().getBody().size();
-	size_t maxBodySize = client.getServerConf().getMaxBodySize();
-	if (maxBodySize > 0 && contentLength > maxBodySize) {
-		client.sendErrorResponse(413); // Payload Too Large
-		return;
-	}
-	
 	std::ofstream file(path.c_str(), std::ios::binary);
 
 	if (!file.is_open()) {
@@ -39,14 +31,23 @@ void	RequestHandler::handlePostRequest(Client &client)
 		client.sendErrorResponse(500);
 		return ;
 	}
-	file << client.getRequest().getBody();
+
+	const std::vector<char>& body = client.getRequest().getBody();
+
+	//Change to add to poll, and write just from there!!!
+	if (!body.empty()) {
+		file.write(body.data(), body.size());
+	}
 	file.close();
-	
+
 	client.getResponse().setStatusCode(201); //created
 	client.getResponse().setHeaderField("Location", client.getRequest().getPath()); // URI should be there
 	client.getResponse().setHeaderField("Content-Type", "text/plain");
 	std::string responseBody = "File '" + path.substr(path.find_last_of('/') + 1) + "' was successfully uploaded.\n";
-	client.getResponse().setBodyBuffer(responseBody);
+	std::vector<char> responseVector(responseBody.begin(), responseBody.end());
+	client.getResponse().setBodyBuffer(responseVector);
 	client.getResponse().setBodyLength(responseBody.length());
+	client.getResponse().setState(READ);
+	client.getResponse().setBytesRead(responseBody.length());
 }
 

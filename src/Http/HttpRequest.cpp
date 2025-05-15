@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 16:29:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:50:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 HttpRequest::HttpRequest()
-	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _body(""), _complete(false)
+	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _body(), _complete(false)
 {
+	_body.reserve(BUFF_SIZE);
 }
 
 HttpRequest::~HttpRequest()
@@ -67,14 +68,16 @@ void HttpRequest::setVersion(const std::string s)
 	this->_version = s;
 }
 
-void HttpRequest::setBody(const std::string body)
+void HttpRequest::setBody(const std::vector<char> &body)
 {
 	this->_body = body;
 }
 
-void HttpRequest::appendBody(const std::string chunk, size_t length)
+void HttpRequest::appendBody(const std::vector<char> &chunk, size_t length)
 {
-	_body.append(chunk, length);
+	if (_body.capacity() < _body.size() + length)
+		_body.reserve(_body.size() + length);
+	_body.insert(_body.end(), chunk.begin(), chunk.begin() + length);
 }
 
 void HttpRequest::setComplete(bool flag)
@@ -139,7 +142,7 @@ std::string HttpRequest::getVersion()
 	return _version;
 }
 
-std::string HttpRequest::getBody()
+std::vector<char> &HttpRequest::getBody()
 {
 	return _body;
 }
