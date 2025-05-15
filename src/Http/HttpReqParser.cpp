@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 15:30:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:23:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,39 @@ bool HttpReqParser::httpParse(Client &client)
 	return _stage == FINISH;
 }
 
+//TODO in LocConf and ServerConf Parsing!!! (upload_store)
+std::string	HttpReqParser::_mapUploadPath(Client &client)
+{
+	(void) client;
+	return ("");
+// 	std::string	uripath = client.getRequest().getUri();
+// 	std::string uploadPath;
+// 	ServerConf	&config = client.getServerConf();
+// 	LocationConf *location = client.getLocationConf();
+// 	if (!location) {
+// 		uploadPath = config.getUpload();
+// 		if (uploadPath.empty())
+// 			return ("");
+// 	}
+// 	else {
+// 		uploadPath = location->getUpload();
+// 		if (uploadPath.empty())
+// 			uploadPath = config.getUpload();
+// 		if (uploadPath.empty())
+// 			return ("");
+// 	}
+// 	std::string locationRoot = location->getLocRoot();
+// 	if (locationRoot.empty())
+// 		locationRoot = config.getRoot();
+// 	std::string relativePath = uripath;
+// 	if (uripath.find(uploadPath) == 0) {
+// 		relativePath = uripath.substr(uploadPath.length());
+// 	}
+// 	if (!relativePath.empty() && relativePath[0] != '/') {
+// 		relativePath = "/" + relativePath;
+// 	}
+// 	return locationRoot + relativePath;
+}
 
 std::string	HttpReqParser::_getPathFromUri(Client &client)
 {
@@ -118,6 +151,8 @@ void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
 	}
 	request.setVersion(ver);
 	client.getRequest().setPath(_getPathFromUri(client));
+	if (request.getMethod() == POST || request.getMethod() == DELETE)
+		client.getRequest().setUpload(_mapUploadPath(client));
 	client.defineMaxBodySize();
 	_stage = HEADERS;
 }

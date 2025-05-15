@@ -6,25 +6,25 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 16:51:49 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:19:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
+
 //todo: need change
 void	RequestHandler::handlePostRequest(Client &client)
 {
-	std::string path = client.getRequest().getPath();
-
-	//check that directory exists and is writable
-	std::string directory = path.substr(0, path.find_last_of('/'));
-	if (access(directory.c_str(), W_OK) != 0) {
+	// std::string uploadPath = client.getRequest().getUpload(); //should not be the path, but the upload at that location
+	std::string uploadPath = client.getRequest().getPath(); //should not be the path, but the upload at that location
+	std::string directory = uploadPath.substr(0, uploadPath.find_last_of('/'));
+	if (uploadPath.empty() || access(directory.c_str(), W_OK) != 0) {
 		client.sendErrorResponse(403); // Forbidden
 		return;
 	}
 
-	int file_fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	int file_fd = open(uploadPath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 	if (file_fd == -1) {
 		client.sendErrorResponse(500); // Not Found
@@ -39,6 +39,22 @@ void	RequestHandler::handlePostRequest(Client &client)
 	
 	client.setFileFd(file_fd);
 }
+
+std::string RequestHandler::_getAbsoluteUrl(Client& client, const std::string& uri)
+{
+	std::string scheme = "http://";
+	std::string host= client.getRequest().getHeaderVal("Host");
+
+	if (host.empty()) {
+		host = client.getServerConf().getHost();
+		int port = client.getServerConf().getPort();
+		if (port != 80) {
+			host += ":" + std::to_string(port);
+		}
+	}
+	return scheme + host + uri;
+}
+
 
 bool	RequestHandler::handleFileWrite(Client &client)
 {
@@ -59,8 +75,8 @@ bool	RequestHandler::handleFileWrite(Client &client)
 	}
 	if (client.getRequest().getPostBytesWritten() == body.size()) {
 		close(file_fd);
-		client.getResponse().setStatusCode(201); // created
-		client.getResponse().setHeaderField("Location", client.getRequest().getPath()); // URI should be there!?!?
+		client.getResponse().setStatusCode(201); // succesfully created
+		client.getResponse().setHeaderField("Location", _getAbsoluteUrl(client, client.getRequest().getUri()));
 		client.getResponse().setHeaderField("Content-Type", "text/plain");
 		std::string responseBody = "File '" + client.getRequest().getPath().substr(client.getRequest().getPath().find_last_of('/') + 1) + "' was successfully uploaded.\n";
 		std::vector<char> responseVector(responseBody.begin(), responseBody.end());
@@ -72,3 +88,4 @@ bool	RequestHandler::handleFileWrite(Client &client)
 	}
 	return false;
 }
+

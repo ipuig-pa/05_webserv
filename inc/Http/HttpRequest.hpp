@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 12:36:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:12:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ private:
 	std::string	_path; //absolute path
 	std::string _queryPart;
 	std::string _version;
+	std::string	_upload_path;
 	std::vector<char>	_body;
+	size_t			_postBytesWritten;
 	bool		_complete;
 
 public:
@@ -50,7 +52,9 @@ public:
 	void	setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
 	void	setBody(const std::vector<char> &body);
 	void	appendBody(const std::vector<char> &chunk, size_t length);
+	void	addPostBytesWritten(size_t bytesWritten);
 	void	setComplete(bool flag); //flag for finsihing parsing or not
+	void	setUpload(std::string upload_path);
 	
 	//getters
 	std::string		getHeaderVal(const std::string& name) const;//needed?!!? -yes, this will check is there has a body or not
@@ -62,6 +66,8 @@ public:
 	std::string		getQueryPart() const;
 	std::string		getVersion();
 	std::vector<char>		&getBody();
+	size_t			getPostBytesWritten();
+	std::string		getUpload();
 	bool			isComplete();
 
 	//method: reset status

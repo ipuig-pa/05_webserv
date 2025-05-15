@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/14 11:29:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:21:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ private:
 	void		handleDirectoryRequest(Client &client);
 	void		handleDirectoryListing(Client &client);
 	void		_handleCgiRequest(Client &client);
-	// std::string	getPathFromUri(Client &client); //Moved to HttpReqParser
 	bool		checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
+	std::string	_getAbsoluteUrl(Client& client, const std::string& path);
 	
 public:
 	RequestHandler();
@@ -46,7 +46,7 @@ public:
 	void				processRequest(Client &client);
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
-	void				handleFileWrite(Client &client); //client or fd or what?
+	bool				handleFileWrite(Client &client); //client or fd or what?
 
 	bool				validCgi(Client& client);
 	// bool 		_forkErr(int& pip1, int& pip2);

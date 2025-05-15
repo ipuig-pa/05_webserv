@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 11:52:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:07:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ private:
 	std::vector<char>::const_iterator	_findEndOfLine();
 	std::string	_takeLine();
 	void	_prepareBodyParsing(HttpRequest &request, Client &client);
-	
+	std::string	_mapUploadPath(Client &client);
 
 public:
 	HttpReqParser(HttpRequest &request);

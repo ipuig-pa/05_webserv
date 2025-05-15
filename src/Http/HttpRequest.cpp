@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 16:40:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:13:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 HttpRequest::HttpRequest()
-	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _body(), _postBytesWritten(0), _complete(false)
+	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false)
 {
 	_body.reserve(BUFF_SIZE);
 }
@@ -90,6 +90,11 @@ void HttpRequest::setComplete(bool flag)
 	this->_complete = flag;
 }
 
+void HttpRequest::setUpload(std::string upload_path)
+{
+	_upload_path = upload_path;
+}
+
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
 std::string HttpRequest::getHeaderVal(const std::string& name) const
@@ -157,6 +162,11 @@ size_t	HttpRequest::getPostBytesWritten()
 	return _postBytesWritten;
 }
 
+std::string	HttpRequest::getUpload()
+{
+	return _upload_path;
+}
+
 bool HttpRequest::isComplete()
 {
 	return _complete;
@@ -176,6 +186,7 @@ void HttpRequest::reset()
 	_path.clear();
 	_queryPart.clear();
 	_version.clear();
+	_upload_path.clear();
 	_body.clear();
 	_postBytesWritten = 0;
 	_complete = false;
