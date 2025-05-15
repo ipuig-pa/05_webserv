@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 15:55:16 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 16:25:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	MultiServer::run()
 					req_hand.handleClientWrite(*(it_c->second));
 				}
 				else //file or cgi case
-					_handleOutputFd(fd);
+					_handleOutputFd(fd, req_hand);
 			}
 			if (_poll[i].revents & (POLLERR | POLLHUP | POLLNVAL | POLLPRI))
 				_handlePollErr(fd, i);
