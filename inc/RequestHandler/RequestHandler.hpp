@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 18:21:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:21:41 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ private:
 	void		handleDirectoryRequest(Client &client);
 	void		handleDirectoryListing(Client &client);
 	void		_handleCgiRequest(Client &client);
+	// bool		_handleRedirection(const LocationConf& curLoc);
+	// bool		_handleRedirection(Client& client);
+	std::string	getPathFromUri(Client &client);
 	bool		checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
 	std::string	_getAbsoluteUrl(Client& client, const std::string& path);

@@ -28,6 +28,7 @@ SOURCES =	ReadConf.cpp \
 			Client.cpp \
 			Socket.cpp \
 			RequestHandler.cpp \
+			LocRedirection.cpp \
 			CgiRequest.cpp \
 			ProcessRequest.cpp \
 			GetHeadRequest.cpp \

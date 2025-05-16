@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 10:38:07 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/15 16:39:37 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,10 +185,10 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		loc.setPathExMap(loc.getCgiExtension(), loc.getCgiSysPath());
 	}
 	//debug message, remove later
-	std::map<std::string, std::string> _map = loc.getPathExMap();
-	for (auto it = _map.begin(); it != _map.end(); ++it) {
-		std::cout << "\033[31mKey: " << it->first << "\nValue: \033[0m" << it->second << std::endl;
-	}
+	// std::map<std::string, std::string> _map = loc.getPathExMap();
+	// for (auto it = _map.begin(); it != _map.end(); ++it) {
+	// 	std::cout << "\033[31mKey: " << it->first << "\nValue: \033[0m" << it->second << std::endl;
+	// }
 	
 	if (loc.getLocPath() == "/cgi") {
 		if (CgiChecker::_checkCGI(loc) != true) {
@@ -406,17 +406,27 @@ void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& 
 }
 void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
-	if (i + 1 >= loc_tks.size()) {
-		throw std::runtime_error("Error: no parameter after 'return'.");
+	if (i + 2 >= loc_tks.size()) {
+		LOG_ERR("Invalid return directive: return code + url.");
+		// throw std::runtime_error("Error: no parameter after 'return'.");
 	}
-	if (loc.getReturn().empty() == false) {
+	if (loc.getRetUrl().empty() == false) {
+		LOG_ERR("return value already set.");
 		throw std::runtime_error("Error: 'return' value already set.");
 	}
 	if (loc.getLocPath() == "/cgi") {
 		throw std::runtime_error("Error: CGI called.");
 	}
-	++i;
-	loc.setReturn(loc_tks[i]);
+	i++;
+	if (!_codeRange(loc_tks[i])) {
+		throw std::runtime_error("Invalid Redirect code!");
+	}
+	loc.setRetCode(std::stoi(loc_tks[i]));
+	i++;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Syntax error: return url must end with ';'");
+	}
+	loc.setRetUrl(rmvSemicolon(loc_tks[i]));
 }
 
 //getters
