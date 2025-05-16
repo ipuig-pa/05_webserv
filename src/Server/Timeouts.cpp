@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:54:19 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 16:46:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 16:07:11 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	MultiServer::_checkTimeouts()
 		return ;
 	}
 
+	//REALLY CLOSE THEM OR SEND  408 Request Timeout!?!?
 	for (auto it = _clients.begin(); it != _clients.end(); ) {
 		Client* client = it->second;
 		bool should_close = false;

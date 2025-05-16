@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 16:20:43 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 10:21:41 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ private:
 	// bool		_handleRedirection(Client& client);
 	std::string	getPathFromUri(Client &client);
 	bool		checkAllowedMethod(Client &client);
-	bool		_isCgiRequest(Client& client);
+	bool				_isCgiRequest(Client& client);
+	std::string	_getAbsoluteUrl(Client& client, const std::string& path);
 	
 public:
 	RequestHandler();
@@ -48,7 +49,7 @@ public:
 	void				processRequest(Client &client);
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
-	void				handleFileWrite(Client &client); //client or fd or what?
+	bool				handleFileWrite(Client &client); //client or fd or what?
 
 	bool				validCgi(Client& client);
 	// bool 		_forkErr(int& pip1, int& pip2);

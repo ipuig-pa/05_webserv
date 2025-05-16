@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 12:09:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:42:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,8 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	client.getResponse().setStatusCode(200);
 	client.getResponse().setHeaderField("Content-Type", "text/html");
 	client.getResponse().setHeaderField("Content-Length", std::to_string(html.str().size()));
-	client.getResponse().setBodyBuffer(html.str());
+	std::vector<char> html_vector(html.str().begin(), html.str().end());
+	client.getResponse().setBodyBuffer(html_vector);
 	client.setState(SENDING_RESPONSE);
 	client.getTracker().setResponseStart();
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 09:04:23 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/14 11:39:33 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,6 @@
 
 #define DEFAULT_CONF "config/default.conf"
 #define BUFF_SIZE 4096
+#define DEFAULT_MAX_CLIENT_BODY 1000000
 
 #endif

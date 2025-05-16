@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 17:11:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 16:25:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,9 @@ private:
 	void						_checkTimeouts();
 	void						_handleCgiTimeout(CgiProcess *cgi, bool &should_close);
 	void						_eraseFromPoll(int fd);
-	void						_handleClientSocket(int fd, Client *client, int i, RequestHandler &req_hand);
 	void						_handleInputFd(int fd, RequestHandler &req_hand);
-	void						_handleOutputFd(int fd);
-	void						_handleClosedConnections(void);
+	void						_handleOutputFd(int fd, RequestHandler &req_hand);
+	void						_handleConnections(void);
 	void						_closeClientConnection(Client *client);
 	void						_closeListeningSocket(Socket *socket);
 	void						_newFdsToPoll(Client *client);

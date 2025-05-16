@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/13 12:12:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 12:53:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 CgiProcess::CgiProcess(Client *client)
-	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(42), _cgiBuffer(""), _cgiActive(false), _headers_sent(false), _envp(nullptr)
+	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(42), _cgiBuffer(), _cgiActive(false), _headers_sent(false), _envp(nullptr)
 {
 	_script_path = client->getRequest().getPath();
 }

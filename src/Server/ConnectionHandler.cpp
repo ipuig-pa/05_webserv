@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 11:23:03 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 18:57:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,12 @@ void	MultiServer::_acceptNewConnection(Socket *listen_socket)
 	_poll.push_back(cli_sock_fd);
 }
 
-void	MultiServer::_handleClosedConnections(void)
+void	MultiServer::_handleConnections(void)
 {
 	std::map<int, Client*>::iterator it_c;
 	std::map<int, Client*>::iterator current;
 
+	LOG_DEBUG("Handling connections");
 	it_c = _clients.begin();
 	while(it_c != _clients.end()){
 		if (it_c->second->getState() == CONNECTION_CLOSED) {
@@ -74,6 +75,30 @@ void	MultiServer::_handleClosedConnections(void)
 			current = it_c;
 			it_c++;
 			_closeClientConnection(current->second);
+		}
+		else if (it_c->second->getState() == SENDING_RESPONSE || it_c->second->getState() == SENDING_CONTINUE) {
+			for (size_t i = 0; i < _poll.size(); i++) {
+				if (_poll[i].fd == it_c->first) {
+					if (_poll[i].events == POLLIN) {
+						LOG_DEBUG("Client at socket " + std::to_string(it_c->first) + " changed to monitor POLLOUT");
+						_poll[i].events = POLLOUT;
+						break;
+					}
+				}
+			}
+			it_c++;
+		}
+		else if (it_c->second->getState() == NEW_REQUEST || it_c->second->getState() == CONTINUE_REQUEST) {
+			for (size_t i = 0; i < _poll.size(); i++) {
+				if (_poll[i].fd == it_c->first) {
+					if (_poll[i].events == POLLOUT) {
+						LOG_DEBUG("Client at socket " + std::to_string(it_c->first) + " changed to monitor POLLIN");
+						_poll[i].events = POLLIN;
+						break;
+					}
+				}
+			}
+			it_c++;
 		}
 		else
 			it_c++;

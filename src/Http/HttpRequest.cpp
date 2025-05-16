@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 14:48:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 18:13:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 HttpRequest::HttpRequest()
-	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _body(""), _complete(false)
+	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false)
 {
+	_body.reserve(BUFF_SIZE);
 }
 
 HttpRequest::~HttpRequest()
@@ -67,14 +68,31 @@ void HttpRequest::setVersion(const std::string s)
 	this->_version = s;
 }
 
-void HttpRequest::setBody(const std::string body)
+void HttpRequest::setBody(const std::vector<char> &body)
 {
 	this->_body = body;
+}
+
+void HttpRequest::appendBody(const std::vector<char> &chunk, size_t length)
+{
+	if (_body.capacity() < _body.size() + length)
+		_body.reserve(_body.size() + length);
+	_body.insert(_body.end(), chunk.begin(), chunk.begin() + length);
+}
+
+void HttpRequest::addPostBytesWritten(size_t bytesWritten)
+{
+	_postBytesWritten += bytesWritten;
 }
 
 void HttpRequest::setComplete(bool flag)
 {
 	this->_complete = flag;
+}
+
+void HttpRequest::setUpload(std::string upload_path)
+{
+	_upload_path = upload_path;
 }
 
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
@@ -134,9 +152,19 @@ std::string HttpRequest::getVersion()
 	return _version;
 }
 
-std::string HttpRequest::getBody()
+std::vector<char> &HttpRequest::getBody()
 {
 	return _body;
+}
+
+size_t	HttpRequest::getPostBytesWritten()
+{
+	return _postBytesWritten;
+}
+
+std::string	HttpRequest::getUpload()
+{
+	return _upload_path;
 }
 
 bool HttpRequest::isComplete()
@@ -158,6 +186,8 @@ void HttpRequest::reset()
 	_path.clear();
 	_queryPart.clear();
 	_version.clear();
+	_upload_path.clear();
 	_body.clear();
+	_postBytesWritten = 0;
 	_complete = false;
 }

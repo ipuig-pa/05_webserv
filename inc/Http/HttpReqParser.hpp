@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 12:06:39 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 10:21:09 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "webserv.hpp"
 #include "HttpRequest.hpp"
 
+class Client;
+
 enum reqStage {
 	REQ_LINE, //raw lines of http request
 	HEADERS,
@@ -24,27 +26,38 @@ enum reqStage {
 	PARSE_ERROR
 };
 
-class HttpReqParser
-{
+class HttpReqParser {
 private:
-	bool			_header_complete;
-	size_t			_bodyLength;
-	reqStage		_stage;
-	HttpRequest 	&_httpReq;
-	std::string 	_buffer;
+	reqStage			_stage;
+	size_t				_bodyLength;
+	std::vector<char>	_buffer;
+	bool				_header_complete;
+	bool				_chunked;
+	bool				_chunk_complete;
+	size_t				_chunk_size;
+	HttpRequest			&_httpReq;
 
-	bool 			_parseHeader(HttpRequest& request);
-	bool 			_parseBody(HttpRequest& request);
-	bool 			_parseReqLine(HttpRequest& request);
-	bool 			_singleHeaderLine(HttpRequest& request, const std::string& curLine);
+	std::string	_getPathFromUri(Client &client);
+	void _parseReqLine(HttpRequest& request, Client &client);
+	void _parseHeader(HttpRequest& request, Client &client);
+	void _parseBody(HttpRequest& request, Client &client);
+	bool _singleHeaderLine(HttpRequest& request, const std::string& curLine);
+	bool	_parseChunkSize(Client &client);
+	void	_parseChunk(HttpRequest &request);
+	void	_checkHeaderCompletion();
+	void	_checkChunkCompletion();
+	std::vector<char>::const_iterator	_findEndOfLine();
+	std::string	_takeLine();
+	void	_prepareBodyParsing(HttpRequest &request, Client &client);
+	std::string	_mapUploadPath(Client &client);
 
 public:
 	HttpReqParser(HttpRequest &request);
 	~HttpReqParser();
 	
 	void reset();
-	bool httpParse(void);
-	void	appendBuffer(const std::string data, size_t length);
+	bool httpParse(Client &client);
+	void	appendBuffer(const std::vector<char> &new_data);
 
 	//setter
 	// bool _setFinish(bool _flag);

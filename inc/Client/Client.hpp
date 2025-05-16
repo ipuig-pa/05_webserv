@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/10 16:57:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 19:21:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,13 @@ enum clientState
 {
 	NEW_CONNECTION,
 	NEW_REQUEST,
+	CONTINUE_REQUEST,
 	READING_REQUEST,
 	PROCESSING,
-	WRITING_CGI, //POST
 	READING_CGI,
+	WRITING_CGI, //POST
 	SENDING_RESPONSE,
+	SENDING_CONTINUE,
 	CONNECTION_CLOSED,
 	BOUNCED //when!?!?!?
 };
@@ -51,6 +53,7 @@ class Client //or struct?
 private:
 	HttpRequest			_request;
 	HttpReqParser		_req_parser;
+	size_t				_max_body_size;
 	HttpResponse		_response;
 	ErrorPageHandler	*_error_handler;
 	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
@@ -77,6 +80,7 @@ private:
 	HttpReqParser	&getParser(void);
 	ConnectionTracker	&getTracker(void);
 	CgiProcess		*getCgiProcess(void);
+	size_t			getMaxBodySize(void);
 	
 	void			setState(clientState state);
 	void			setFileFd(int file_fd);
@@ -87,7 +91,9 @@ private:
 	void			setCgiProcess(CgiProcess *cgi);
 	
 	bool			sendResponseChunk(void);
+	bool			sendContinue(void);
 	void			sendErrorResponse(int code);
+	void			defineMaxBodySize(void);
 };
 
 #endif

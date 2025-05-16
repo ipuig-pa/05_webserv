@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 16:56:10 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 10:22:50 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	RequestHandler::processRequest(Client &client)
 
 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
 
-	client.getRequest().setPath(getPathFromUri(client));
+	// client.getRequest().setPath(getPathFromUri(client)); //moved to parsing, in order to get the location path beforehand
 
 	bool method_allowed = checkAllowedMethod(client);
 	if (method_allowed) {
