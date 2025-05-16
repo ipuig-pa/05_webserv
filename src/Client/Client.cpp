@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 10:36:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:41:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,11 +225,11 @@ void	Client::setLocationConf(LocationConf *conf)
 	_currentLocConf = conf;
 }
 
-void	Client::sendErrorResponse(int code)
+void	Client::sendErrorResponse(int code, std::string message)
 {
 	LOG_ERR("Error " + std::to_string(code) + " occurred");
 	_response.setStatusCode(code);
-	std::string error_page = _error_handler->generateErrorBody(code);
+	std::string error_page = _error_handler->generateErrorBody(code, message);
 	std::vector<char> error_vector(error_page.begin(), error_page.end());
 	_response.setBodyBuffer(error_vector);
 	_response.setState(READ);

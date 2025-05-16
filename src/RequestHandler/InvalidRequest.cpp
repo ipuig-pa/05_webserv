@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 12:09:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:31:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,5 @@ void	RequestHandler::handleInvalidRequest(Client &client)
 	}
 	str << methods[i];
 	client.getResponse().setHeaderField("Allow", str.str());
-	client.sendErrorResponse(405);
+	client.sendErrorResponse(405, "Request method is not allowed in this location");
 }

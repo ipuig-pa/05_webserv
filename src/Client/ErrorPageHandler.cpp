@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 10:35:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:44:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ ErrorPageHandler::~ErrorPageHandler()
 
 /*-------------METHODS--------------------------------------------------------*/
 
-std::string	ErrorPageHandler::generateErrorBody(int status_code)
+std::string	ErrorPageHandler::generateErrorBody(int status_code, std::string message)
 {
 	std::string	body;
 
@@ -54,20 +54,23 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 		return ("");
 	}	
 	else
-		return ErrorPageHandler::getDefaultErrorPage(status_code);
+		return ErrorPageHandler::getDefaultErrorPage(status_code, message);
 }
 
-std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
+std::string ErrorPageHandler::getDefaultErrorPage(int status_code, std::string message)
 {
+	std::string	explanation = "The server encountered an error processing your request: " + message;
 	std::string status_message = _client->getResponse().getStatus().getStatusMessage();
 	std::stringstream ss;
 
+	if (message.empty())
+		explanation = "The server encountered an error processing your request";
 	ss	<< "<!DOCTYPE html>\n"
 		<< "<html>\n"
 		<< "<head><title>" << status_code << " " << status_message << "</title></head>\n"
 		<< "<body>\n"
 		<< "<h1>" << status_code << " " << status_message << "</h1>\n"
-		<< "<p>The server encountered an error processing your request.</p>\n"
+		<< "<p>" << explanation << "</p>\n"
 		<< "<hr>\n"
 		<< "<address>webserv</address>\n"
 		<< "</body>\n"

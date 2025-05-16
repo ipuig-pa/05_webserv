@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 10:43:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:31:14 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@ void	RequestHandler::handleGetRequest(Client &client)
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {
-		client.sendErrorResponse(404); // Not found
+		client.sendErrorResponse(404, ""); // Not found
 		return ;
 	}
 	if (access(path.c_str(), R_OK) != 0) {
-		client.sendErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403, ""); // Forbidden
 		return ;
 	}
 	struct stat file_stat;
@@ -36,7 +36,7 @@ void	RequestHandler::handleGetRequest(Client &client)
 	int file_fd = open(path.c_str(), O_RDONLY);
 
 	if (file_fd == -1) {
-		client.sendErrorResponse(404); // Not Found
+		client.sendErrorResponse(404, ""); // Not Found
 		return ;
 	}
 	// Set non-blocking
@@ -133,7 +133,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 		handleDirectoryListing(client);
 	else {
 		// Directory listing is disabled and no index file exists
-		client.sendErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403, ""); // Forbidden
 	}
 }
 

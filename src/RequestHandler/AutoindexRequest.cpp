@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 14:42:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:37:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	LOG_DEBUG("About to list " + path);
 	if (!dirp)
 	{
-		client.sendErrorResponse(500); //Internal Server error
+		client.sendErrorResponse(500, ""); //Internal Server error
 		return;
 	}
 	//Build HTML Content: check with telnet - nginx what exactly to build

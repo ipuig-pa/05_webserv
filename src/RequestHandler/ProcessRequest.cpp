@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 10:22:50 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 11:06:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,10 @@ std::string	RequestHandler::getPathFromUri(Client &client)
 	ServerConf	&config = client.getServerConf();
 	LocationConf *location = config.getMatchingLocation(uripath);
 
-	client.setLocationConf(location);
 	if (!location) {
 		return (config.getRoot() + uripath);
 	}
-	// client.setLocationConf(location);
+	client.setLocationConf(location);
 	std::string locationPath = location->getLocPath();
 	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
 	//needed??

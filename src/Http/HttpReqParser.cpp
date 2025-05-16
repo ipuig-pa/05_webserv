@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 18:23:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:09:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ bool HttpReqParser::httpParse(Client &client)
 	if (_stage == BODY)
 		_parseBody(_httpReq, client);
 	if (_stage == PARSE_ERROR && client.getState() != SENDING_RESPONSE)
-		client.sendErrorResponse(400);
+		client.sendErrorResponse(400, "Error parsing request"); //Bad request
 	LOG_DEBUG("STAGE AFTER PARSING: " + std::to_string(_stage));
 	return _stage == FINISH;
 }
@@ -225,7 +225,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 				return ;
 			}
 			else if (_bodyLength > client.getMaxBodySize())
-				client.sendErrorResponse(413); //Payload Too Large
+				client.sendErrorResponse(413, "Request body is too large"); //Payload Too Large
 			_stage = PARSE_ERROR;
 		}
 		catch (const std::exception& e) {
@@ -261,7 +261,7 @@ bool	HttpReqParser::_parseChunkSize(Client &client)
 		return true;
 	}
 	else if (_bodyLength + _chunk_size > client.getMaxBodySize())
-		client.sendErrorResponse(413); //Payload Too Large
+		client.sendErrorResponse(413, "Request body is too large"); //Payload Too Large
 	_checkChunkCompletion();
 	return false;
 }

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 12:53:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:04:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,8 @@ bool CgiProcess::initCgi()
 	} else {
 		//std::cerr << "Location{} block is NULL!\n";
 		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
+		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		return false;
 	}
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
 		LOG_ERR("\033[32mDEBUG messaga in pipe_CGI in requesthandler\033[0m");
@@ -213,12 +215,16 @@ std::string	CgiProcess::_getExtSysPath(Client* client)
 	std::cout << "CGI EXT: " << cgiExt << std::endl;
 	//Get from config file!!! 
 	//should we restrict the cgi we are handling?!?!??
-	std::map<std::string, std::string> _pair = client->getLocationConf()->getPathExMap();
-	std::map<std::string, std::string>::iterator it = _pair.find(cgiExt);
-	if (it != _pair.end())
+	std::map<std::string, std::string> pair = client->getLocationConf()->getPathExMap();
+	if (pair.empty())
+		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
+	if (it != pair.end())
 		return (it->second);
-	else
-		LOG_ERR("\033[31mcannot find corresponding excutable path for the extension passed.\033[0m");
+	else {
+		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
+		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+	}
 	return cgiExt;
 }
 
@@ -269,7 +275,7 @@ void	CgiProcess::cleanCloseCgi(void)
 	else if (result < 0) {
 		// Error occurred
 		LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
-		_client->sendErrorResponse(500);
+		_client->sendErrorResponse(500, "");
 	}
 	_cgiActive = false;
 	_cgiPid = -1;

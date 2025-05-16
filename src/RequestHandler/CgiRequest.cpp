@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/13 13:44:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 12:28:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ void	RequestHandler::_handleCgiRequest(Client &client)
 {
 	LOG_INFO("\033[32mCGI Request recived\033[0m");
 	client.setCgiProcess(new CgiProcess(&client));
-	if (!client.getCgiProcess()->initCgi()) {
+	if (!client.getCgiProcess()->initCgi() && client.getState() != SENDING_RESPONSE) {
 		LOG_DEBUG("\033[31mCGI init fail\033[0m");
-		client.sendErrorResponse(500);
+		client.sendErrorResponse(500, "");
 	}
 }
 
@@ -40,12 +40,12 @@ bool RequestHandler::validCgi(Client& client)
 {
 	std::string cgiPath = client.getRequest().getPath();
 	if (FileUtils::_pathType(cgiPath) == -1) {
-		client.sendErrorResponse(404);
+		client.sendErrorResponse(404, "CGI path not found");
 		std::cerr << "\033[31mError in cgi path type. Path is: " << cgiPath << "\033[0m" << std::endl;
 		return false;
 	}
 	if (FileUtils::_isExec(cgiPath) == -1) {
-		client.sendErrorResponse(403);
+		client.sendErrorResponse(403, "CGI path is not executable");
 		std::cout << "\033[31mError in cgi path not excutable. Path is: " << cgiPath << "\033[0m" << std::endl;
 		return false;
 	}

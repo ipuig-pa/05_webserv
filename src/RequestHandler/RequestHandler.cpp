@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 14:45:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:35:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	RequestHandler::handleClientRead(Client &client)
 						client.setState(PROCESSING);
 				}
 				catch(int error_code) {
-					client.sendErrorResponse(error_code); //413: Request entity too large
+					client.sendErrorResponse(error_code, "Request entity too large"); //413: Request entity too large
 				}
 			}
 		}
@@ -61,7 +61,7 @@ void	RequestHandler::handleClientRead(Client &client)
 // }
 // if (isCgiRequest(client)) {
 // 	if (initCgi(client) == false) {
-// 		client.sendErrorResponse(500);
+// 		client.sendErrorResponse(500, "");
 // 	}
 // 	else {
 // 		client.setState(READING_CGI);

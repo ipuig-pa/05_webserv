@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 18:19:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:34:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,20 @@ void	RequestHandler::handlePostRequest(Client &client)
 {
 	// std::string uploadPath = client.getRequest().getUpload(); //should not be the path, but the upload at that location
 	std::string uploadPath = client.getRequest().getPath(); //should not be the path, but the upload at that location
+	if (uploadPath.empty()) {
+		client.sendErrorResponse(404, ""); // Not Found
+		return;
+	}
 	std::string directory = uploadPath.substr(0, uploadPath.find_last_of('/'));
-	if (uploadPath.empty() || access(directory.c_str(), W_OK) != 0) {
-		client.sendErrorResponse(403); // Forbidden
+	if (access(directory.c_str(), W_OK) != 0) {
+		client.sendErrorResponse(403, ""); // Forbidden
 		return;
 	}
 
 	int file_fd = open(uploadPath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 	if (file_fd == -1) {
-		client.sendErrorResponse(500); // Not Found
+		client.sendErrorResponse(500, "");
 		return ;
 	}
 	// Set non-blocking
@@ -69,7 +73,7 @@ bool	RequestHandler::handleFileWrite(Client &client)
 		else if (bytesWritten == -1) {
 			close(file_fd);
 			file_fd = -1;
-			client.sendErrorResponse(500);
+			client.sendErrorResponse(500, "");
 			return true;
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:54:19 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/14 16:07:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:37:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	MultiServer::_checkTimeouts()
 			// Send 408 Request Timeout if appropriate
 			if (client->getState() == READING_REQUEST) {
 				LOG_ERR("Preparing error code 408 for client at socket " + std::to_string(client->getSocket()));
-				client->sendErrorResponse(408); // + close?!?!?
+				client->sendErrorResponse(408, "Request timeout"); // + close?!?!?
 			}
 			else {
 				client->setState(CONNECTION_CLOSED);
@@ -82,7 +82,7 @@ void	MultiServer::_checkTimeouts()
 
 void	MultiServer::_handleCgiTimeout(CgiProcess *cgi, bool &should_close) {
 	if (!cgi->getHeadersSent()){
-		cgi->getClient()->sendErrorResponse(504); // "Gateway Timeout"
+		cgi->getClient()->sendErrorResponse(504, "Gateway timeout"); // "Gateway Timeout"
 	}
 	else if (cgi->getClient()->getResponse().isChunked()){
 		cgi->getClient()->getResponse().setState(READ); //to send the final chunk, handled in SendResponseChunk in Client

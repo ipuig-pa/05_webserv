@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 10:43:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:04:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ void	CgiProcess::readCgiOutput()
 		// cleanCloseCgi();//close and clean
 	}
 	else {
-		LOG_ERR("\033[31merror in reading CGI (pipe)\033[0m\n");
-		_client->sendErrorResponse(500);
+		LOG_ERR("\033[31mError in reading CGI (pipe)\033[0m\n");
+		_client->sendErrorResponse(500, "");
 		cleanCloseCgi();//close and clean
 	}
 }
