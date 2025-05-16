@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ProcessRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/13 12:10:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 16:56:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,14 @@
 
 void	RequestHandler::processRequest(Client &client)
 {
+	// LocationConf* locRetCheck = client.getLocationConf();
+	// if (locRetCheck && locRetCheck->checkRet()) {
+	// 	client.getResponse().setStatusCode(locRetCheck->getRetCode());
+	// 	client.getResponse().setHeaderField("Location", locRetCheck->getRetUrl());
+	// 	client.setState(SENDING_RESPONSE);
+	// 	return ;
+	// }
+	
 	void	(RequestHandler::*handleMethod[])(Client &) = {
 		&RequestHandler::handleGetRequest, 
 		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
@@ -31,6 +39,7 @@ void	RequestHandler::processRequest(Client &client)
 			_handleCgiRequest(client);
 			return ;
 		} else {
+			LOG_DEBUG("\033[32mStatic request called!\033[0m");
 			(this->*handleMethod[client.getRequest().getMethod()])(client);
 		}
 	} else {
@@ -39,15 +48,45 @@ void	RequestHandler::processRequest(Client &client)
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
 
+// void	RequestHandler::processRequest(Client &client)
+// {
+// 	void	(RequestHandler::*handleMethod[])(Client &) = {
+// 		&RequestHandler::handleGetRequest, 
+// 		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
+// 		&RequestHandler::handlePostRequest, 
+// 		&RequestHandler::handleDeleteRequest, 
+// 		&RequestHandler::handleInvalidRequest};
+
+// 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
+
+// 	client.getRequest().setPath(getPathFromUri(client));
+
+// 	bool method_allowed = checkAllowedMethod(client);
+// 	if (method_allowed) {
+// 		if (_isCgiRequest(client) == true) {
+// 			_handleCgiRequest(client);
+// 			return ;
+// 		} else {
+// 			LOG_DEBUG("\033[32mStatic request called!\033[0m");
+// 			(this->*handleMethod[client.getRequest().getMethod()])(client);
+// 		}
+// 	} else {
+// 		(this->*handleMethod[4])(client); // invalid request
+// 	}
+// 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
+// }
+
 std::string	RequestHandler::getPathFromUri(Client &client)
 {
 	std::string	uripath = client.getRequest().getUri();
 	ServerConf	&config = client.getServerConf();
 	LocationConf *location = config.getMatchingLocation(uripath);
+
+	client.setLocationConf(location);
 	if (!location) {
 		return (config.getRoot() + uripath);
 	}
-	client.setLocationConf(location);
+	// client.setLocationConf(location);
 	std::string locationPath = location->getLocPath();
 	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
 	//needed??

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/13 11:45:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 16:02:51 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,13 @@ class LocationConf
 	bool _autoflag; //flag to check repetition 
 	std::string _locIndex; //should be a vector? (there can be more that one index files??)
 	//other optional, may not use
-	std::string _returnUrl; //redirect: return url: 301 https://... or return error code
-	int _returnCode;
+	
+	int		_retCode;
+	bool	_hasReturn;
+	std::string _retUrl;
+	//redirect: return url: 301 https://...
+	std::map<int, std::string> _locReturn; //necessary or not??
+	
 	std::map<int, std::string> _error_page; //err_code, url
 	
 	public:
@@ -63,7 +68,12 @@ class LocationConf
 	void setLocIndex(std::string s);
 	bool _autoSet() const;
 	void setLocAuto(bool _flag);
-	void setReturn(std::string s);
+	
+	//return
+	void	setRetCode(int n);
+	void	setRetUrl(std::string s);
+	// void setReturn(std::map<int, std::string> returnPair);
+	bool checkRet();
 	
 	//CGI
 	void setPathExMap(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
@@ -81,7 +91,11 @@ class LocationConf
 	int getLocCMBS() const;
 	const std::string getLocIndex() const;
 	bool getLocAuto() const;
-	std::string getReturn() const;
+	
+	int 						getRetCode() const;
+	std::string					getRetUrl() const;
+	// std::map<int, std::string>	getReturn() const;
+	
 	// const std::string& getCgiPath() const;
 	const std::vector<std::string>& getCgiSysPath() const;
 	// const std::string& getCgiExtension() const;

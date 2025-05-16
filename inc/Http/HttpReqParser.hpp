@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpReqParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/14 12:06:39 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,20 @@ enum reqStage {
 	FINISH,
 	PARSE_ERROR
 };
+
 class HttpReqParser
 {
 private:
-	reqStage _stage;
-	size_t _bodyLength;
-	std::string _buffer;
-	bool	_header_complete;
-	HttpRequest &_httpReq;
+	bool			_header_complete;
+	size_t			_bodyLength;
+	reqStage		_stage;
+	HttpRequest 	&_httpReq;
+	std::string 	_buffer;
 
-	bool _parseHeader(HttpRequest& request);
-	bool _parseBody(HttpRequest& request);
-	bool _parseReqLine(HttpRequest& request);
-	bool _singleHeaderLine(HttpRequest& request, const std::string& curLine);
+	bool 			_parseHeader(HttpRequest& request);
+	bool 			_parseBody(HttpRequest& request);
+	bool 			_parseReqLine(HttpRequest& request);
+	bool 			_singleHeaderLine(HttpRequest& request, const std::string& curLine);
 
 public:
 	HttpReqParser(HttpRequest &request);

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 08:59:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/13 13:44:02 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,12 @@ bool RequestHandler::_isCgiRequest(Client& client)
 {
 	std::string tmp = client.getRequest().getUri();
 	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
-	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
+	// if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
+	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos || tmp.find(".sh") != std::string::npos) {
+		LOG_DEBUG("\033[32mCGI request called!\033[0m");
 		return true;
 	}
+	LOG_DEBUG("\033[32mNot CGI request or Unsupported CGI extension passed!\nSupproted extension is: .php, .py, .sh\033[0m");
 	return false;
 }
 

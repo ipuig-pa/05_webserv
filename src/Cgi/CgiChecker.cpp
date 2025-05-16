@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 10:51:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/13 13:34:16 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ bool CgiChecker::_validCgiPath(const std::vector<std::string>& _cgipath)
 bool CgiChecker::_validExtension(const std::vector<std::string>& _cgiextend)
 {
 	for (size_t i = 0; i < _cgiextend.size(); ++i) {
-		if (_cgiextend[i] == ".php" || _cgiextend[i] == ".py") {//idea: if more extension wanted, add '||' check
+		if (_cgiextend[i] == ".php" || _cgiextend[i] == ".py" || _cgiextend[i] == ".sh") {//idea: if more extension wanted, add '||' check
 			return true;
 		}
 	}

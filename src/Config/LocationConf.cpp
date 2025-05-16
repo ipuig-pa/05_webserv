@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/13 12:11:16 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/15 16:52:46 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ LocationConf::LocationConf()
 	_locAuto = false;
 	_autoflag = false;
 	_locIndex = "";
-	_returnUrl = "";
+	_hasReturn = false;
 }
 
 LocationConf::~LocationConf() {}
@@ -108,8 +108,8 @@ void LocationConf::setCgiSysPath(std::vector<std::string> s)
 {
 	for (size_t i = 0; i < s.size(); ++i)
 	{
-		if ((s[i].find("/php") == std::string::npos) && (s[i].find("/py") == std::string::npos)) {
-			throw std::runtime_error("invalid cgi path. non '/php' nor '/py' found");
+		if ((s[i].find("/php") == std::string::npos) && (s[i].find("/py") == std::string::npos) && (s[i].find("/bash") == std::string::npos)) {
+			LOG_ERR("\033[31mInvalid CGI executable path!\033[0m");
 		}
 	}
 	this->cgi_sys_path = s;
@@ -139,6 +139,10 @@ void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std:
 				_path_extend[".py"] = cgiSys[j];
 				LOG_DEBUG("Add Python mapping: .py -> " + cgiSys[j]);
 			}
+			else if ((ext == ".sh" || ext == "*.sh") && (cgiSys[j].find("bash") != std::string::npos)) {
+				_path_extend[".sh"] = cgiSys[j];
+				LOG_DEBUG("Add bash mapping: .sh -> " + cgiSys[j]);
+			}
 		}
 	}
 	this->_cgiExPathMap = _path_extend;
@@ -164,10 +168,29 @@ void LocationConf::setLocAuto(bool _flag)
 	this->_locAuto = _flag;
 	this->_autoflag = true;
 }
-void LocationConf::setReturn(std::string s)
+void	LocationConf::setRetCode(int n)
 {
-	// _cleanLocTk(s);
-	this->_returnUrl = s;
+	this->_retCode = n;
+	LOG_DEBUG("return code is: " + std::to_string(_retCode));
+}
+void	LocationConf::setRetUrl(std::string s)
+{
+	this->_retUrl = s;
+	LOG_DEBUG("return url is: " + _retUrl);
+	this->_hasReturn = true;
+}
+	
+// void LocationConf::setReturn(std::map<int, std::string> returnPair)
+// {
+// 	this->_locReturn = returnPair;
+// 	_hasReturn = true;
+// 	for (auto it = _locReturn.begin(); it != _locReturn.end(); ++it) {
+// 		std::cout << "\033[31mreturn code: " << it->first << "\nreturn url: "<< it->second << "\033[0m\n";
+// 	}
+// }
+bool LocationConf::checkRet()
+{
+	return _hasReturn;
 }
 
 //getters
@@ -216,9 +239,20 @@ bool LocationConf::getLocAuto() const
 {
 	return this->_locAuto;
 }
-std::string LocationConf::getReturn() const
+
+// std::map<int, std::string> LocationConf::getReturn() const
+// {
+// 	return this->_locReturn;
+// }
+
+int LocationConf::getRetCode() const
 {
-	return this->_returnUrl;
+	return _retCode;
+}
+
+std::string LocationConf::getRetUrl() const
+{
+	return _retUrl;
 }
 
 // const std::string& LocationConf::getCgiPath() const;
