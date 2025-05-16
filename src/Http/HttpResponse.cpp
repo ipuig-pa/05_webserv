@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 10:41:32 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 14:27:59 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,7 +173,7 @@ void	HttpResponse::checkMandatoryHeaders()
 		setHeaderField("Date", std::string(buffer));
 	}
 	if (getHeader("Server").empty())
-		setHeaderField("Server", "webserv");
+		setHeaderField("Server", "webserv/1.0");
 	if (getHeader("Content-Type").empty())
 		LOG_ERR("No Content-Type header is found in HttpResponse");
 	if (getHeader("Content-Length").empty() && !_chunked)

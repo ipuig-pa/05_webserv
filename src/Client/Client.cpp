@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 12:41:26 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:50:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 // 	//create a new socket?!?!
 // }
 
-Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
+Client::Client(int socket, ListenSocket *listenSocket)
+	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _listenSocket(listenSocket), _currentServerConf(nullptr), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
 {
 	_error_handler = new ErrorPageHandler(this);
 }
@@ -66,7 +66,12 @@ std::string	Client::getStateString(clientState state) {
 	}
 }
 
-ServerConf	&Client::getServerConf(void)
+ListenSocket	*Client::getListenSocket(void)
+{
+	return (_listenSocket);
+}
+
+ServerConf	*Client::getServerConf(void)
 {
 	return	(_currentServerConf);
 }
@@ -215,7 +220,7 @@ bool	Client::sendContinue(void)
 }
 
 
-void	Client::setServerConf(ServerConf &conf)
+void	Client::setServerConf(ServerConf *conf)
 {
 	_currentServerConf = conf;
 }
@@ -247,8 +252,9 @@ void	Client::defineMaxBodySize(void)
 	// if (_currentLocConf && !(_currentLocConf->getMaxBodySize() != -1))
 	// 	_max_body_size = _currentLocConf->getMaxBodySize();
 	// else 
-	if (_currentServerConf.getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
-		_max_body_size = _currentServerConf.getMaxBodySize();
+	if (_currentServerConf->getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
+		_max_body_size = _currentServerConf->getMaxBodySize();
 	else
 		_max_body_size = DEFAULT_MAX_CLIENT_BODY;
 }
+

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:44:16 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:56:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code, std::string mes
 	// 		return (body);
 	// 	}
 	// }
-	body = _client->getServerConf().getErrPageCode(status_code);
+	body = _client->getServerConf()->getErrPageCode(status_code);
 	if (!body.empty()) {
 		_client->getResponse().setBodyLength(body.length()); // or should read from there?
 		_client->getResponse().setBytesRead(body.length());

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:34:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:53:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ std::string RequestHandler::_getAbsoluteUrl(Client& client, const std::string& u
 	std::string host= client.getRequest().getHeaderVal("Host");
 
 	if (host.empty()) {
-		host = client.getServerConf().getHost();
-		int port = client.getServerConf().getPort();
+		host = client.getServerConf()->getHost();
+		int port = client.getServerConf()->getPort();
 		if (port != 80) {
 			host += ":" + std::to_string(port);
 		}

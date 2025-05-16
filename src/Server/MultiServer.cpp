@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 16:25:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:05:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
 
 MultiServer::~MultiServer()
 {
-	std::map<int, Socket*>::iterator it_s;
+	std::map<int, ListenSocket*>::iterator it_s;
 	std::map<int, Client*>::iterator it_c;
 
 	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
@@ -80,7 +80,7 @@ void	MultiServer::run()
 	
 			// std::cout << "POLL revents[" << i << "]: " << _poll[i].fd << std::endl;
 			if (_poll[i].revents & POLLIN) { //ready for reading / receiving
-				if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listenint socket case
+				if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listenint socket case
 					LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
 					_acceptNewConnection(it_s->second);
 				}

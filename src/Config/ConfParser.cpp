@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 11:07:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 17:03:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ void ConfParser::_split(const std::vector<std::string>& tokens)
 		throw std::runtime_error("Error: cannot find server."); //will be caught by try-catch block
 	}
 	size_t i = 0;
-	while (i < tokens.size())
-	{	if (tokens[i] == "server")
+	while (i < tokens.size()) {
+		if (tokens[i] == "server")
 		{
 			size_t right = _blockEnd(tokens, i);
 			_addToServBlock(tokens, i, right);

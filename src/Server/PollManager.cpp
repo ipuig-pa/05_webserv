@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 16:50:07 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 15:46:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	MultiServer::_handlePollErr(int fd, int i)
 		LOG_INFO("Client at socket " + std::to_string(fd) + " disconnected");
 	} else
 		LOG_ERR("Error on socket " + std::to_string(fd));
-	if (std::map<int, Socket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) {
+	if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) {
 		_closeListeningSocket(it_s->second);
 		return ;
 	} else if (it_c = _clients.find(fd); it_c != _clients.end()){

@@ -26,7 +26,7 @@ SOURCES =	ReadConf.cpp \
 			ConnectionHandler.cpp\
 			Timeouts.cpp\
 			Client.cpp \
-			Socket.cpp \
+			ListenSocket.cpp \
 			RequestHandler.cpp \
 			LocRedirection.cpp \
 			CgiRequest.cpp \

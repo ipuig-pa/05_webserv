@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/14 18:57:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:51:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	MultiServer::_init_sockets(std::vector<std::vector<ServerConf>> &serv_confi
 
 void	MultiServer::_openListeningSocket(std::vector<ServerConf> &serv_conf)
 {
-	Socket *listen_socket = new Socket(serv_conf);
+	ListenSocket *listen_socket = new ListenSocket(serv_conf);
 	int	listen_fd = listen_socket->getFd();
 	if (listen_fd < 0) {
 		throw std::runtime_error("Invalid socket file descriptor");
@@ -36,10 +36,10 @@ void	MultiServer::_openListeningSocket(std::vector<ServerConf> &serv_conf)
 	struct pollfd listen_pollfd = {listen_fd, POLLIN, 0};
 	_poll.push_back(listen_pollfd);
 	_sockets.emplace(listen_fd, listen_socket);
-	LOG_INFO("Suceeded on opening listening socket " + std::to_string(listen_socket->getFd()) + ", on " + listen_socket->getDefaultConf().getHost() + ":" + std::to_string(listen_socket->getPort()));
+	LOG_INFO("Suceeded on opening listening socket " + std::to_string(listen_socket->getFd()) + ", on " + listen_socket->getDefaultConf()->getHost() + ":" + std::to_string(listen_socket->getPort()));
 }
 
-void	MultiServer::_acceptNewConnection(Socket *listen_socket)
+void	MultiServer::_acceptNewConnection(ListenSocket *listen_socket)
 {
 	sockaddr_in client_addr;
 	socklen_t addr_len = sizeof(client_addr);
@@ -51,8 +51,7 @@ void	MultiServer::_acceptNewConnection(Socket *listen_socket)
 		throw std::runtime_error("Invalid socket file descriptor");
 		return ;
 	}
-	Client *client = new Client(cli_socket, listen_socket->getDefaultConf());
-	client->setServerConf(listen_socket->getConf(client->getRequest().getHeaderVal("Host")));
+	Client *client = new Client(cli_socket, listen_socket);
 	_clients.insert(std::pair<int, Client*>(cli_socket, client));
 	if (fcntl(cli_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
@@ -141,7 +140,7 @@ void	MultiServer::_closeClientConnection(Client *client)
 	delete (client);
 }
 
-void	MultiServer::_closeListeningSocket(Socket *socket)
+void	MultiServer::_closeListeningSocket(ListenSocket *socket)
 {
 	if (!socket)
 		return;
@@ -160,7 +159,7 @@ void	MultiServer::_closeListeningSocket(Socket *socket)
 	delete(socket);
 
 	//attempt to reopen listening socket
-	Socket *listen_socket = nullptr;
+	ListenSocket *listen_socket = nullptr;
 	try{
 		LOG_INFO("Attempting to reopen a new listening socket on " + conf[0].getHost() + ":" + std::to_string(conf[0].getPort()));
 		_openListeningSocket(conf);

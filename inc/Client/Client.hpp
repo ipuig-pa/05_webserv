@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 19:21:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:50:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include "LocationConf.hpp"
 # include "ConnectionTracker.hpp"
 # include "CgiProcess.hpp"
+# include "ListenSocket.hpp"
 
 class ErrorPageHandler;
 class CgiProcess;
@@ -59,13 +60,14 @@ private:
 	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState			_state;
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
-	ServerConf			&_currentServerConf; //idea: maybe create a upper class
+	ListenSocket		*_listenSocket;
+	ServerConf			*_currentServerConf; //idea: maybe create a upper class
 	LocationConf		*_currentLocConf;
 	CgiProcess			*_cgi;
 	ConnectionTracker	_tracker;
 
 	public:
-	Client(int fd, ServerConf &default_conf);
+	Client(int fd, ListenSocket *listenSocket);
 	~Client();
 	
 	HttpRequest		&getRequest(void);
@@ -75,7 +77,8 @@ private:
 	std::string		getStateString(clientState state);
 	int				getFileFd(void);
 	bool			getEmptyBuffer(void);
-	ServerConf		&getServerConf(void);
+	ListenSocket	*getListenSocket(void);
+	ServerConf		*getServerConf(void);
 	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
 	ConnectionTracker	&getTracker(void);
@@ -86,13 +89,13 @@ private:
 	void			setFileFd(int file_fd);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
-	void			setServerConf(ServerConf &conf);
+	void			setServerConf(ServerConf *conf);
 	void			setLocationConf(LocationConf *conf);
 	void			setCgiProcess(CgiProcess *cgi);
 	
 	bool			sendResponseChunk(void);
 	bool			sendContinue(void);
-	void			sendErrorResponse(int code);
+	void			sendErrorResponse(int code, std::string message);
 	void			defineMaxBodySize(void);
 };
 

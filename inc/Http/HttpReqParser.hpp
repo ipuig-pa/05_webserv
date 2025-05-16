@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpReqParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 10:21:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 15:40:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ private:
 	HttpRequest			&_httpReq;
 
 	std::string	_getPathFromUri(Client &client);
-	void _parseReqLine(HttpRequest& request, Client &client);
+	void _parseReqLine(HttpRequest& request);
 	void _parseHeader(HttpRequest& request, Client &client);
 	void _parseBody(HttpRequest& request, Client &client);
 	bool _singleHeaderLine(HttpRequest& request, const std::string& curLine);
@@ -48,6 +48,7 @@ private:
 	void	_checkChunkCompletion();
 	std::vector<char>::const_iterator	_findEndOfLine();
 	std::string	_takeLine();
+	void	_setRequestConf(HttpRequest &request, Client &client);
 	void	_prepareBodyParsing(HttpRequest &request, Client &client);
 	std::string	_mapUploadPath(Client &client);
 

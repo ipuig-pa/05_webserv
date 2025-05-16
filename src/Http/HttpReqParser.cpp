@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 12:09:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:54:49 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ bool HttpReqParser::httpParse(Client &client)
 {
 	_httpReq.setComplete(false);
 	if (_stage == REQ_LINE && _chunk_complete)
-		_parseReqLine(_httpReq, client);
+		_parseReqLine(_httpReq);
 	if (_stage == HEADERS && _header_complete)
 		_parseHeader(_httpReq, client);
 	if (_stage == BODY)
@@ -40,48 +40,48 @@ std::string	HttpReqParser::_mapUploadPath(Client &client)
 {
 	(void) client;
 	return ("");
-// 	std::string	uripath = client.getRequest().getUri();
-// 	std::string uploadPath;
-// 	ServerConf	&config = client.getServerConf();
-// 	LocationConf *location = client.getLocationConf();
-// 	if (!location) {
-// 		uploadPath = config.getUpload();
-// 		if (uploadPath.empty())
-// 			return ("");
-// 	}
-// 	else {
-// 		uploadPath = location->getUpload();
-// 		if (uploadPath.empty())
-// 			uploadPath = config.getUpload();
-// 		if (uploadPath.empty())
-// 			return ("");
-// 	}
-// 	std::string locationRoot = location->getLocRoot();
-// 	if (locationRoot.empty())
-// 		locationRoot = config.getRoot();
-// 	std::string relativePath = uripath;
-// 	if (uripath.find(uploadPath) == 0) {
-// 		relativePath = uripath.substr(uploadPath.length());
-// 	}
-// 	if (!relativePath.empty() && relativePath[0] != '/') {
-// 		relativePath = "/" + relativePath;
-// 	}
-// 	return locationRoot + relativePath;
+	// std::string	uripath = client.getRequest().getUri();
+	// std::string uploadPath;
+	// ServerConf	*config = client.getServerConf();
+	// LocationConf *location = client.getLocationConf();
+	// if (!location) {
+	// 	uploadPath = config->getUpload();
+	// 	if (uploadPath.empty())
+	// 		return ("");
+	// }
+	// else {
+	// 	uploadPath = location->getUpload();
+	// 	if (uploadPath.empty())
+	// 		uploadPath = config->getUpload();
+	// 	if (uploadPath.empty())
+	// 		return ("");
+	// }
+	// std::string locationRoot = location->getLocRoot();
+	// if (locationRoot.empty())
+	// 	locationRoot = config->getRoot();
+	// std::string relativePath = uripath;
+	// if (uripath.find(uploadPath) == 0) {
+	// 	relativePath = uripath.substr(uploadPath.length());
+	// }
+	// if (!relativePath.empty() && relativePath[0] != '/') {
+	// 	relativePath = "/" + relativePath;
+	// }
+	// return locationRoot + relativePath;
 }
 
 std::string	HttpReqParser::_getPathFromUri(Client &client)
 {
 	std::string	uripath = client.getRequest().getUri();
-	ServerConf	&config = client.getServerConf();
-	LocationConf *location = config.getMatchingLocation(uripath);
+	ServerConf	*config = client.getServerConf();
+	LocationConf *location = config->getMatchingLocation(uripath);
 	if (!location) {
-		return (config.getRoot() + uripath);
+		return (config->getRoot() + uripath);
 	}
 	client.setLocationConf(location);
 	std::string locationPath = location->getLocPath();
 	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
 	if (locationRoot.empty())
-		locationRoot = config.getRoot();
+		locationRoot = config->getRoot();
 	std::string relativePath = uripath;
 	if (uripath.find(locationPath) == 0) {
 		relativePath = uripath.substr(locationPath.length());
@@ -117,7 +117,7 @@ std::string	HttpReqParser::_takeLine()
 	return (cur_line);
 }
 
-void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
+void HttpReqParser::_parseReqLine(HttpRequest &request)
 {
 	LOG_DEBUG("PARSING REQ LINE");
 	std::string method;
@@ -150,10 +150,6 @@ void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
 		return ;
 	}
 	request.setVersion(ver);
-	client.getRequest().setPath(_getPathFromUri(client));
-	if (request.getMethod() == POST || request.getMethod() == DELETE)
-		client.getRequest().setUpload(_mapUploadPath(client));
-	client.defineMaxBodySize();
 	_stage = HEADERS;
 }
 
@@ -188,10 +184,22 @@ void HttpReqParser::_parseHeader(HttpRequest &request, Client &client)
 			}
 		}
 		else if (cur_line.empty()) {
+			_setRequestConf(request, client);
 			_prepareBodyParsing(request, client);
 		}
 	}
 }
+
+
+void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
+{
+	client.setServerConf(client.getListenSocket()->getConf(request.getHeaderVal("Host")));
+	request.setPath(_getPathFromUri(client));
+	if (request.getMethod() == POST || request.getMethod() == DELETE)
+		request.setUpload(_mapUploadPath(client));
+	client.defineMaxBodySize();
+}
+
 
 void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 {

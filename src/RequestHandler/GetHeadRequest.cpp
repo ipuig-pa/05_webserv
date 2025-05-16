@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:31:14 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:53:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,8 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 	}
 	else
 	{
-		indexFile = client.getServerConf().getIndex();
-		path = client.getServerConf().getRoot();
+		indexFile = client.getServerConf()->getIndex();
+		path = client.getServerConf()->getRoot();
 		std::cout << "index file (server conf) at " << path << " is: " << indexFile << std::endl;
 	}
 	if (!indexFile.empty())
@@ -129,7 +129,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 	// 	}
 	// }
 	// No index file found, check if directory listing is enabled
-	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf().getAutoIndex()))
+	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf()->getAutoIndex()))
 		handleDirectoryListing(client);
 	else {
 		// Directory listing is disabled and no index file exists
