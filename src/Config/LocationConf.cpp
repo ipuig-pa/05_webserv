@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 11:52:04 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:22:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 LocationConf::LocationConf()
 {
 	_locPath = "";
+	_methods[GET] = true;
+	_methods[HEAD] = true;
+	_methods[POST] = false;
+	_methods[DELETE] = false;
 	_locRoot = "";
 	_methodSet = false;
 	_cmbsFlag = false;

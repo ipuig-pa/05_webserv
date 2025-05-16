@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 16:55:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:15:13 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,6 @@ bool	RequestHandler::checkAllowedMethod(Client &client)
 	bool	method_allowed = false;
 
 	if (client.getLocationConf()) {
-		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
 			method_allowed = true;
 	}
