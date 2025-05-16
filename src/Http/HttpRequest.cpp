@@ -6,13 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 18:13:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:06:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
 
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
+
 HttpRequest::HttpRequest()
 	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false)
 {

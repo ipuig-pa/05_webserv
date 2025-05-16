@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 14:51:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:41:32 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	HttpResponse::setBytesRead(size_t bytes_read)
 	_bytes_read = bytes_read; //needed? Add or set?!!?
 }
 
-void	HttpResponse::setBytesSent(size_t bytes_sent)
+void	HttpResponse::addBytesSent(size_t bytes_sent)
 {
 	_bytes_sent += bytes_sent; //needed? Add or set?!!?
 }
@@ -139,13 +139,14 @@ bool	HttpResponse::isChunked(void)
 
 /*-------------METHODS--------------------------------------------------------*/
 
-void	HttpResponse::appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read)
+void	HttpResponse::appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length)
 {
 	if (_body_buffer.capacity() < _body_buffer.size() + bytes_read)
 		_body_buffer.reserve(_body_buffer.size() + bytes_read);
 	_body_buffer.insert(_body_buffer.end(), buffer.begin(), buffer.begin() + bytes_read);
 	_bytes_read += bytes_read;
-	_body_length += bytes_read;
+	if (contribute_length)
+		_body_length += bytes_read;
 }
 
 std::string	HttpResponse::statusToString() const

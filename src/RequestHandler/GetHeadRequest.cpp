@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 12:44:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:43:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ bool	RequestHandler::handleFileRead(Client &client)
 		size_t bytesRead = read(client.getFileFd(), buffer.data(), sizeof(buffer));
 		if (bytesRead > 0) {
 			buffer.resize(bytesRead);
-			client.getResponse().appendBodyBuffer(buffer, bytesRead);
+			client.getResponse().appendBodyBuffer(buffer, bytesRead, false);
 			LOG_INFO(std::to_string(bytesRead) + " bytes read from file " + std::to_string(client.getFileFd()) + "linked to client " + std::to_string(client.getSocket()));
 			return (false);
 		}

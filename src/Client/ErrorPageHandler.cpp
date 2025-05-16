@@ -6,11 +6,13 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 09:39:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:35:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ErrorPageHandler.hpp"
+
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 ErrorPageHandler::ErrorPageHandler(Client *client)
 	: _client(client)
@@ -21,13 +23,13 @@ ErrorPageHandler::~ErrorPageHandler()
 {
 }
 
+/*-------------METHODS--------------------------------------------------------*/
+
 std::string	ErrorPageHandler::generateErrorBody(int status_code)
 {
 	std::string	body;
 
-
 	//Handle here the status specific headers???
-
 
 	//INCLUDE GET ERR PAGE IN LOCATION CONF, SO IT CAN BE CHECKED HERE!!!!!!!
 	// if (_client->getLocationConf())
@@ -39,16 +41,14 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 	// 	}
 	// }
 	body = _client->getServerConf().getErrPageCode(status_code);
-	if (!body.empty())
-	{
+	if (!body.empty()) {
 		_client->getResponse().setBodyLength(body.length()); // or should read from there?
 		_client->getResponse().setBytesRead(body.length());
 		_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
 		_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
 		return (body);
 	}
-	if (status_code == 204 || status_code == 304)
-	{
+	if (status_code == 204 || status_code == 304) {
 		_client->getResponse().setBodyLength(0);
 		_client->getResponse().setBytesRead(0);
 		return ("");
@@ -79,12 +79,3 @@ std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 	_client->getResponse().setHeaderField("Content-Length", std::to_string(ss.str().length()));
 	return ss.str();
 }
-
-//to move to ServerConf and LocationConf, or to parent abstract class AConf
-// std::string	getErrPage(int status_code)
-// {
-// 	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
-// 	if (it != _error_page.end())
-// 		return it->second;
-// 	return "";
-// }

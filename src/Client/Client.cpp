@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 15:15:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:36:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,11 +153,11 @@ bool	Client::sendResponseChunk(void)
 		size_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
 			return false;
-		_response.setBytesSent(sent);
+		_response.addBytesSent(sent);
 		sent = send(_socket, headers.c_str(), headers.length(), 0);
 		if (sent < 0)
 			return false;
-		_response.setBytesSent(sent);
+		_response.addBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
 	if (!_response.isChunked() && _response.getBodyLength() != 0)
@@ -169,7 +169,7 @@ bool	Client::sendResponseChunk(void)
 			if (sent < 0)
 				return false;
 			_response.clearBodyBuffer();
-			_response.setBytesSent(sent);
+			_response.addBytesSent(sent);
 			return true;
 		}
 		else if (_file_fd == -1 && _response.getState() == READ) //or handle the case where there was a fd and is already sent!
@@ -189,7 +189,7 @@ bool	Client::sendResponseChunk(void)
 			size_t sent = send(_socket, chunk.data(), chunk.size(), 0);
 			if (sent < 0)
 				return false;
-			_response.setBytesSent(_response.getBodyBuffer().size());
+			_response.addBytesSent(_response.getBodyBuffer().size());
 			_response.clearBodyBuffer();
 			// std::cout << chunk << std::endl;
 		}
