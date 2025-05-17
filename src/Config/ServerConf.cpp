@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 14:40:15 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 16:04:09 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,25 +203,28 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 	}
 	if (loc.getCgiExtension().size() != 0) {
 		loc.setPathExMap(loc.getCgiExtension(), loc.getCgiSysPath());
-	}	
-	if (loc.getLocPath() == "/cgi") {
-		if (CgiChecker::_checkCGI(loc) != true) {
-			return ; //detailed error msg wrote in std::cerr alredy
-		}
-	} else {
-		if (loc.getLocPath()[0] != '/') {
-			throw std::runtime_error("Error: path should start with '/'");
-		}
-		if (loc.getLocRoot().empty()) { 
-			loc.setLocRoot(this->_root_dir);//not extra root passed inheritance from server{}
-		}
-		//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
-		// if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
-		// 	throw std::runtime_error("Error: path in loction is invalid: ");
-		// }
-		if (!_locReturnCheck(loc)) {
-			throw std::runtime_error("Error: invalid return parameter.");
-		}
+		CgiChecker::checkCGI(loc);
+	}
+	//debug message, remove later
+	// std::map<std::string, std::string> _map = loc.getPathExMap();
+	// for (auto it = _map.begin(); it != _map.end(); ++it) {
+	// 	std::cout << "\033[31mKey: " << it->first << "\nValue: \033[0m" << it->second << std::endl;
+	// }
+	// if (loc.getCgiExtension().size() != 0 && loc.getCgiSysPath().size() != 0) {
+	// 	loc.createCgiMatch();
+	// }
+	if (loc.getLocPath()[0] != '/') {
+		throw std::runtime_error("Error: path should start with '/'.");
+	}
+	if (loc.getLocRoot().empty()) { 
+		loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
+	}
+	//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
+	// if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
+	// 	throw std::runtime_error("Error: path in loction is invalid: ");
+	// }
+	if (!_locReturnCheck(loc)) {
+		throw std::runtime_error("Error: invalid return parameter.");
 	}
 	this->_location.push_back(loc);
 }
@@ -507,6 +510,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	std::cout << _location.size() << std::endl;
 	for(size_t i = 0; i < _location.size(); ++i)
 	{
+		std::cout << _location[i].getLocPath() << std::endl;
 		if ((_location[i]).getLocPath().compare(uripath) == 0)
 		{
 			std::cout << i << std::endl;

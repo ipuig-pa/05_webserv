@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 15:40:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:58:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,9 @@ private:
 	size_t				_chunk_size;
 	HttpRequest			&_httpReq;
 
-	std::string	_getPathFromUri(Client &client);
+	std::string	_mapSysPathFromUri(Client &client);
+	std::string	_normalizeUriPath(std::string rawUri);
+	bool		_isPathSafe(std::string normalizedUri, std::string docRoot);
 	void _parseReqLine(HttpRequest& request);
 	void _parseHeader(HttpRequest& request, Client &client);
 	void _parseBody(HttpRequest& request, Client &client);

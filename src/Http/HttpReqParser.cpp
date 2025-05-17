@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 14:03:15 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 16:04:15 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,9 @@ std::string	HttpReqParser::_mapUploadPath(Client &client)
 	// 	if (uploadPath.empty())
 	// 		return ("");
 	// }
-	// std::string locationRoot = location->getLocRoot();
-	// if (locationRoot.empty())
-	// 	locationRoot = config->getRoot();
+	// std::string docRoot = location->getLocRoot();
+	// if (docRoot.empty())
+	// 	docRoot = config->getRoot();
 	// std::string relativePath = uripath;
 	// if (uripath.find(uploadPath) == 0) {
 	// 	relativePath = uripath.substr(uploadPath.length());
@@ -67,30 +67,110 @@ std::string	HttpReqParser::_mapUploadPath(Client &client)
 	// if (!relativePath.empty() && relativePath[0] != '/') {
 	// 	relativePath = "/" + relativePath;
 	// }
-	// return locationRoot + relativePath;
+	// return docRoot + relativePath;
 }
 
-std::string	HttpReqParser::_getPathFromUri(Client &client)
+std::string	HttpReqParser::_normalizeUriPath(std::string rawUri)
 {
-	std::string	uripath = client.getRequest().getUri();
+	std::string	path = rawUri;
+	if (path.empty() || path[0] != '/') {
+		path = "/" + path;
+	}
+
+	std::vector<std::string> segments;
+	std::string segment;
+	std::stringstream ss(path);
+
+	std::getline(ss, segment, '/');
+	while (std::getline(ss, segment, '/')) {
+		if (segment.empty() || segment == ".") {
+			continue;
+		} else if (segment == "..") {
+			if (!segments.empty())
+				segments.pop_back();
+		} else
+			segments.push_back(segment);
+	}
+	std::string normalizedPath = "/";
+	for (size_t i = 0; i < segments.size(); ++i) {
+		normalizedPath += segments[i];
+		if (i < segments.size() - 1)
+			normalizedPath += "/";
+	}
+	if (!rawUri.empty() && rawUri[rawUri.length() - 1] == '/' && 
+		normalizedPath.length() > 1 && normalizedPath[normalizedPath.length() - 1] != '/') {
+		normalizedPath += "/";
+	}
+	return normalizedPath;
+}
+
+bool	HttpReqParser::_isPathSafe(std::string normalizedUri, std::string docRoot)
+{
+	std::string root = docRoot;
+	if (root.empty())
+		return false;
+	if (root[root.length() - 1] != '/')
+		root += "/";
+
+	std::string fullPath = root;
+	if (!normalizedUri.empty() && normalizedUri[0] == '/')
+		fullPath += normalizedUri.substr(1);
+	else
+		fullPath += normalizedUri;
+
+	char resolvedRoot[PATH_MAX];
+	char resolvedPath[PATH_MAX];
+	if (realpath(root.c_str(), resolvedRoot) == NULL)
+		return false;
+	std::string resolvedRootStr(resolvedRoot);
+	if (resolvedRootStr[resolvedRootStr.length() - 1] != '/')
+		resolvedRootStr += "/";
+	if (realpath(fullPath.c_str(), resolvedPath) == NULL) { // The path doesn't exist yet. This could be valid for new file creation, check if parent exist.
+		size_t lastSlash = fullPath.find_last_of('/');
+		if (lastSlash == std::string::npos)
+			return false;
+		std::string parentDir = fullPath.substr(0, lastSlash + 1);
+		char resolvedParent[PATH_MAX];
+		if (realpath(parentDir.c_str(), resolvedParent) == NULL)
+			return false;
+		std::string resolvedParentStr(resolvedParent);
+		if (resolvedParentStr[resolvedParentStr.length() - 1] != '/')
+			resolvedParentStr += "/";
+		return resolvedParentStr.find(resolvedRootStr) == 0;
+	}
+	std::string resolvedPathStr(resolvedPath);
+	return resolvedPathStr.find(resolvedRootStr) == 0;
+}
+
+std::string	HttpReqParser::_mapSysPathFromUri(Client &client)
+{
+	std::string normalizedUri = _normalizeUriPath(client.getRequest().getUri());
+
+	std::cout << "NORMALIZED URI: " << normalizedUri << std::endl;
 	ServerConf	*config = client.getServerConf();
-	LocationConf *location = config->getMatchingLocation(uripath);
-	if (!location) {
-		return (config->getRoot() + uripath);
+	LocationConf *location = client.getLocationConf();
+	std::string docRoot;
+	if (!location || location->getLocRoot().empty())
+		docRoot = config->getRoot();
+	else
+		docRoot = location->getLocRoot();
+	std::cout << "DOC ROOT: " << docRoot << std::endl;
+	if (!_isPathSafe(normalizedUri, docRoot)){
+		client.sendErrorResponse(403, "Resolved Uri is not allowed in this location");
+		return "";
 	}
-	client.setLocationConf(location);
-	std::string locationPath = location->getLocPath();
-	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
-	if (locationRoot.empty())
-		locationRoot = config->getRoot();
-	std::string relativePath = uripath;
-	if (uripath.find(locationPath) == 0) {
-		relativePath = uripath.substr(locationPath.length());
+	if (!location || location->getLocRoot().empty()) {
+		if (!normalizedUri.empty() && normalizedUri[0] != '/')
+			normalizedUri = "/" + normalizedUri;
+		return (docRoot + normalizedUri);
 	}
-	if (!relativePath.empty() && relativePath[0] != '/') {
+	std::string relativePath = normalizedUri;
+	if (normalizedUri.find(docRoot) == 0)
+		relativePath = normalizedUri.substr(docRoot.length());
+	if (!relativePath.empty() && relativePath[0] != '/')
 		relativePath = "/" + relativePath;
-	}
-	return locationRoot + relativePath;
+	std::cout << "RESOLVED PATH: " << docRoot << relativePath << std::endl;
+	return docRoot + relativePath;
 }
 
 std::vector<char>::const_iterator	HttpReqParser::_findEndOfLine()
@@ -184,9 +264,10 @@ void HttpReqParser::_parseHeader(HttpRequest &request, Client &client)
 				_stage = PARSE_ERROR;
 			}
 		}
-		else if (cur_line.empty()) {
+		else if (cur_line.empty() && _stage != PARSE_ERROR) {
 			_setRequestConf(request, client);
-			_prepareBodyParsing(request, client);
+			if (_stage != PARSE_ERROR)
+				_prepareBodyParsing(request, client);
 		}
 	}
 }
@@ -195,7 +276,8 @@ void HttpReqParser::_parseHeader(HttpRequest &request, Client &client)
 void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
 {
 	client.setServerConf(client.getListenSocket()->getConf(request.getHeaderVal("Host")));
-	request.setPath(_getPathFromUri(client));
+	client.setLocationConf(client.getServerConf()->getMatchingLocation(client.getRequest().getUri()));
+	request.setPath(_mapSysPathFromUri(client));
 	if (request.getMethod() == POST || request.getMethod() == DELETE)
 		request.setUpload(_mapUploadPath(client));
 	client.defineMaxBodySize();
@@ -227,7 +309,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 			_bodyLength = std::stoul(_content_len);
 			if (_bodyLength >= 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
 					_stage = BODY;
-				if(_bodyLength == 0)
+				if (_bodyLength == 0)
 					_stage = FINISH;
 				if (request.getHeaderVal("Expect") == "100-continue") {
 					client.setState(SENDING_CONTINUE);

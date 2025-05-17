@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 08:58:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:12:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 void	RequestHandler::handleDirectoryListing(Client &client)
 {
 	std::string path = client.getRequest().getPath();
+	std::string uri = client.getRequest().getUri();
 	DIR	*dirp = opendir(path.c_str());
 
-	LOG_DEBUG("About to list " + path);
-	if (!dirp)
-	{
+	LOG_DEBUG("About to list " + uri);
+	if (!dirp) {
 		client.sendErrorResponse(500, ""); //Internal Server error
 		return;
 	}
@@ -34,11 +34,11 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 
 	//COMPARE AND CHECK THE CONTENT WITH NGINX OUTPUT!!!!! (USE TELNET)
 	html << "<!DOCTYPE html>\n<html>\n<head>\n";
-	html << "<title>Index of " << path << "</title>\n";
+	html << "<title>Index of " << uri << "</title>\n";
 	html << "<style>table { width: 100%; } th, td { text-align: left; padding: 8px; } "
 		 << "tr:nth-child(even) { background-color: #f2f2f2; }</style>\n";
 	html << "</head>\n<body>\n";
-	html << "<h1>Index of " << path << "</h1>\n";
+	html << "<h1>Index of " << uri << "</h1>\n";
 	html << "<table>\n<tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>\n";
 	// Add parent directory link unless we're at root
 	if (path != "/") {
@@ -50,7 +50,7 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 		std::cout << "dirent reading " << dirent->d_name << std::endl;
 		std::string name = dirent->d_name;
 		// Skip hidden files and . and ..
-		if (name[0] == '.' && (name != "..")) {
+		if (name[0] == '.') {
 			continue;
 		}
 		std::string	fullPath = path + "/" + name;
@@ -70,11 +70,15 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 		LOG_ERR("Readdir error: " + std::string(strerror(errno)));
 		//handle error
 	}
+	std::cout << "REDIR LIST DONE" << std::endl;
 	std::sort(dirs.begin(), dirs.end());
+	std::cout << "DIR SORT DONE" << std::endl;
 	std::sort(files.begin(), files.end());
+	std::cout << "FILES SORT DONE" << std::endl;
 
 	for (const std::string& name : dirs) {
 		std::string fullPath = path + "/" + name;
+		std::string fullUri = uri + "/" + name;
 		if (stat(fullPath.c_str(), &fileStat) < 0) continue;
 		
 		// Format time
@@ -82,14 +86,15 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 		struct tm* timeinfo = localtime(&fileStat.st_mtime);
 		strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
 		
-		html << "<tr><td><a href=\"" << name << "/\">" << name << "/</a></td>";
+		html << "<tr><td><a href=\"" << fullUri << "/\">" << name << "/</a></td>";
 		html << "<td>" << timeStr << "</td>";
 		html << "<td>-</td></tr>\n";
 	}
-	
+
 	// Add files to HTML
 	for (const std::string& name : files) {
 		std::string fullPath = path + "/" + name;
+		std::string fullUri = uri + "/" + name;
 		if (stat(fullPath.c_str(), &fileStat) < 0) continue;
 		
 		// Format time
@@ -106,21 +111,22 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 		else
 			sizeStr = std::to_string(fileStat.st_size / (1024 * 1024)) + " MB";
 		
-		html << "<tr><td><a href=\"" << name << "\">" << name << "</a></td>";
+		html << "<tr><td><a href=\"" << fullUri << "\">" << name << "</a></td>";
 		html << "<td>" << timeStr << "</td>";
 		html << "<td>" << sizeStr << "</td></tr>\n";
 	}
-	
+
 	html << "</table>\n</body>\n</html>";
 	closedir(dirp);
+
+	std::string html_str = html.str();
 
 	// Send response to client
 	client.getResponse().setStatusCode(200);
 	client.getResponse().setHeaderField("Content-Type", "text/html");
-	client.getResponse().setHeaderField("Content-Length", std::to_string(html.str().size()));
-	std::vector<char> html_vector(html.str().begin(), html.str().end());
-	LOG_DEBUG("DIRECTORY LISTING: " + html.str());
-	client.getResponse().appendBodyBuffer(html_vector, html.str().size(), true);
+	client.getResponse().setHeaderField("Content-Length", std::to_string(html_str.size()));
+	std::vector<char> html_vector(html_str.begin(), html_str.end());
+	client.getResponse().appendBodyBuffer(html_vector, html_str.size(), true);
 	client.getResponse().setState(READ);
 	client.setState(SENDING_RESPONSE);
 	client.getTracker().setResponseStart();

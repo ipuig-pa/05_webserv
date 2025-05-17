@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 11:48:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 16:06:54 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void	RequestHandler::processRequest(Client &client)
 		client.setState(SENDING_RESPONSE);
 		return ;
 	}
-	
 	bool method_allowed = checkAllowedMethod(client);
 	if (method_allowed) {
 		if (_isCgiRequest(client) == true) {
@@ -42,35 +41,6 @@ void	RequestHandler::processRequest(Client &client)
 	}
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
-
-//Moved to parsing
-// std::string	RequestHandler::getPathFromUri(Client &client)
-// {
-// 	std::string	uripath = client.getRequest().getUri();
-// 	ServerConf	*config = client.getServerConf();
-// 	LocationConf *location = config->getMatchingLocation(uripath);
-
-// 	if (!location) {
-// 		return (config->getRoot() + uripath);
-// 	}
-// 	client.setLocationConf(location);
-// 	std::string locationPath = location->getLocPath();
-// 	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
-// 	//needed??
-// 	if (locationRoot.empty())
-// 		locationRoot = config->getRoot();
-// 	// Remove the location prefix from the URL path and append to the location's root
-// 	std::string relativePath = uripath;
-// 	if (uripath.find(locationPath) == 0) {
-// 		relativePath = uripath.substr(locationPath.length());
-// 	}
-// 	if (!relativePath.empty() && relativePath[0] != '/') {
-// 		relativePath = "/" + relativePath;
-// 	}
-// 	// std::string final = locationRoot + relativePath;
-// 	// std::cout << "LOC ROOT: " << locationRoot << " OR " << location->getLocRoot() << " OR " << config.getRoot() <<std::endl;
-// 	return locationRoot + relativePath;
-// }
 
 bool	RequestHandler::checkAllowedMethod(Client &client)
 {
