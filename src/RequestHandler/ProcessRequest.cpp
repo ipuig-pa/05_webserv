@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 11:42:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 11:48:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ bool	RequestHandler::checkAllowedMethod(Client &client)
 	bool	method_allowed = false;
 
 	if (client.getLocationConf()) {
+		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
 			method_allowed = true;
 	}
@@ -87,7 +88,6 @@ bool	RequestHandler::checkAllowedMethod(Client &client)
 	}
 	return (method_allowed);
 }
-
 /*-------------------------original version of processrequest, not redirection handled*/
 
 // void	RequestHandler::processRequest(Client &client)
@@ -147,22 +147,38 @@ bool	RequestHandler::checkAllowedMethod(Client &client)
 // 	return locationRoot + relativePath;
 // }
 
-bool	RequestHandler::checkAllowedMethod(Client &client)
-{
-	bool	method_allowed = false;
+// bool	RequestHandler::checkAllowedMethod(Client &client)
+// {
+// 	bool	method_allowed = false;
 
-	if (client.getLocationConf()) {
-		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
-		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
-			method_allowed = true;
-	}
-	else {
-		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
-			method_allowed = true;
-		}
-	}
-	return (method_allowed);
-}
+// 	if (client.getLocationConf()) {
+// 		std::cout << "Location Conf found in " << client.getLocationConf() << std::endl;
+// 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
+// 			method_allowed = true;
+// 	}
+// 	else {
+// 		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
+// 			method_allowed = true;
+// 		}
+// 	}
+// 	return (method_allowed);
+// }
+
+// bool	RequestHandler::checkAllowedMethod(Client &client)
+// {
+// 	bool	method_allowed = false;
+
+// 	if (client.getLocationConf()) {
+// 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
+// 			method_allowed = true;
+// 	}
+// 	else {
+// 		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
+// 			method_allowed = true;
+// 		}
+// 	}
+// 	return (method_allowed);
+// }
 
 /*-------------------------original version of processrequest, not redirection handled*/
 

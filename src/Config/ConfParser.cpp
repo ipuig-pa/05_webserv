@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 11:41:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 13:29:54 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 ConfParser::ConfParser() : _server_count(0) {
 	// _initHandler(); or put this in mainparse???
 }
-ConfParser::~ConfParser(){}
+ConfParser::~ConfParser() {}
 
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ConfParser::_split(const std::vector<std::string>& tokens)
@@ -146,7 +146,7 @@ ServerConf ConfParser::_addCategory(const std::vector<std::string>& tokens)
 			if (_cate == "location") {
 				_insideBlock = false;
 			}
-		} else if (_cate != "{" && _cate != "}"){
+		} else if (_cate != "{" && _cate != "}") {
 			throw std::runtime_error("Error: is problem happens here ? misplaced category: " + _cate);
 		}
 	}
@@ -164,14 +164,28 @@ void ConfParser::_initHandler()
 	_handlers["index"] = &ConfParser::parseIndex;
 	_handlers["error_page"] = &ConfParser::parseErrPage;
 	_handlers["autoindex"] = &ConfParser::parseAutoIndex;
+	_handlers["upload_store"] = &ConfParser::parseUploads;
+}
+
+size_t ConfParser::parseUploads(const std::vector<std::string> &tokens, size_t i, ServerConf &servConf)
+{
+	if (i + 1 > tokens.size()) {
+		throw std::runtime_error("Error: no parameter after 'upload_store'.");
+	}
+	if (servConf.getSrvUpload().empty() == false) {
+		throw std::runtime_error("Error: upload_store directive already exist.");
+	}
+	servConf.setSrvUpload(tokens[i + 1]);
+	i += 1;
+	return i;
 }
 
 size_t ConfParser::parseListen(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
-	if (i + 1 >= tokens.size()){
+	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'listen'.");
 	}
-	if (servConf.getPort()){
+	if (servConf.getPort()) {
 		throw std::runtime_error("Error: port already exist.");
 	}
 	servConf.setPort(tokens[i + 1]);
@@ -181,10 +195,10 @@ size_t ConfParser::parseListen(const std::vector<std::string>& tokens, size_t i,
 //str.empty() => return true if empty, false if non-empty
 size_t ConfParser::parseHost(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
-	if (i + 1 >= tokens.size()){
+	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'host'.");
 	}
-	if (servConf.getHost().empty() == false){
+	if (servConf.getHost().empty() == false) {
 		throw std::runtime_error("Error: 'host' already exist.");
 	}
 	servConf.setHost(tokens[i + 1]);
@@ -193,10 +207,10 @@ size_t ConfParser::parseHost(const std::vector<std::string>& tokens, size_t i, S
 }
 size_t ConfParser::parseRoot(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
-	if (i + 1 >= tokens.size()){
+	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'root'.");
 	}
-	if (servConf.getRoot().empty() == false){
+	if (servConf.getRoot().empty() == false) {
 		throw std::runtime_error("Error: 'root' already exist.");
 	}
 	servConf.setRoot(tokens[i + 1]);
@@ -205,10 +219,10 @@ size_t ConfParser::parseRoot(const std::vector<std::string>& tokens, size_t i, S
 }
 size_t ConfParser::parseSvrName(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
-	if (i + 1 >= tokens.size()){
+	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'server_name'.");
 	}
-	if (servConf.getSrvName().empty() == false){
+	if (servConf.getSrvName().empty() == false) {
 		throw std::runtime_error("Error: 'server_name' already exist.");
 	}
 	servConf.setSrvName(tokens[i + 1]);
@@ -217,10 +231,10 @@ size_t ConfParser::parseSvrName(const std::vector<std::string>& tokens, size_t i
 }
 size_t ConfParser::parseCMBS(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
-	if (i + 1 >= tokens.size()){
+	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'client_max_body_size'.");
 	}
-	if (servConf.getCMBS()){
+	if (servConf.getCMBS()) {
 		throw std::runtime_error("Error: 'client_max_body_size' already exist.");
 	}
 	servConf.setCMBS(tokens[i + 1]);
@@ -244,7 +258,7 @@ size_t ConfParser::parseAutoIndex(const std::vector<std::string>& tokens, size_t
 	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'autoindex'.");
 	}
-	//debug: need to sey flag, fix later
+	//debug: need to set flag, fix later
 	if (servConf.getAutoIndex() != false) {
 		throw std::runtime_error("Error: 'autoindex' already set.");
 	}

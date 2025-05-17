@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 12:28:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 15:33:33 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,23 @@
 
 void	RequestHandler::_handleCgiRequest(Client &client)
 {
-	LOG_INFO("\033[32mCGI Request recived\033[0m");
+	LOG_INFO("\033[32;1mCGI Request recived");
+	
+	// std::string	uripath = client.getRequest().getUri();
+	// std::cout << uripath << "\n";
+	// size_t pos = uripath.rfind("/");
+	// std::string tmp = uripath.substr(pos);
+	// std::cout << tmp << "\n";
+	// if (tmp.find(".")) {
+	// 	uripath = uripath.substr(0, pos);
+	// }
+	// std::cout << uripath << "\n";
+	// ServerConf	*config = client.getServerConf();
+	// LocationConf *location = config->getMatchingLocation(uripath);
+	// client.setLocationConf(location);
+	// LOG_DEBUG("DEBUGGING block finished\033[0m");
+	// LOG_DEBUG("\033[31mcurrent loction block is: \033[0m" + client.getLocationConf()->getLocPath());
+	
 	client.setCgiProcess(new CgiProcess(&client));
 	if (!client.getCgiProcess()->initCgi() && client.getState() != SENDING_RESPONSE) {
 		LOG_DEBUG("\033[31mCGI init fail\033[0m");

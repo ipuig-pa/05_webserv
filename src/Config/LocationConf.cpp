@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:22:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 14:56:56 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,30 @@ void LocationConf::setLocAuto(bool _flag)
 	this->_locAuto = _flag;
 	this->_autoflag = true;
 }
+void LocationConf::setLocUpload(std::string s)
+{
+	//3 is dir
+	// if (FileUtils::_pathType(s) != 3) {
+	// 	std::cout << "loction root is: " << _locRoot << "\n";
+	// 	s = _locRoot + _locPath + s;
+	// 	if (FileUtils::_pathType(s)) {
+	// 		throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
+	// 	}
+	// }
+	if (FileUtils::_pathType(s) != 3) {
+		// std::cout << "loction root is: " << _locRoot << "\n";
+		char cwd[PATH_MAX];
+		if (!getcwd(cwd, sizeof(cwd))) {
+			throw std::runtime_error("Error: location: cannot resolve uploads dorectory!");
+		}
+		s = std::string(cwd) + _locPath + s;
+		if (FileUtils::_pathType(s) != 3) {
+			throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
+		}
+	}
+	this->_locUp = s;
+}
+
 void	LocationConf::setRetCode(int n)
 {
 	this->_retCode = n;
@@ -200,6 +224,11 @@ bool LocationConf::checkRet()
 const std::string LocationConf::getLocPath() const
 {
 	return this->_locPath;
+}
+
+const std::string LocationConf::getLocUpload() const
+{
+	return this->_locUp;
 }
 
 bool LocationConf::getMethod(int method)

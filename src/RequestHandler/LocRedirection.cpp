@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 13:37:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 09:54:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 11:46:56 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 bool RequestHandler::_handleRedirection(Client& client)
 {
 	std::string	reqUri = client.getRequest().getUri();
-	ServerConf	&config = client.getServerConf();
-	LocationConf *locRetCheck = config.getMatchingLocation(reqUri);
+	ServerConf*	config = client.getServerConf();
+	LocationConf *locRetCheck = config->getMatchingLocation(reqUri);
 	if (!locRetCheck || !locRetCheck->checkRet()) {
 		return false;
 	}

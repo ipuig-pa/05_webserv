@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 13:33:30 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 14:40:15 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,21 @@ void ServerConf::setIndex(std::string s)
 	s = rmvSemicolon(s);
 	this->_index = s;
 }
+
+void ServerConf::setSrvUpload(std::string s)
+{
+	if (!_hasSemicolon(s)) {
+		throw std::runtime_error("Error: missing ';' after upload_store value.");
+	}
+	s = rmvSemicolon(s);
+	if (FileUtils::_pathType(s) != 3) {
+		s = _root_dir + s;
+		if (FileUtils::_pathType(s) != 3)
+		throw std::runtime_error("Error: Server level: upload_store value is not dir." + s);
+	}
+	this->_upload = s;
+}
+
 void ServerConf::_cleanLocTk(std::string& tk)
 {
 	if (!_hasSemicolon(tk)) {
@@ -178,31 +193,27 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
 		loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance //handle it in the directory request better?!?!?
 	}
+	if (loc.getLocRoot().empty() == true) {
+		loc.setLocRoot(_root_dir);
+		std::cout << "serve root is: " << _root_dir << "\n";
+		std::cout << "location root is: " << loc.getLocRoot() << "\n";
+	}
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
 	}
 	if (loc.getCgiExtension().size() != 0) {
 		loc.setPathExMap(loc.getCgiExtension(), loc.getCgiSysPath());
-	}
-	//debug message, remove later
-	// std::map<std::string, std::string> _map = loc.getPathExMap();
-	// for (auto it = _map.begin(); it != _map.end(); ++it) {
-	// 	std::cout << "\033[31mKey: " << it->first << "\nValue: \033[0m" << it->second << std::endl;
-	// }
-	
+	}	
 	if (loc.getLocPath() == "/cgi") {
 		if (CgiChecker::_checkCGI(loc) != true) {
 			return ; //detailed error msg wrote in std::cerr alredy
 		}
-	// if (loc.getCgiExtension().size() != 0 && loc.getCgiSysPath().size() != 0) {
-	// 	loc.createCgiMatch();
-	// }
 	} else {
 		if (loc.getLocPath()[0] != '/') {
-			throw std::runtime_error("Error: path should start with '/'.");
+			throw std::runtime_error("Error: path should start with '/'");
 		}
 		if (loc.getLocRoot().empty()) { 
-			loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
+			loc.setLocRoot(this->_root_dir);//not extra root passed inheritance from server{}
 		}
 		//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
 		// if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
@@ -214,13 +225,13 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 	}
 	this->_location.push_back(loc);
 }
+
 //use ofstd::map<string, std::function<void<>>
 void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
 {
 	LocationConf locBlock;
 	locBlock.setLocPath(_path);
-	std::cout << "\033[31;1mpath is: " << _path << "\033[0m\n";
-	std::cout << "\033[31;1min Loc is: " << locBlock.getLocPath() << "\033[0m\n";
+	std::cout << "\033[31;1mpath is: " << _path << "\nin Loc is: " << locBlock.getLocPath() << "\033[0m\n";
 	size_t i = 0;
 	std::map<std::string, std::function<void()> > _locHandler = {
 		{"root", [&](){ parseLocRoot(locBlock, loc_tokens, i); }},
@@ -230,24 +241,45 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 		{"index", [&](){ parseLocIndex(locBlock, loc_tokens, i); }},
 		{"cgi_path", [&](){ parseCgiSysPath(locBlock, loc_tokens, i); }},
 		{"cgi_extension", [&](){ parseCgiExtension(locBlock, loc_tokens, i); }},
-		{"return", [&](){ parseReturn(locBlock, loc_tokens, i); }}
+		{"return", [&](){ parseReturn(locBlock, loc_tokens, i); }},
+		{"upload_store", [&](){ parseLocUpload(locBlock, loc_tokens, i); }}
 	};
 	while (i < loc_tokens.size()) {
 		const std::string& _key = loc_tokens[i];
 		if (_locHandler.find(_key) != _locHandler.end()) {
 			_locHandler[_key]();
 			++i;
-		}
-		else {
+		} else {
 			throw std::runtime_error("Error: passed parameter in location is invalid" + _key);
 		}
 	}
-	//locBlock.createCgiMatch(locBlock.getCgiExtension(), locBlock.getCgiSysPath());
 	_wrapLocChecker(locBlock); //checks validity after parsing (cgi an static) and return err_msg
 }
 
+void ServerConf::parseLocUpload(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
+{
+	if (i + 1 > loc_tks.size()) {
+		throw std::runtime_error("Error: location: no parameter after 'upload'.");
+	}
+	if (loc.getLocUpload().empty() == false) {
+		throw std::runtime_error("Error: 'upload' in location already defined.");
+	}
+	++i;
+	if (!_hasSemicolon(loc_tks[i])) {
+		throw std::runtime_error("Error: missing ';' at value passed.");
+	}
+	std::string tmp = rmvSemicolon(loc_tks[i]);
+	if (FileUtils::_pathType(tmp) != 3) {
+		// std::cout << "loction root is: " << _locRoot << "\n";
+		// s = _locRoot + _locPath + s;
+		// if (FileUtils::_pathType(s)) {
+		// 	throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
+		// }
+	}
+	loc.setLocUpload(tmp);
+}
+
 //clean at parsing stage, and directly use setter
-//check 在setter中remove‘；’， cuz在parse checking后directly call setter
 void ServerConf::parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()){
@@ -508,6 +540,10 @@ std::string	ServerConf::getErrPageCode(int status_code)
 	return "";
 }
 
+std::string ServerConf::getSrvUpload() const
+{
+	return _upload;
+}
 
 unsigned int	ServerConf::getMaxBodySize() const
 {

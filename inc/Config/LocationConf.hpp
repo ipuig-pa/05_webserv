@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:17:39 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 13:58:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ class LocationConf
 	bool _locAuto;
 	bool _autoflag; //flag to check repetition 
 	std::string _locIndex; //should be a vector? (there can be more that one index files??)
-	//other optional, may not use
+	
+	std::string _locUp;
 	
 	int		_retCode;
 	bool	_hasReturn;
@@ -69,6 +70,8 @@ class LocationConf
 	bool _autoSet() const;
 	void setLocAuto(bool _flag);
 	
+	void setLocUpload(std::string s);
+	
 	//return
 	void	setRetCode(int n);
 	void	setRetUrl(std::string s);
@@ -91,6 +94,7 @@ class LocationConf
 	int getLocCMBS() const;
 	const std::string getLocIndex() const;
 	bool getLocAuto() const;
+	const std::string getLocUpload() const;
 	
 	int 						getRetCode() const;
 	std::string					getRetUrl() const;
