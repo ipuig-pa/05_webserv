@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:04:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 16:15:24 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,8 +195,16 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 	}
 	if (loc.getLocRoot().empty() == true) {
 		loc.setLocRoot(_root_dir);
-		std::cout << "serve root is: " << _root_dir << "\n";
-		std::cout << "location root is: " << loc.getLocRoot() << "\n";
+	}
+	if (loc.getLocUpload().empty() == false) {
+		if (FileUtils::_pathType(loc.getLocUpload()) != 3) {
+			std::string tmp = loc.getLocRoot() + loc.getLocPath() + loc.getLocUpload();
+			if (FileUtils::_pathType(tmp) != 3) {
+				throw std::runtime_error("Error: Location: upload value is not a dir: " + tmp);
+			}
+			loc.setLocUpload(tmp);
+			std::cout << "loction upload full path is: " << loc.getLocUpload() << "\n";
+		}
 	}
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);

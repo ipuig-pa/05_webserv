@@ -11,4 +11,4 @@
 # print("</body></html>")
 
 print("Content-Type: text/html\n")
-print("<html><body><h1>Hello from CGI!</h1></body></html>\n")
+print("<html><body><h1>\033[32;1mHello from CGI!</h1></body></html>\033[0m\n")

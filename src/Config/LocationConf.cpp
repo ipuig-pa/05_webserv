@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 14:56:56 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 16:20:49 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,25 +173,6 @@ void LocationConf::setLocAuto(bool _flag)
 }
 void LocationConf::setLocUpload(std::string s)
 {
-	//3 is dir
-	// if (FileUtils::_pathType(s) != 3) {
-	// 	std::cout << "loction root is: " << _locRoot << "\n";
-	// 	s = _locRoot + _locPath + s;
-	// 	if (FileUtils::_pathType(s)) {
-	// 		throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
-	// 	}
-	// }
-	if (FileUtils::_pathType(s) != 3) {
-		// std::cout << "loction root is: " << _locRoot << "\n";
-		char cwd[PATH_MAX];
-		if (!getcwd(cwd, sizeof(cwd))) {
-			throw std::runtime_error("Error: location: cannot resolve uploads dorectory!");
-		}
-		s = std::string(cwd) + _locPath + s;
-		if (FileUtils::_pathType(s) != 3) {
-			throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
-		}
-	}
 	this->_locUp = s;
 }
 
