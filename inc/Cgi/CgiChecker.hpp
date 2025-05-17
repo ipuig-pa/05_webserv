@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 09:17:23 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/12 10:07:26 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 15:24:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 // #include "conf/LocationConf.hpp"
 
 class LocationConf;
+class Client;
 
 class CgiChecker
 {
@@ -30,7 +31,8 @@ private:
 	static bool _matchSize(const LocationConf& loc);
 
 public:
-	static bool _checkCGI(const LocationConf& loc);
+	static bool checkCGI(const LocationConf& loc);
+	static bool	validCgiScript(Client *client);
 };
 
 #endif

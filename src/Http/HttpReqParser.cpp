@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 12:54:39 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 13:47:49 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,28 +145,30 @@ std::string	HttpReqParser::_mapSysPathFromUri(Client &client)
 {
 	std::string normalizedUri = _normalizeUriPath(client.getRequest().getUri());
 
+	std::cout << "NORMALIZED URI: " << normalizedUri << std::endl;
 	ServerConf	*config = client.getServerConf();
 	LocationConf *location = client.getLocationConf();
 	std::string docRoot;
-	if (!location)
+	if (!location || location->getLocRoot().empty())
 		docRoot = config->getRoot();
 	else
 		docRoot = location->getLocRoot();
+	std::cout << "DOC ROOT: " << docRoot << std::endl;
 	if (!_isPathSafe(normalizedUri, docRoot)){
 		client.sendErrorResponse(403, "Resolved Uri is not allowed in this location");
 		return "";
 	}
-	if (!location) {
+	if (!location || location->getLocRoot().empty()) {
 		if (!normalizedUri.empty() && normalizedUri[0] != '/')
 			normalizedUri = "/" + normalizedUri;
 		return (docRoot + normalizedUri);
 	}
-	std::string locationPath = location->getLocPath();
 	std::string relativePath = normalizedUri;
-	if (normalizedUri.find(locationPath) == 0)
-		relativePath = normalizedUri.substr(locationPath.length());
+	if (normalizedUri.find(docRoot) == 0)
+		relativePath = normalizedUri.substr(docRoot.length());
 	if (!relativePath.empty() && relativePath[0] != '/')
 		relativePath = "/" + relativePath;
+	std::cout << "RESOLVED PATH: " << docRoot << relativePath << std::endl;
 	return docRoot + relativePath;
 }
 

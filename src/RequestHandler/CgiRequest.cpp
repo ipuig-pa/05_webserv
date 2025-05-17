@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 12:28:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 15:22:07 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,3 @@ bool RequestHandler::_isCgiRequest(Client& client)
 	LOG_DEBUG("\033[32mNot CGI request or Unsupported CGI extension passed!\nSupproted extension is: .php, .py, .sh\033[0m");
 	return false;
 }
-
-//When is it used?!?!?!? Move to CgiChecker?!? Remove?!!?
-bool RequestHandler::validCgi(Client& client)
-{
-	std::string cgiPath = client.getRequest().getPath();
-	if (FileUtils::_pathType(cgiPath) == -1) {
-		client.sendErrorResponse(404, "CGI path not found");
-		std::cerr << "\033[31mError in cgi path type. Path is: " << cgiPath << "\033[0m" << std::endl;
-		return false;
-	}
-	if (FileUtils::_isExec(cgiPath) == -1) {
-		client.sendErrorResponse(403, "CGI path is not executable");
-		std::cout << "\033[31mError in cgi path not excutable. Path is: " << cgiPath << "\033[0m" << std::endl;
-		return false;
-	}
-	return true;
-}
-

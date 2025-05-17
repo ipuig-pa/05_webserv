@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 11:40:58 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 15:27:37 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,20 +77,18 @@ bool CgiProcess::initCgi()
 	int pipFromCgi[2] = {-1, -1};
 	int pipToCgi[2] = {-1, -1};
 	
-	LocationConf* locPTR = _client->getLocationConf();
-	std::cout << "\033[32mcurrent location is: \033[0m" << locPTR->getLocPath() << "\n";
-	if (locPTR != nullptr) {
-		if (!CgiChecker::_checkCGI(*locPTR)) {
-			return false;
-		}
-	} else {
+	LocationConf* locConf = _client->getLocationConf();
+	std::cout << "\033[32mcurrent location is: \033[0m" << locConf->getLocPath() << "\n";
+	if (!locConf) {
 		//std::cerr << "Location{} block is NULL!\n";
 		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
 		return false;
 	}
+	else if (!CgiChecker::validCgiScript(_client)) //Check CGI removed, as it is already checked in wrapLocChecker (in ServerConf creation at parsing)
+		return false;
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
-		LOG_ERR("\033[32mDEBUG messaga in pipe_CGI in requesthandler\033[0m");
+		LOG_ERR("\033[32mDEBUG message in pipe_CGI in requesthandler\033[0m"); //CHANGE MESSAGE!
 		cleanupCgiPipe(pipFromCgi, pipToCgi);
 		return false;
 	}
