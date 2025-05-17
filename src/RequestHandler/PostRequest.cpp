@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PostRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 08:53:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 14:04:02 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 
 //todo: need change
+//idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
 void	RequestHandler::handlePostRequest(Client &client)
 {
 	// std::string uploadPath = client.getRequest().getUpload(); //should not be the path, but the upload at that location

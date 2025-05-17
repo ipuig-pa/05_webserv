@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 18:21:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 18:25:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ bool HttpReqParser::httpParse(Client &client)
 }
 
 //TODO in LocConf and ServerConf Parsing!!! (upload_store)
+//idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
 std::string	HttpReqParser::_mapUploadPath(Client &client)
 {
 	(void) client;

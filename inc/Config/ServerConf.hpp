@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/11 14:51:18 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 13:30:22 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ private:
 	std::string _index;
 	std::map<int, std::string> _error_page; //err_code, url
 	bool _srv_autoindex; //default as false in construtor
-	// std::map<std::string, LocationConf> _locations;
+	std::string _upload;
 	std::vector<LocationConf> _location; //a set of location_blocks in server_configuration //todo check how to read specific loc
 
 	// std::vector<std::string> _error_page;
@@ -68,6 +68,7 @@ public:
 	void setIndex(std::string s);
 	void setAutoIndex(bool _flag);
 	void setErr(std::vector<std::string>& errTokens); //return std::map<> pair??
+	void	setSrvUpload(std::string s);
 	void _addLocation(std::string& _path, std::vector<std::string>& loc_tokens); //todo: setter for var in this class
 	//getters
 	int getPort() const;
@@ -77,8 +78,9 @@ public:
 	std::string getHost() const; //at socket binding part, use getaddrindo() to resolve!
 	std::string getIndex() const;
 	std::string getSrvName() const;
+	std::string getSrvUpload() const;
+	
 	const std::map<int, std::string>& getErrPage() const;
-	// const std::map<std::string, LocationConf>& getLocation() const;
 	// std::vector<std::string>& getErrPage() const;
 	const std::vector<LocationConf>& getLocation() const;
 	//[...]
@@ -94,6 +96,7 @@ public:
 	void parseCgiSysPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
+	void parseLocUpload(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	
 	LocationConf	*getMatchingLocation(std::string uripath);
 	std::string		getErrPageCode(int status_code);
