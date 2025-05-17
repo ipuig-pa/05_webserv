@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 16:50:16 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 16:08:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ bool	Client::sendResponseChunk(void)
 		std::string	status = _response.statusToString();
 		std::string	headers = _response.headersToString();
 		
-		size_t sent = send(_socket, status.c_str(), status.length(), 0);
+		ssize_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
 			return false;
 		_response.addBytesSent(sent);
@@ -170,7 +170,7 @@ bool	Client::sendResponseChunk(void)
 		// std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (_response.getBodyBuffer().size() != 0)
 		{
-			size_t sent = send(_socket, _response.getBodyBuffer().data(), _response.getBodyBuffer().size(), 0);
+			ssize_t sent = send(_socket, _response.getBodyBuffer().data(), _response.getBodyBuffer().size(), 0);
 			if (sent < 0)
 				return false;
 			_response.clearBodyBuffer();
@@ -191,7 +191,7 @@ bool	Client::sendResponseChunk(void)
 		if (_response.getBodyBuffer().size() != 0){
 			// LOG_DEBUG("buffer is not empty");
 			std::vector<char>	chunk = getChunk(_response.getBodyBuffer());
-			size_t sent = send(_socket, chunk.data(), chunk.size(), 0);
+			ssize_t sent = send(_socket, chunk.data(), chunk.size(), 0);
 			if (sent < 0)
 				return false;
 			_response.addBytesSent(_response.getBodyBuffer().size());
@@ -199,7 +199,7 @@ bool	Client::sendResponseChunk(void)
 			// std::cout << chunk << std::endl;
 		}
 		if (_response.getState() == READ && _response.getBytesSent() == (_response.statusToString().length() + _response.headersToString().length() + _response.getBytesRead())){
-			size_t sent = send(_socket, "0\r\n\r\n", 5, 0);
+			ssize_t sent = send(_socket, "0\r\n\r\n", 5, 0);
 			if (sent < 0)
 				return false;
 			return true;
@@ -213,7 +213,7 @@ bool	Client::sendResponseChunk(void)
 bool	Client::sendContinue(void)
 {
 	const char* response = "HTTP/1.1 100 Continue\r\n\r\n";
-	size_t sent = send(_socket, response, strlen(response), 0);
+	ssize_t sent = send(_socket, response, strlen(response), 0);
 	if (sent < 0)
 		return false;
 	return true;

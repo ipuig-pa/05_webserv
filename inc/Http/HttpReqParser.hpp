@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 11:58:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 17:25:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ enum reqStage {
 class HttpReqParser {
 private:
 	reqStage			_stage;
-	size_t				_bodyLength;
+	ssize_t				_bodyLength;
 	std::vector<char>	_buffer;
 	bool				_header_complete;
 	bool				_chunked;
@@ -39,7 +39,7 @@ private:
 
 	std::string	_mapSysPathFromUri(Client &client);
 	std::string	_normalizeUriPath(std::string rawUri);
-	bool		_isPathSafe(std::string normalizedUri, std::string docRoot);
+	bool		_isPathSafe(std::string normalizedUri, const std::string &docRoot);
 	void _parseReqLine(HttpRequest& request);
 	void _parseHeader(HttpRequest& request, Client &client);
 	void _parseBody(HttpRequest& request, Client &client);

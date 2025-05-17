@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 13:47:49 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 18:21:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ std::string	HttpReqParser::_normalizeUriPath(std::string rawUri)
 	return normalizedPath;
 }
 
-bool	HttpReqParser::_isPathSafe(std::string normalizedUri, std::string docRoot)
+bool	HttpReqParser::_isPathSafe(std::string normalizedUri, const std::string &docRoot)
 {
 	std::string root = docRoot;
 	if (root.empty())
@@ -138,6 +138,8 @@ bool	HttpReqParser::_isPathSafe(std::string normalizedUri, std::string docRoot)
 		return resolvedParentStr.find(resolvedRootStr) == 0;
 	}
 	std::string resolvedPathStr(resolvedPath);
+	if (resolvedPathStr[resolvedPathStr.length() - 1] != '/')
+		resolvedPathStr += "/";
 	return resolvedPathStr.find(resolvedRootStr) == 0;
 }
 
@@ -306,7 +308,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 	else {
 		try {
 			_bodyLength = std::stoul(_content_len);
-			if (_bodyLength >= 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
+			if (_bodyLength >= 0 && static_cast<size_t>(_bodyLength) <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
 					_stage = BODY;
 				if (_bodyLength == 0)
 					_stage = FINISH;
@@ -316,7 +318,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 				}
 				return ;
 			}
-			else if (_bodyLength > client.getMaxBodySize())
+			else if (static_cast<size_t>(_bodyLength) > client.getMaxBodySize())
 				client.sendErrorResponse(413, "Request body is too large"); //Payload Too Large
 			_stage = PARSE_ERROR;
 		}
@@ -406,7 +408,7 @@ void	HttpReqParser::_parseBody(HttpRequest &request, Client &client)
 			_buffer.clear();
 			return ;
 		}
-		else if (_bodyLength - _buffer.size() < 0)
+		else if (_bodyLength - static_cast<ssize_t>(_buffer.size()) < 0)
 			LOG_ERR("PARSE_Error: Body size does not match Content-Length");
 		request.appendBody(_buffer, _bodyLength);
 		request.setComplete(true);

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/14 11:39:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 16:15:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 #include <iomanip> // for put_time
 
 #include <sys/socket.h> //socket(), bind/listen/accept/send/recv()
+#include <sys/types.h> // For pid_t, etc.
+#include <sys/wait.h> // For waitpid() and related macros like WNOHANG
 #include <fcntl.h> //for fcntl() (non-blocking i/o)
 #include <netinet/in.h> //for sockaddr_in
 #include <poll.h> //see later, select() or epoll() (prob not)

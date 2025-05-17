@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:48:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 18:23:54 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,11 @@ std::atomic<bool> runServer = true;
 void signalHandler(const int signum) {
 	if (!runServer)
 		LOG_INFO("Server is already stopping...");
-	std::string s(sys_signame[signum]);
+	std::string s(sys_signame[signum]); //in Mac
 	for (size_t i = 0; i < s.length(); i++)
 		s[i] = toupper(s[i]);
 	LOG_FATAL("Server interrupted by SIG" + s + ". Stopping server...");
+	// LOG_FATAL("Server interrupted by SIG" + std::to_string(signum) + ". Stopping server..."); // Linux
 	runServer = false;
 }
 

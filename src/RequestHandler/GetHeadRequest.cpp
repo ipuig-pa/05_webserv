@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 16:53:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 18:19:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 		path = client.getLocationConf()->getLocRoot() + client.getLocationConf()->getLocPath();
 		std::cout << "index file (location conf) at " << path << " is: " << indexFile << std::endl;
 	}
-	else
+	if (indexFile.empty())
 	{
 		indexFile = client.getServerConf()->getIndex();
 		path = client.getServerConf()->getRoot();

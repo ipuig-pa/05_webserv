@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:36 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 12:59:50 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 16:19:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,12 @@ bool CgiProcess::writeToCgi(void)
 		return true; //clean and closed, finish writing
 	}
 	const std::vector<char> &cgi_body = _client->getRequest().getBody();
-	size_t bodyWrt = write(_pipToCgi, cgi_body.data(), cgi_body.size());
+	ssize_t bodyWrt = write(_pipToCgi, cgi_body.data(), cgi_body.size());
 	if (bodyWrt < 0) {
 		LOG_ERR("\033[31mfail to write to CGI stdin\033[0m");
 		return false;
 	}
-	else if (bodyWrt == cgi_body.size() && _client->getRequest().isComplete())
+	else if (static_cast<size_t>(bodyWrt) == cgi_body.size() && _client->getRequest().isComplete())
 	{
 		close(_pipToCgi);
 		_pipToCgi = -1;
