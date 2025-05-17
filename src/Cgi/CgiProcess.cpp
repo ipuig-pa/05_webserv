@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:04:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:40:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ bool CgiProcess::initCgi()
 	int pipToCgi[2] = {-1, -1};
 	
 	LocationConf* locPTR = _client->getLocationConf();
+	std::cout << "\033[32mcurrent location is: \033[0m" << locPTR->getLocPath() << "\n";
 	if (locPTR != nullptr) {
 		if (!CgiChecker::_checkCGI(*locPTR)) {
 			return false;

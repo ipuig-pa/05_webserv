@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:35:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:44:55 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,32 +56,19 @@ void	RequestHandler::handleClientRead(Client &client)
 			processRequest(client);
 	}
 }
-// if (client.getState() == READING_CGI) {
-// 	readCgiOutput(client);
-// }
-// if (isCgiRequest(client)) {
-// 	if (initCgi(client) == false) {
-// 		client.sendErrorResponse(500, "");
-// 	}
-// 	else {
-// 		client.setState(READING_CGI);
-// 	}
-// 	return ;
-// }
 
 void	RequestHandler::handleClientWrite(Client &client)
 {
 	LOG_DEBUG("Handle writing to client at socket " + std::to_string(client.getSocket()));
+	
 	if (client.getState() == SENDING_RESPONSE)
 	{
-		if (!client.sendResponseChunk())
-		//error handling??
+		if (!client.sendResponseChunk()) //error handling??
 			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
 	}
 	if (client.getState() == SENDING_CONTINUE)
 	{
-		if (!client.sendContinue())
-		//error handling??
+		if (!client.sendContinue()) //error handling??
 			std::cerr << "Error sending continue" << std::endl; // change to proper behaviour
 		client.setState(CONTINUE_REQUEST);
 		return ;
@@ -101,6 +88,71 @@ void	RequestHandler::handleClientWrite(Client &client)
 
 // if (client.getState() == WRITING_CGI) {
 // 	if (writeToCgi(client)) {
+// 		client.setState(READING_CGI);
+// 	}
+// 	return ;
+// }
+
+/*-------------------coe snippet for test-------------------*/
+// void	RequestHandler::handleClientWrite(Client &client)
+// {
+// 	LOG_DEBUG("Handle writing to client at socket " + std::to_string(client.getSocket()));
+	
+// 	if (client.getState() == SENDING_RESPONSE)
+// 	{
+// 		if (!client.sendResponseChunk()) {
+// 			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
+// 			//error handling??
+// 		}
+// 		if (client.getResponse().getStatusCode() >= 300 && client.getResponse().getStatusCode() < 400)
+// 		{
+// 			size_t totalBytes = client.getResponse().statusToString().length() + 
+// 								client.getResponse().headersToString().length() + 
+// 								client.getResponse().getBodyLength();
+
+// 			if (client.getResponse().getBytesSent() >= totalBytes)
+// 			{
+// 				LOG_DEBUG("Redirect client.getResponse() fully sent.");
+// 				client.getResponse().setState(SENT);
+				
+// 				if (client.getRequest().getHeaderVal("Connection") == "close")
+// 					client.setState(CONNECTION_CLOSED);
+// 				else
+// 					client.setState(NEW_REQUEST);
+// 				// return;
+// 			}
+// 		}
+// 	}
+// 	if (client.getState() == SENDING_CONTINUE)
+// 	{
+// 		if (!client.sendContinue())
+// 		//error handling??
+// 			std::cerr << "Error sending continue" << std::endl; // change to proper behaviour
+// 		client.setState(CONTINUE_REQUEST);
+// 		return ;
+// 	}
+// 	std::cout << "sent " << client.getResponse().getBytesSent() << ".\nStatus: " << client.getResponse().statusToString().length() << ".\nHeader: " << client.getResponse().headersToString().length() << ".\nBody: " << client.getResponse().getHeader("Content-Length") << "/" << client.getResponse().getBodyLength() << "/" << client.getResponse().getBytesRead() << std::endl;
+// 	std::cout << "RESPO STATE: " << client.getResponse().getState() << std::endl;
+// 	if (client.getResponse().getState() == READ && (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() + client.getResponse().getBytesRead())))
+// 	{
+// 		client.getResponse().setState(SENT);
+// 		if (client.getRequest().getHeaderVal("Connection") == "close")
+// 			client.setState(CONNECTION_CLOSED);
+// 		else
+// 			// client.setState(CONNECTION_CLOSED);
+// 			client.setState(NEW_REQUEST);
+// 	}
+// }
+
+/*-----previous version of put cgi loop in processrequest(), now moved to run()(in multiserver) */
+// if (client.getState() == READING_CGI) {
+// 	readCgiOutput(client);
+// }
+// if (isCgiRequest(client)) {
+// 	if (initCgi(client) == false) {
+// 		client.sendErrorResponse(500);
+// 	}
+// 	else {
 // 		client.setState(READING_CGI);
 // 	}
 // 	return ;

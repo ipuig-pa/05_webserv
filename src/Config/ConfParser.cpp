@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:03:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:41:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,6 @@ ConfParser::ConfParser() : _server_count(0) {
 	// _initHandler(); or put this in mainparse???
 }
 ConfParser::~ConfParser(){}
-
-//read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
-// -> create serverBlock and actual instance of serverConf
-// #include "ReadConf.hpp"
-// int ConfParser::testMain(const std::string& fileName)
-// {
-// 	//add path check logic here for server block
-// 	std::vector<std::string> tokens;
-// 	std::string lines = read_conf(fileName);
-// 	createTokens(lines, tokens);
-// 	_split(tokens);
-// 	_createServBlock();
-// 	//inside location{}, path_valid check needed
-// 	return (0);
-// }
-
 
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ConfParser::_split(const std::vector<std::string>& tokens)
@@ -308,6 +292,7 @@ size_t ConfParser::parseLocation(const std::vector<std::string>& tokens, size_t 
 	}
 	i++; //move the the '/path'
 	std::string _path = tokens[i];
+	//std::cout << "\033[31;1mLocation path is: " << _path << "\033[0m\n";
 	size_t _locEnd = _blockEnd(tokens, i);
 	std::vector<std::string> loc_tokens(tokens.begin() + i + 2, tokens.begin() + _locEnd);//pos i+2: the 1st element after '{'
 	servConf._addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
@@ -348,4 +333,21 @@ size_t ConfParser::parseLocation(const std::vector<std::string>& tokens, size_t 
 // 		i++; //return index of closing '}', and hence put this into one 'server{}' block
 // 	}
 // 	return pos;
+// }
+
+/*logic flow for any reference*/
+
+//read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
+// -> create serverBlock and actual instance of serverConf
+// #include "ReadConf.hpp"
+// int ConfParser::testMain(const std::string& fileName)
+// {
+// 	//add path check logic here for server block
+// 	std::vector<std::string> tokens;
+// 	std::string lines = read_conf(fileName);
+// 	createTokens(lines, tokens);
+// 	_split(tokens);
+// 	_createServBlock();
+// 	//inside location{}, path_valid check needed
+// 	return (0);
 // }

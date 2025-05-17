@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 10:21:41 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 09:53:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,19 +27,18 @@
 class RequestHandler
 {
 private:
-	void		handleGetRequest(Client &client);
-	void		handlePostRequest(Client &client);
-	void		handleDeleteRequest(Client &client);
-	void		handleInvalidRequest(Client &client);
-	void		handleDirectoryRequest(Client &client);
-	void		handleDirectoryListing(Client &client);
-	void		_handleCgiRequest(Client &client);
-	// bool		_handleRedirection(const LocationConf& curLoc);
-	// bool		_handleRedirection(Client& client);
-	std::string	getPathFromUri(Client &client);
-	bool		checkAllowedMethod(Client &client);
+	void				handleGetRequest(Client &client);
+	void				handlePostRequest(Client &client);
+	void				handleDeleteRequest(Client &client);
+	void				handleInvalidRequest(Client &client);
+	void				handleDirectoryRequest(Client &client);
+	void				handleDirectoryListing(Client &client);
+	void				_handleCgiRequest(Client &client);
+	bool				_handleRedirection(Client& client);
+	std::string			getPathFromUri(Client &client);
+	bool				checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
-	std::string	_getAbsoluteUrl(Client& client, const std::string& path);
+	std::string			_getAbsoluteUrl(Client& client, const std::string& path);
 	
 public:
 	RequestHandler();
