@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 10:22:50 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 09:49:19 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,6 @@
 
 void	RequestHandler::processRequest(Client &client)
 {
-	// LocationConf* locRetCheck = client.getLocationConf();
-	// if (locRetCheck && locRetCheck->checkRet()) {
-	// 	client.getResponse().setStatusCode(locRetCheck->getRetCode());
-	// 	client.getResponse().setHeaderField("Location", locRetCheck->getRetUrl());
-	// 	client.setState(SENDING_RESPONSE);
-	// 	return ;
-	// }
-	
 	void	(RequestHandler::*handleMethod[])(Client &) = {
 		&RequestHandler::handleGetRequest, 
 		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
@@ -31,8 +23,11 @@ void	RequestHandler::processRequest(Client &client)
 
 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
 
-	// client.getRequest().setPath(getPathFromUri(client)); //moved to parsing, in order to get the location path beforehand
-
+	if (_handleRedirection(client) == true) {
+		client.setState(SENDING_RESPONSE);
+		return ;
+	}
+	
 	bool method_allowed = checkAllowedMethod(client);
 	if (method_allowed) {
 		if (_isCgiRequest(client) == true) {
@@ -47,34 +42,6 @@ void	RequestHandler::processRequest(Client &client)
 	}
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
-
-// void	RequestHandler::processRequest(Client &client)
-// {
-// 	void	(RequestHandler::*handleMethod[])(Client &) = {
-// 		&RequestHandler::handleGetRequest, 
-// 		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
-// 		&RequestHandler::handlePostRequest, 
-// 		&RequestHandler::handleDeleteRequest, 
-// 		&RequestHandler::handleInvalidRequest};
-
-// 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
-
-// 	client.getRequest().setPath(getPathFromUri(client));
-
-// 	bool method_allowed = checkAllowedMethod(client);
-// 	if (method_allowed) {
-// 		if (_isCgiRequest(client) == true) {
-// 			_handleCgiRequest(client);
-// 			return ;
-// 		} else {
-// 			LOG_DEBUG("\033[32mStatic request called!\033[0m");
-// 			(this->*handleMethod[client.getRequest().getMethod()])(client);
-// 		}
-// 	} else {
-// 		(this->*handleMethod[4])(client); // invalid request
-// 	}
-// 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
-// }
 
 std::string	RequestHandler::getPathFromUri(Client &client)
 {
@@ -121,3 +88,33 @@ bool	RequestHandler::checkAllowedMethod(Client &client)
 	}
 	return (method_allowed);
 }
+
+/*-------------------------original version of processrequest, not redirection handled*/
+
+// void	RequestHandler::processRequest(Client &client)
+// {
+// 	void	(RequestHandler::*handleMethod[])(Client &) = {
+// 		&RequestHandler::handleGetRequest, 
+// 		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
+// 		&RequestHandler::handlePostRequest, 
+// 		&RequestHandler::handleDeleteRequest, 
+// 		&RequestHandler::handleInvalidRequest};
+
+// 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
+
+// 	client.getRequest().setPath(getPathFromUri(client));
+
+// 	bool method_allowed = checkAllowedMethod(client);
+// 	if (method_allowed) {
+// 		if (_isCgiRequest(client) == true) {
+// 			_handleCgiRequest(client);
+// 			return ;
+// 		} else {
+// 			LOG_DEBUG("\033[32mStatic request called!\033[0m");
+// 			(this->*handleMethod[client.getRequest().getMethod()])(client);
+// 		}
+// 	} else {
+// 		(this->*handleMethod[4])(client); // invalid request
+// 	}
+// 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
+// }

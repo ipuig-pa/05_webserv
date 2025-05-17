@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorPageHandler.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 09:39:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 09:34:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 		_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
 		return (body);
 	}
-	if (status_code == 204 || status_code == 304)
+	// if (status_code == 204 || status_code == 304)
+	if (status_code == 204 || (status_code >= 300 && status_code <= 400))
 	{
 		_client->getResponse().setBodyLength(0);
 		_client->getResponse().setBytesRead(0);

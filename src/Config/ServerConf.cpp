@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 16:39:37 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 13:33:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,6 +219,8 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 {
 	LocationConf locBlock;
 	locBlock.setLocPath(_path);
+	std::cout << "\033[31;1mpath is: " << _path << "\033[0m\n";
+	std::cout << "\033[31;1min Loc is: " << locBlock.getLocPath() << "\033[0m\n";
 	size_t i = 0;
 	std::map<std::string, std::function<void()> > _locHandler = {
 		{"root", [&](){ parseLocRoot(locBlock, loc_tokens, i); }},
@@ -462,6 +464,8 @@ const std::vector<LocationConf>& ServerConf::getLocation() const {
 	return this->_location;
 }
 
+
+//todo: instead of full-match, for redirection, as long as the "request uri" is included in locPath, go REDIRECTION
 LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 {
 	LocationConf	*longest_match = nullptr;

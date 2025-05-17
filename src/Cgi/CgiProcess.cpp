@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 12:53:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 11:30:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,13 @@ bool CgiProcess::initCgi()
 	int pipToCgi[2] = {-1, -1};
 	
 	LocationConf* locPTR = _client->getLocationConf();
+	std::cout << "\033[32mcurrent location is: \033[0m" << locPTR->getLocPath() << "\n";
 	if (locPTR != nullptr) {
 		if (!CgiChecker::_checkCGI(*locPTR)) {
 			return false;
 		}
 	} else {
-		//std::cerr << "Location{} block is NULL!\n";
-		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
+		throw std::runtime_error("\033[31mLocation{} block is NULL!\033[0m");
 	}
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
 		LOG_ERR("\033[32mDEBUG messaga in pipe_CGI in requesthandler\033[0m");
