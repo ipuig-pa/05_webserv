@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 16:54:49 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 09:17:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,8 +224,10 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 	else {
 		try {
 			_bodyLength = std::stoul(_content_len);
-			if (_bodyLength > 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
-				_stage = BODY;
+			if (_bodyLength >= 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
+					_stage = BODY;
+				if(_bodyLength == 0)
+					_stage = FINISH;
 				if (request.getHeaderVal("Expect") == "100-continue") {
 					client.setState(SENDING_CONTINUE);
 					_buffer.clear();

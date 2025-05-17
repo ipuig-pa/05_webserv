@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:37:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 08:58:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 
 	while ((dirent = readdir(dirp)))
 	{
-		std::cout << "dirent reading" << dirent->d_name << std::endl;
+		std::cout << "dirent reading " << dirent->d_name << std::endl;
 		std::string name = dirent->d_name;
 		// Skip hidden files and . and ..
 		if (name[0] == '.' && (name != "..")) {
@@ -67,7 +67,7 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	}
 	if (errno) // will catch errors from readdir
 	{
-		LOG_ERR("Poll error: " + std::string(strerror(errno)));
+		LOG_ERR("Readdir error: " + std::string(strerror(errno)));
 		//handle error
 	}
 	std::sort(dirs.begin(), dirs.end());
@@ -119,7 +119,9 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	client.getResponse().setHeaderField("Content-Type", "text/html");
 	client.getResponse().setHeaderField("Content-Length", std::to_string(html.str().size()));
 	std::vector<char> html_vector(html.str().begin(), html.str().end());
-	client.getResponse().setBodyBuffer(html_vector);
+	LOG_DEBUG("DIRECTORY LISTING: " + html.str());
+	client.getResponse().appendBodyBuffer(html_vector, html.str().size(), true);
+	client.getResponse().setState(READ);
 	client.setState(SENDING_RESPONSE);
 	client.getTracker().setResponseStart();
 }

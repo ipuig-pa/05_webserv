@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 16:02:51 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 17:17:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ class LocationConf
 {
 	private:
 	std::string _locPath; //where path starts: /images (ie: go under this dir)
+	std::string _locRoot; //where to get files: ./www/images, if not set, go with SRV_root
 	// std::vector<std::string> _methods; //GET POST DELETE
 	bool _methods[4]; //4 methods supported : GET, HEAD, POST, DELETE
 	bool _methodSet;
 	//for serve files
-	std::string _locRoot; //where to get files: ./www/images, if not set, go with SRV_root
 	//for uplaod limit
 	bool _cmbsFlag;
 	unsigned long long _locCMBS;

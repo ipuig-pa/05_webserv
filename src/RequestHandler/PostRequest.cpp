@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 16:53:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 08:53:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,8 @@ bool	RequestHandler::handleFileWrite(Client &client)
 		client.getResponse().setHeaderField("Content-Type", "text/plain");
 		std::string responseBody = "File '" + client.getRequest().getPath().substr(client.getRequest().getPath().find_last_of('/') + 1) + "' was successfully uploaded.\n";
 		std::vector<char> responseVector(responseBody.begin(), responseBody.end());
-		client.getResponse().setBodyBuffer(responseVector);
-		client.getResponse().setBodyLength(responseBody.length());
+		client.getResponse().appendBodyBuffer(responseVector, responseBody.length(), true);
 		client.getResponse().setState(READ);
-		client.getResponse().setBytesRead(responseBody.length());
 		return true;
 	}
 	return false;
