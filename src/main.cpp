@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/08 15:48:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:48:58 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 #include "MultiServer.hpp"
 
 std::atomic<bool> runServer = true;
-
-
 
 // Signal handler function
 void signalHandler(const int signum) {

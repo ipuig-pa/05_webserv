@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:37:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 16:25:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 15:45:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "global.hpp"
 #include "Client.hpp"
 #include "ServerConf.hpp"
-#include "Socket.hpp"
+#include "ListenSocket.hpp"
 #include "RequestHandler.hpp"
 #include "TimeoutConf.hpp"
 #include "CgiProcess.hpp"
@@ -27,7 +27,7 @@ class MultiServer
 private:
 	std::vector<std::vector<ServerConf>>	_serv_config;
 	std::vector<struct pollfd>				_poll;
-	std::map<int, Socket*>					_sockets; //maps each listening socket fd to the socket object
+	std::map<int, ListenSocket*>			_sockets; //maps each listening socket fd to the socket object
 	std::map<int, Client*>					_clients; //maps each client socket fd to the client object
 	TimeoutConf								_timeouts;
 	bool									_drain_mode;
@@ -35,7 +35,7 @@ private:
 
 	void						_init_sockets(std::vector<std::vector<ServerConf>> &serv_config);
 	void						_openListeningSocket(std::vector<ServerConf> &serv_conf);
-	void						_acceptNewConnection(Socket *listen_socket);
+	void						_acceptNewConnection(ListenSocket *listen_socket);
 	void						_checkTimeouts();
 	void						_handleCgiTimeout(CgiProcess *cgi, bool &should_close);
 	void						_eraseFromPoll(int fd);
@@ -43,7 +43,7 @@ private:
 	void						_handleOutputFd(int fd, RequestHandler &req_hand);
 	void						_handleConnections(void);
 	void						_closeClientConnection(Client *client);
-	void						_closeListeningSocket(Socket *socket);
+	void						_closeListeningSocket(ListenSocket *socket);
 	void						_newFdsToPoll(Client *client);
 	void						_handlePollErr(int fd, int i);
 

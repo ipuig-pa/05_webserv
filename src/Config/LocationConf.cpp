@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 16:52:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/16 17:22:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,10 @@
 LocationConf::LocationConf()
 {
 	_locPath = "";
+	_methods[GET] = true;
+	_methods[HEAD] = true;
+	_methods[POST] = false;
+	_methods[DELETE] = false;
 	_locRoot = "";
 	_methodSet = false;
 	_cmbsFlag = false;
@@ -152,7 +156,6 @@ const std::map<std::string, std::string>& LocationConf::getPathExMap() const
 {
 	return this->_cgiExPathMap;
 }
-
 
 void LocationConf::setLocIndex(std::string s)
 {

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 14:15:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 12:04:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ void	CgiProcess::readCgiOutput()
 		// cleanCloseCgi();//close and clean
 	}
 	else {
-		LOG_ERR("\033[31merror in reading CGI (pipe)\033[0m\n");
-		_client->sendErrorResponse(500);
+		LOG_ERR("\033[31mError in reading CGI (pipe)\033[0m\n");
+		_client->sendErrorResponse(500, "");
 		cleanCloseCgi();//close and clean
 	}
 }
@@ -63,7 +63,7 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 			_cgiHeadersToResponse();
 	}
 	else
-		_client->getResponse().appendBodyBuffer(buffer, bytes);
+		_client->getResponse().appendBodyBuffer(buffer, bytes, true);
 	// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
 }
 
@@ -100,7 +100,7 @@ void	CgiProcess::_cgiHeadersToResponse()
 
 	std::string content_str = content.str();
 	std::vector<char> content_vector(content_str.begin(), content_str.end());
-	response.appendBodyBuffer(content_vector, content.str().length());
+	response.appendBodyBuffer(content_vector, content.str().length(), true);
 	response.setBodyLength(content.str().length());
 	// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;
 }

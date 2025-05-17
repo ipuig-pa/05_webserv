@@ -6,11 +6,13 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 09:34:25 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 11:41:21 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ErrorPageHandler.hpp"
+
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 ErrorPageHandler::ErrorPageHandler(Client *client)
 	: _client(client)
@@ -21,13 +23,13 @@ ErrorPageHandler::~ErrorPageHandler()
 {
 }
 
-std::string	ErrorPageHandler::generateErrorBody(int status_code)
+/*-------------METHODS--------------------------------------------------------*/
+
+std::string	ErrorPageHandler::generateErrorBody(int status_code, std::string message)
 {
 	std::string	body;
 
-
 	//Handle here the status specific headers???
-
 
 	//INCLUDE GET ERR PAGE IN LOCATION CONF, SO IT CAN BE CHECKED HERE!!!!!!!
 	// if (_client->getLocationConf())
@@ -38,9 +40,8 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 	// 		return (body);
 	// 	}
 	// }
-	body = _client->getServerConf().getErrPageCode(status_code);
-	if (!body.empty())
-	{
+	body = _client->getServerConf()->getErrPageCode(status_code);
+	if (!body.empty()) {
 		_client->getResponse().setBodyLength(body.length()); // or should read from there?
 		_client->getResponse().setBytesRead(body.length());
 		_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
@@ -55,20 +56,23 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code)
 		return ("");
 	}	
 	else
-		return ErrorPageHandler::getDefaultErrorPage(status_code);
+		return ErrorPageHandler::getDefaultErrorPage(status_code, message);
 }
 
-std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
+std::string ErrorPageHandler::getDefaultErrorPage(int status_code, std::string message)
 {
+	std::string	explanation = "The server encountered an error processing your request: " + message;
 	std::string status_message = _client->getResponse().getStatus().getStatusMessage();
 	std::stringstream ss;
 
+	if (message.empty())
+		explanation = "The server encountered an error processing your request";
 	ss	<< "<!DOCTYPE html>\n"
 		<< "<html>\n"
 		<< "<head><title>" << status_code << " " << status_message << "</title></head>\n"
 		<< "<body>\n"
 		<< "<h1>" << status_code << " " << status_message << "</h1>\n"
-		<< "<p>The server encountered an error processing your request.</p>\n"
+		<< "<p>" << explanation << "</p>\n"
 		<< "<hr>\n"
 		<< "<address>webserv</address>\n"
 		<< "</body>\n"
@@ -80,12 +84,3 @@ std::string ErrorPageHandler::getDefaultErrorPage(int status_code)
 	_client->getResponse().setHeaderField("Content-Length", std::to_string(ss.str().length()));
 	return ss.str();
 }
-
-//to move to ServerConf and LocationConf, or to parent abstract class AConf
-// std::string	getErrPage(int status_code)
-// {
-// 	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
-// 	if (it != _error_page.end())
-// 		return it->second;
-// 	return "";
-// }

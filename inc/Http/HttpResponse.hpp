@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 14:17:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 10:41:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ public:
 	void		clearBodyBuffer();
 	void		setState(responseState state);
 	void		setBytesRead(size_t bytes_read);
-	void		setBytesSent(size_t bytes_sent);
+	void		addBytesSent(size_t bytes_sent);
 	void		setChunked(bool chunked);
 
 	//getters
@@ -65,7 +65,7 @@ public:
 	bool		isChunked(void);
 
 	//methods
-	void		appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read);
+	void		appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length);
 	std::string	statusToString() const;
 	std::string	headersToString() const;
 	void		checkMandatoryHeaders();

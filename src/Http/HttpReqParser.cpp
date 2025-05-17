@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 18:23:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/17 09:17:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,13 @@ bool HttpReqParser::httpParse(Client &client)
 {
 	_httpReq.setComplete(false);
 	if (_stage == REQ_LINE && _chunk_complete)
-		_parseReqLine(_httpReq, client);
+		_parseReqLine(_httpReq);
 	if (_stage == HEADERS && _header_complete)
 		_parseHeader(_httpReq, client);
 	if (_stage == BODY)
 		_parseBody(_httpReq, client);
 	if (_stage == PARSE_ERROR && client.getState() != SENDING_RESPONSE)
-		client.sendErrorResponse(400);
+		client.sendErrorResponse(400, "Error parsing request"); //Bad request
 	LOG_DEBUG("STAGE AFTER PARSING: " + std::to_string(_stage));
 	return _stage == FINISH;
 }
@@ -40,48 +40,48 @@ std::string	HttpReqParser::_mapUploadPath(Client &client)
 {
 	(void) client;
 	return ("");
-// 	std::string	uripath = client.getRequest().getUri();
-// 	std::string uploadPath;
-// 	ServerConf	&config = client.getServerConf();
-// 	LocationConf *location = client.getLocationConf();
-// 	if (!location) {
-// 		uploadPath = config.getUpload();
-// 		if (uploadPath.empty())
-// 			return ("");
-// 	}
-// 	else {
-// 		uploadPath = location->getUpload();
-// 		if (uploadPath.empty())
-// 			uploadPath = config.getUpload();
-// 		if (uploadPath.empty())
-// 			return ("");
-// 	}
-// 	std::string locationRoot = location->getLocRoot();
-// 	if (locationRoot.empty())
-// 		locationRoot = config.getRoot();
-// 	std::string relativePath = uripath;
-// 	if (uripath.find(uploadPath) == 0) {
-// 		relativePath = uripath.substr(uploadPath.length());
-// 	}
-// 	if (!relativePath.empty() && relativePath[0] != '/') {
-// 		relativePath = "/" + relativePath;
-// 	}
-// 	return locationRoot + relativePath;
+	// std::string	uripath = client.getRequest().getUri();
+	// std::string uploadPath;
+	// ServerConf	*config = client.getServerConf();
+	// LocationConf *location = client.getLocationConf();
+	// if (!location) {
+	// 	uploadPath = config->getUpload();
+	// 	if (uploadPath.empty())
+	// 		return ("");
+	// }
+	// else {
+	// 	uploadPath = location->getUpload();
+	// 	if (uploadPath.empty())
+	// 		uploadPath = config->getUpload();
+	// 	if (uploadPath.empty())
+	// 		return ("");
+	// }
+	// std::string locationRoot = location->getLocRoot();
+	// if (locationRoot.empty())
+	// 	locationRoot = config->getRoot();
+	// std::string relativePath = uripath;
+	// if (uripath.find(uploadPath) == 0) {
+	// 	relativePath = uripath.substr(uploadPath.length());
+	// }
+	// if (!relativePath.empty() && relativePath[0] != '/') {
+	// 	relativePath = "/" + relativePath;
+	// }
+	// return locationRoot + relativePath;
 }
 
 std::string	HttpReqParser::_getPathFromUri(Client &client)
 {
 	std::string	uripath = client.getRequest().getUri();
-	ServerConf	&config = client.getServerConf();
-	LocationConf *location = config.getMatchingLocation(uripath);
+	ServerConf	*config = client.getServerConf();
+	LocationConf *location = config->getMatchingLocation(uripath);
 	if (!location) {
-		return (config.getRoot() + uripath);
+		return (config->getRoot() + uripath);
 	}
 	client.setLocationConf(location);
 	std::string locationPath = location->getLocPath();
 	std::string locationRoot = location->getLocRoot(); // it sould return serverConf root if it does not exist??
 	if (locationRoot.empty())
-		locationRoot = config.getRoot();
+		locationRoot = config->getRoot();
 	std::string relativePath = uripath;
 	if (uripath.find(locationPath) == 0) {
 		relativePath = uripath.substr(locationPath.length());
@@ -117,7 +117,7 @@ std::string	HttpReqParser::_takeLine()
 	return (cur_line);
 }
 
-void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
+void HttpReqParser::_parseReqLine(HttpRequest &request)
 {
 	LOG_DEBUG("PARSING REQ LINE");
 	std::string method;
@@ -150,10 +150,6 @@ void HttpReqParser::_parseReqLine(HttpRequest &request, Client &client)
 		return ;
 	}
 	request.setVersion(ver);
-	client.getRequest().setPath(_getPathFromUri(client));
-	if (request.getMethod() == POST || request.getMethod() == DELETE)
-		client.getRequest().setUpload(_mapUploadPath(client));
-	client.defineMaxBodySize();
 	_stage = HEADERS;
 }
 
@@ -188,10 +184,22 @@ void HttpReqParser::_parseHeader(HttpRequest &request, Client &client)
 			}
 		}
 		else if (cur_line.empty()) {
+			_setRequestConf(request, client);
 			_prepareBodyParsing(request, client);
 		}
 	}
 }
+
+
+void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
+{
+	client.setServerConf(client.getListenSocket()->getConf(request.getHeaderVal("Host")));
+	request.setPath(_getPathFromUri(client));
+	if (request.getMethod() == POST || request.getMethod() == DELETE)
+		request.setUpload(_mapUploadPath(client));
+	client.defineMaxBodySize();
+}
+
 
 void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 {
@@ -216,8 +224,10 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 	else {
 		try {
 			_bodyLength = std::stoul(_content_len);
-			if (_bodyLength > 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
-				_stage = BODY;
+			if (_bodyLength >= 0 && _bodyLength <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
+					_stage = BODY;
+				if(_bodyLength == 0)
+					_stage = FINISH;
 				if (request.getHeaderVal("Expect") == "100-continue") {
 					client.setState(SENDING_CONTINUE);
 					_buffer.clear();
@@ -225,7 +235,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 				return ;
 			}
 			else if (_bodyLength > client.getMaxBodySize())
-				client.sendErrorResponse(413); //Payload Too Large
+				client.sendErrorResponse(413, "Request body is too large"); //Payload Too Large
 			_stage = PARSE_ERROR;
 		}
 		catch (const std::exception& e) {
@@ -261,7 +271,7 @@ bool	HttpReqParser::_parseChunkSize(Client &client)
 		return true;
 	}
 	else if (_bodyLength + _chunk_size > client.getMaxBodySize())
-		client.sendErrorResponse(413); //Payload Too Large
+		client.sendErrorResponse(413, "Request body is too large"); //Payload Too Large
 	_checkChunkCompletion();
 	return false;
 }

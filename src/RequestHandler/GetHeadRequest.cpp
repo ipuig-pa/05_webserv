@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 12:44:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:53:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@ void	RequestHandler::handleGetRequest(Client &client)
 	std::string path = client.getRequest().getPath();
 
 	if (access(path.c_str(), F_OK) != 0) {
-		client.sendErrorResponse(404); // Not found
+		client.sendErrorResponse(404, ""); // Not found
 		return ;
 	}
 	if (access(path.c_str(), R_OK) != 0) {
-		client.sendErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403, ""); // Forbidden
 		return ;
 	}
 	struct stat file_stat;
@@ -36,7 +36,7 @@ void	RequestHandler::handleGetRequest(Client &client)
 	int file_fd = open(path.c_str(), O_RDONLY);
 
 	if (file_fd == -1) {
-		client.sendErrorResponse(404); // Not Found
+		client.sendErrorResponse(404, ""); // Not Found
 		return ;
 	}
 	// Set non-blocking
@@ -88,8 +88,8 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 	}
 	else
 	{
-		indexFile = client.getServerConf().getIndex();
-		path = client.getServerConf().getRoot();
+		indexFile = client.getServerConf()->getIndex();
+		path = client.getServerConf()->getRoot();
 		std::cout << "index file (server conf) at " << path << " is: " << indexFile << std::endl;
 	}
 	if (!indexFile.empty())
@@ -129,11 +129,11 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 	// 	}
 	// }
 	// No index file found, check if directory listing is enabled
-	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf().getAutoIndex()))
+	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf()->getAutoIndex()))
 		handleDirectoryListing(client);
 	else {
 		// Directory listing is disabled and no index file exists
-		client.sendErrorResponse(403); // Forbidden
+		client.sendErrorResponse(403, ""); // Forbidden
 	}
 }
 
@@ -146,7 +146,7 @@ bool	RequestHandler::handleFileRead(Client &client)
 		size_t bytesRead = read(client.getFileFd(), buffer.data(), sizeof(buffer));
 		if (bytesRead > 0) {
 			buffer.resize(bytesRead);
-			client.getResponse().appendBodyBuffer(buffer, bytesRead);
+			client.getResponse().appendBodyBuffer(buffer, bytesRead, false);
 			LOG_INFO(std::to_string(bytesRead) + " bytes read from file " + std::to_string(client.getFileFd()) + "linked to client " + std::to_string(client.getSocket()));
 			return (false);
 		}

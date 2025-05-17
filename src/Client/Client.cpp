@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/15 15:15:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 16:50:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 // 	//create a new socket?!?!
 // }
 
-Client::Client(int socket, ServerConf &default_conf)
-	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _currentServerConf(default_conf), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
+Client::Client(int socket, ListenSocket *listenSocket)
+	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _listenSocket(listenSocket), _currentServerConf(nullptr), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
 {
 	_error_handler = new ErrorPageHandler(this);
 }
@@ -66,7 +66,12 @@ std::string	Client::getStateString(clientState state) {
 	}
 }
 
-ServerConf	&Client::getServerConf(void)
+ListenSocket	*Client::getListenSocket(void)
+{
+	return (_listenSocket);
+}
+
+ServerConf	*Client::getServerConf(void)
 {
 	return	(_currentServerConf);
 }
@@ -153,11 +158,11 @@ bool	Client::sendResponseChunk(void)
 		size_t sent = send(_socket, status.c_str(), status.length(), 0);
 		if (sent < 0)
 			return false;
-		_response.setBytesSent(sent);
+		_response.addBytesSent(sent);
 		sent = send(_socket, headers.c_str(), headers.length(), 0);
 		if (sent < 0)
 			return false;
-		_response.setBytesSent(sent);
+		_response.addBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
 	if (!_response.isChunked() && _response.getBodyLength() != 0)
@@ -169,7 +174,7 @@ bool	Client::sendResponseChunk(void)
 			if (sent < 0)
 				return false;
 			_response.clearBodyBuffer();
-			_response.setBytesSent(sent);
+			_response.addBytesSent(sent);
 			return true;
 		}
 		else if (_file_fd == -1 && _response.getState() == READ) //or handle the case where there was a fd and is already sent!
@@ -189,7 +194,7 @@ bool	Client::sendResponseChunk(void)
 			size_t sent = send(_socket, chunk.data(), chunk.size(), 0);
 			if (sent < 0)
 				return false;
-			_response.setBytesSent(_response.getBodyBuffer().size());
+			_response.addBytesSent(_response.getBodyBuffer().size());
 			_response.clearBodyBuffer();
 			// std::cout << chunk << std::endl;
 		}
@@ -215,7 +220,7 @@ bool	Client::sendContinue(void)
 }
 
 
-void	Client::setServerConf(ServerConf &conf)
+void	Client::setServerConf(ServerConf *conf)
 {
 	_currentServerConf = conf;
 }
@@ -225,11 +230,11 @@ void	Client::setLocationConf(LocationConf *conf)
 	_currentLocConf = conf;
 }
 
-void	Client::sendErrorResponse(int code)
+void	Client::sendErrorResponse(int code, std::string message)
 {
 	LOG_ERR("Error " + std::to_string(code) + " occurred");
 	_response.setStatusCode(code);
-	std::string error_page = _error_handler->generateErrorBody(code);
+	std::string error_page = _error_handler->generateErrorBody(code, message);
 	std::vector<char> error_vector(error_page.begin(), error_page.end());
 	_response.setBodyBuffer(error_vector);
 	_response.setState(READ);
@@ -247,8 +252,9 @@ void	Client::defineMaxBodySize(void)
 	// if (_currentLocConf && !(_currentLocConf->getMaxBodySize() != -1))
 	// 	_max_body_size = _currentLocConf->getMaxBodySize();
 	// else 
-	if (_currentServerConf.getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
-		_max_body_size = _currentServerConf.getMaxBodySize();
+	if (_currentServerConf->getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
+		_max_body_size = _currentServerConf->getMaxBodySize();
 	else
 		_max_body_size = DEFAULT_MAX_CLIENT_BODY;
 }
+

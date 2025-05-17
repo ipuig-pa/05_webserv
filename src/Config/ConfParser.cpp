@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 09:52:05 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 11:41:29 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ void ConfParser::_split(const std::vector<std::string>& tokens)
 		throw std::runtime_error("Error: cannot find server."); //will be caught by try-catch block
 	}
 	size_t i = 0;
-	while (i < tokens.size())
-	{	if (tokens[i] == "server")
+	while (i < tokens.size()) {
+		if (tokens[i] == "server")
 		{
 			size_t right = _blockEnd(tokens, i);
 			_addToServBlock(tokens, i, right);

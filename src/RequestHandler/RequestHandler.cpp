@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 09:47:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/17 11:44:55 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	RequestHandler::handleClientRead(Client &client)
 						client.setState(PROCESSING);
 				}
 				catch(int error_code) {
-					client.sendErrorResponse(error_code); //413: Request entity too large
+					client.sendErrorResponse(error_code, "Request entity too large"); //413: Request entity too large
 				}
 			}
 		}

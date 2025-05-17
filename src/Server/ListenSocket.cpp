@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Socket.cpp                                         :+:      :+:    :+:   */
+/*   ListenSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/08 20:07:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/16 17:05:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Socket.hpp"
+#include "ListenSocket.hpp"
 
 /**
  * TASK:
@@ -18,7 +18,7 @@
  * listen to upcoming connection (non-blocking)
 */
 
-Socket::Socket(std::vector<ServerConf> &config)
+ListenSocket::ListenSocket(std::vector<ServerConf> &config)
 	:_socket_fd(-1), _port(config[0].getPort()), _conf(config)
 {
 	//creating socket on IP "???" and port "_port"
@@ -31,7 +31,7 @@ Socket::Socket(std::vector<ServerConf> &config)
 	int opt = 1;
 	setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	//set up the address structure to use
-	Socket::setaddress(config[0]);
+	setaddress(config[0]);
 	// Bind socket to the address and port
 	if (bind(_socket_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 		// Handle listen error -> throw exception / runtime error!?!?!?
@@ -46,12 +46,12 @@ Socket::Socket(std::vector<ServerConf> &config)
 	}
 }
 
-Socket::~Socket()
+ListenSocket::~ListenSocket()
 {
 	close(_socket_fd);
 }
 
-void	Socket::setaddress(const ServerConf& config)
+void	ListenSocket::setaddress(const ServerConf& config)
 {
 	(void) config;
 	memset(&_address, 0, sizeof(_address));
@@ -61,37 +61,39 @@ void	Socket::setaddress(const ServerConf& config)
 	_address.sin_port = htons(_port);// Convert port to network byte order
 }
 
-int	Socket::getFd()
+int	ListenSocket::getFd()
 {
 	return _socket_fd;
 }
 
-int	Socket::getPort()
+int	ListenSocket::getPort()
 {
 	return _port;
 }
 
-struct sockaddr_in	Socket::getAddress()
+struct sockaddr_in	ListenSocket::getAddress()
 {
 	return _address;
 }
 
-ServerConf	&Socket::getDefaultConf()
+ServerConf	*ListenSocket::getDefaultConf()
 {
-	return (_conf[0]);
+	return (&_conf[0]);
 }
 
-ServerConf	&Socket::getConf(std::string name)
+
+ServerConf	*ListenSocket::getConf(std::string name)
 {
 	for(size_t i=0; i < _conf.size(); i++)
 	{
-		if ((_conf[i].getSrvName()).compare(name) == 0)
-			return (_conf[i]);
+		if ((_conf[i].getSrvName()).compare(name) == 0) {
+			return (&_conf[i]);
+		}
 	}
 	return (this->getDefaultConf());
 }
 
-std::vector<ServerConf>	&Socket::getConfVector()
+std::vector<ServerConf>	&ListenSocket::getConfVector()
 {
 	return _conf;
 }
