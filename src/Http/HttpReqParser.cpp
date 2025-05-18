@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpReqParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 18:25:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/18 10:57:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,33 +41,33 @@ std::string	HttpReqParser::_mapUploadPath(Client &client)
 {
 	(void) client;
 	return ("");
-	// std::string	uripath = client.getRequest().getUri();
-	// std::string uploadPath;
-	// ServerConf	*config = client.getServerConf();
-	// LocationConf *location = client.getLocationConf();
-	// if (!location) {
-	// 	uploadPath = config->getUpload();
-	// 	if (uploadPath.empty())
-	// 		return ("");
-	// }
-	// else {
-	// 	uploadPath = location->getUpload();
-	// 	if (uploadPath.empty())
-	// 		uploadPath = config->getUpload();
-	// 	if (uploadPath.empty())
-	// 		return ("");
-	// }
-	// std::string docRoot = location->getLocRoot();
-	// if (docRoot.empty())
-	// 	docRoot = config->getRoot();
-	// std::string relativePath = uripath;
-	// if (uripath.find(uploadPath) == 0) {
-	// 	relativePath = uripath.substr(uploadPath.length());
-	// }
-	// if (!relativePath.empty() && relativePath[0] != '/') {
-	// 	relativePath = "/" + relativePath;
-	// }
-	// return docRoot + relativePath;
+	std::string	uripath = client.getRequest().getUri();
+	std::string uploadPath;
+	ServerConf	*config = client.getServerConf();
+	LocationConf *location = client.getLocationConf();
+	if (!location) {
+		uploadPath = config->getSrvUpload();
+		if (uploadPath.empty())
+			return ("");
+	}
+	else {
+		uploadPath = location->getLocUpload();
+		if (uploadPath.empty()) //idea: i removed the inheritance of locUpload in parser bc you are checking here
+			uploadPath = config->getSrvUpload();
+		if (uploadPath.empty())
+			return ("");
+	}
+	std::string docRoot = location->getLocRoot();
+	if (docRoot.empty())
+		docRoot = config->getRoot(); //this is checked in wrapper()
+	std::string relativePath = uripath;
+	if (uripath.find(uploadPath) == 0) {
+		relativePath = uripath.substr(uploadPath.length());
+	}
+	if (!relativePath.empty() && relativePath[0] != '/') {
+		relativePath = "/" + relativePath;
+	}
+	return docRoot + relativePath;
 }
 
 std::string	HttpReqParser::_normalizeUriPath(std::string rawUri)
