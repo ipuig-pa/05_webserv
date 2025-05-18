@@ -3,22 +3,40 @@
 /*                                                        :::      ::::::::   */
 /*   PostRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 14:04:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 14:23:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-
 //todo: need change
 //idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
 void	RequestHandler::handlePostRequest(Client &client)
 {
-	// std::string uploadPath = client.getRequest().getUpload(); //should not be the path, but the upload at that location
-	std::string uploadPath = client.getRequest().getPath(); //should not be the path, but the upload at that location
+	std::string uploadPath = client.getRequest().getUpload();
+	std::string reqPath = client.getRequest().getPath();
+	if (uploadPath.empty())
+		uploadPath = reqPath;
+	else {
+		if (uploadPath[uploadPath.length() - 1] != '/')
+			uploadPath += '/';
+		std::string filename;
+		if (reqPath.empty() || reqPath[reqPath.length() - 1] == '/')
+			filename = _generateUniqueFilename();
+		else {
+			size_t lastSlash = reqPath.find_last_of('/');
+			if (lastSlash != std::string::npos) {
+				filename = reqPath.substr(lastSlash + 1);
+			} else {
+				filename = reqPath;
+			}
+		}
+		uploadPath += filename;
+	}
+
 	if (uploadPath.empty()) {
 		client.sendErrorResponse(404, ""); // Not Found
 		return;
@@ -66,6 +84,8 @@ bool	RequestHandler::handleFileWrite(Client &client)
 	int file_fd = client.getFileFd();
 	const std::vector<char>& body = client.getRequest().getBody();
 
+	std::cout << "HEADERS: " << client.getRequest().getHeaderVal("Content-Disposition") << "BODY: " << client.getRequest().getBody() << std::endl;
+
 	if (client.getRequest().getPostBytesWritten() < body.size()) {
 		size_t bytesLeft = body.size() - client.getRequest().getPostBytesWritten();
 		ssize_t bytesWritten = write(file_fd, body.data() + client.getRequest().getPostBytesWritten(), bytesLeft);
@@ -92,3 +112,17 @@ bool	RequestHandler::handleFileWrite(Client &client)
 	return false;
 }
 
+std::string	RequestHandler::_generateUniqueFilename()
+{
+	static int id = 0;
+	std::string filename;
+
+	std::time_t now = std::time(nullptr);
+	std::tm* timeinfo = std::localtime(&now);
+	std::stringstream timestamp;
+	timestamp << std::put_time(timeinfo, "%Y%m%d_%H%M%S");
+	
+	filename = "upload_" + std::to_string(id) + "_" + timestamp.str();
+	id++;
+	return (filename);
+}

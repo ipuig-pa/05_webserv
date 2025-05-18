@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 09:53:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 13:21:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,9 @@ private:
 	std::string			getPathFromUri(Client &client);
 	bool				checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
-	std::string			_getAbsoluteUrl(Client& client, const std::string& path);
+	std::string			_getAbsoluteUrl(Client& client, const std::string &path);
+	bool				_deleteAttempt(Client &client, const std::string &path);
+	std::string			_generateUniqueFilename();
 	
 public:
 	RequestHandler();
