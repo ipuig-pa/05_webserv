@@ -3,23 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:15:24 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 11:02:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConf.hpp"
 
-ServerConf::ServerConf() {
-	_port = 0;
-	_server_name = "";
-	_root_dir = "";
-	_host = "";
-	
-	_max_body_size = 0;
-	_srv_autoindex = false;
+ServerConf::ServerConf()
+	: _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _srv_autoindex(false), _upload("")
+{
 }
 // ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
 ServerConf::~ServerConf() {}
@@ -528,7 +523,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	match = 0;
 	for(size_t i = 0; i < _location.size(); ++i)
 	{
-		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().back() == '/' && uripath.find(_location[i].getLocPath()) == 0)
+		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size()] == '/')
 		{
 			if (_location[i].getLocPath().size() > match)
 			{
