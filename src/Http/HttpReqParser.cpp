@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/18 10:57:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 11:53:00 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ bool	HttpReqParser::_isPathSafe(std::string normalizedUri, const std::string &do
 std::string	HttpReqParser::_mapSysPathFromUri(Client &client)
 {
 	std::string normalizedUri = _normalizeUriPath(client.getRequest().getUri());
+	client.getRequest().setUri(normalizedUri);
 
 	std::cout << "NORMALIZED URI: " << normalizedUri << std::endl;
 	ServerConf	*config = client.getServerConf();

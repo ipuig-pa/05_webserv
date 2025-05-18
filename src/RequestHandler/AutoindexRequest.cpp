@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 11:12:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/18 10:01:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,13 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 {
 	std::string path = client.getRequest().getPath();
 	std::string uri = client.getRequest().getUri();
+	if (path[path.length() - 1] != '/')
+		path += "/";
+	if (uri[uri.length() - 1] != '/')
+		uri += "/";
+	// std::string root = client.getServerConf()->getRoot();
+	// if (client.getServerConf() && !client.getLocationConf()->getLocRoot().empty())
+	// 	root = client.getLocationConf()->getLocRoot();
 	DIR	*dirp = opendir(path.c_str());
 
 	LOG_DEBUG("About to list " + uri);
@@ -32,7 +39,6 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	//write the HTML content: d_name etc
 	std::stringstream html;
 
-	//COMPARE AND CHECK THE CONTENT WITH NGINX OUTPUT!!!!! (USE TELNET)
 	html << "<!DOCTYPE html>\n<html>\n<head>\n";
 	html << "<title>Index of " << uri << "</title>\n";
 	html << "<style>table { width: 100%; } th, td { text-align: left; padding: 8px; } "
@@ -41,9 +47,10 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	html << "<h1>Index of " << uri << "</h1>\n";
 	html << "<table>\n<tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>\n";
 	// Add parent directory link unless we're at root
-	if (path != "/") {
+	if (uri != "/")
 		html << "<tr><td><a href=\"../\">Parent Directory</a></td><td>-</td><td>-</td></tr>\n";
-	}
+	else
+		html << "<tr><td><a href=\"./\">Parent Directory</a></td><td>-</td><td>-</td></tr>\n";
 
 	while ((dirent = readdir(dirp)))
 	{
@@ -53,7 +60,7 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 		if (name[0] == '.') {
 			continue;
 		}
-		std::string	fullPath = path + "/" + name;
+		std::string	fullPath = path + name;
 		// skip if an error occur in stat
 		if(stat(fullPath.c_str(), &fileStat) < 0){
 			continue;
@@ -77,8 +84,8 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 	std::cout << "FILES SORT DONE" << std::endl;
 
 	for (const std::string& name : dirs) {
-		std::string fullPath = path + "/" + name;
-		std::string fullUri = uri + "/" + name;
+		std::string fullPath = path + name;
+		std::string fullUri = uri + name;
 		if (stat(fullPath.c_str(), &fileStat) < 0) continue;
 		
 		// Format time
@@ -93,8 +100,8 @@ void	RequestHandler::handleDirectoryListing(Client &client)
 
 	// Add files to HTML
 	for (const std::string& name : files) {
-		std::string fullPath = path + "/" + name;
-		std::string fullUri = uri + "/" + name;
+		std::string fullPath = path + name;
+		std::string fullUri = uri + name;
 		if (stat(fullPath.c_str(), &fileStat) < 0) continue;
 		
 		// Format time
