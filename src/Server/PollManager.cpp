@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 15:46:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:51:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,8 @@ void	MultiServer::_handlePollErr(int fd, int i)
 				it_c->second->getCgiProcess()->readCgiOutput();
 				// it_c->second->getCgiProcess()->setActive(false);
 				// it_c->second->getResponse().setState(READ);
-				// _eraseFromPoll(fd);
+				if (it_c->second->getCgiProcess()->isActive() == false)
+					_eraseFromPoll(fd);
 				return ;
 			}
 		}
