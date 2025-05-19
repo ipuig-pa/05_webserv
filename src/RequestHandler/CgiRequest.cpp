@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:04:26 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/19 19:40:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	RequestHandler::_handleCgiRequest(Client &client)
 {
-	LOG_INFO("\033[32;1mCGI Request recived");
+	LOG_INFO("\033[32;1mCGI Request recived\033[0m");
 	
 	// std::string	uripath = client.getRequest().getUri();
 	// std::cout << uripath << "\n";

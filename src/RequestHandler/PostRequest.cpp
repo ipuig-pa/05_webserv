@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/18 14:23:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:04:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,8 @@ bool	RequestHandler::handleFileWrite(Client &client)
 	int file_fd = client.getFileFd();
 	const std::vector<char>& body = client.getRequest().getBody();
 
-	std::cout << "HEADERS: " << client.getRequest().getHeaderVal("Content-Disposition") << "BODY: " << client.getRequest().getBody() << std::endl;
-
+	std::cout << "HEADERS: " << client.getRequest().getHeaderVal("Content-Disposition") << "BODY: " << std::string(body.data(), body.size()) << std::endl;
+ 
 	if (client.getRequest().getPostBytesWritten() < body.size()) {
 		size_t bytesLeft = body.size() - client.getRequest().getPostBytesWritten();
 		ssize_t bytesWritten = write(file_fd, body.data() + client.getRequest().getPostBytesWritten(), bytesLeft);
