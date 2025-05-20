@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:20:49 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 15:35:08 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,9 @@ void LocationConf::setCgiExtenion(std::vector<std::string> s)
 }
 void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std::vector<std::string>& cgiSys)
 {
+	// if (_ext.size() != cgiSys.size()) {
+	// 	throw std::runtime_error("Error: Cannot match cgi extension with excutable path: non match size!\n");
+	// }
 	std::map<std::string, std::string> _path_extend;
 	for (size_t i = 0; i < _ext.size(); ++i) {
 		const std::string& ext = _ext[i];
@@ -137,15 +140,15 @@ void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std:
 		{
 			if ((ext == ".php" || ext == "*.php") && (cgiSys[j].find("php") != std::string::npos)) {
 				_path_extend[".php"] = cgiSys[j];
-				LOG_DEBUG("Add PHP mapping: .php -> " + cgiSys[j]);
+				LOG_INFO("Add PHP mapping: .php -> " + cgiSys[j]);
 			}
 			else if ((ext == ".py" || ext == "*.py") && (cgiSys[j].find("py") != std::string::npos)) {
 				_path_extend[".py"] = cgiSys[j];
-				LOG_DEBUG("Add Python mapping: .py -> " + cgiSys[j]);
+				LOG_INFO("Add Python mapping: .py -> " + cgiSys[j]);
 			}
 			else if ((ext == ".sh" || ext == "*.sh") && (cgiSys[j].find("bash") != std::string::npos)) {
 				_path_extend[".sh"] = cgiSys[j];
-				LOG_DEBUG("Add bash mapping: .sh -> " + cgiSys[j]);
+				LOG_INFO("Add bash mapping: .sh -> " + cgiSys[j]);
 			}
 		}
 	}

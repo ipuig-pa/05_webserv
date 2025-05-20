@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 13:29:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 12:10:58 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,15 @@ ServerConf ConfParser::_addCategory(const std::vector<std::string>& tokens)
 			}
 		} else if (_cate != "{" && _cate != "}") {
 			throw std::runtime_error("Error: is problem happens here ? misplaced category: " + _cate);
+		}
+	}
+	if (servConf.getSrvUpload().empty() == false) {
+		std::string tmp = servConf.getSrvUpload();
+		if (tmp[0] != '/') {
+			tmp = servConf.getRoot() + "/" + tmp;
+		}
+		if (FileUtils::_pathType(tmp) != 3) {
+			throw std::runtime_error("Error: Server level: upload_store value is not correct." + tmp);
 		}
 	}
 	return servConf;

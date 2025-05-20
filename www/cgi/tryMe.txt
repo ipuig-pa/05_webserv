@@ -1,0 +1,2 @@
+This is a text file to text PATH_INFO (from CGI request)\n
+This should be printed if CGI and pathInfo.py works well!\n

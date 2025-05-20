@@ -3,31 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   CgiEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/13 13:40:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/20 11:23:27 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
 
-void CgiProcess::createEnv(HttpRequest& httpReq, const std::string &req_url)
+void CgiProcess::createEnv(HttpRequest& httpReq, const std::string &req_url) //url here is WITHOUT query part
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMethodStr()));
+	env.push_back("SCRIPT_NAME=" + std::string(req_url));
+	// env.push_back("SCRIPT_NAME=" + std::string(httpReq.getScriptName())); //addr of executable (MAKE SURE WE NEED THIS NAME AND NOT THE LAST PART AFTER LAST /)
+	if (httpReq.getPathInfo().empty() == false) {
+		env.push_back("PATH_INFO=" + std::string(httpReq.getPathInfo()));
+	}
 	if (!httpReq.getQueryPart().empty()) {
 		env.push_back("QUERY_STRING=" + std::string(httpReq.getQueryPart()));
 	}
 	env.push_back("SERVER_PROTOCOL=" + std::string(httpReq.getVersion())); //HTTP/1.1
-	env.push_back("SCRIPT_NAME=" + std::string(req_url)); //addr of executable (MAKE SURE WE NEED THIS NAME AND NOT THE LAST PART AFTER LAST /)
 	env.push_back("SCRIPT_FILENAME=" + std::string(httpReq.getPath())); //_cgiPath ??? difference with script name??? it is printing the same??? (MAKE SUE WE NEED THIS AND NOT JUST UNTIL THE SCRIPT NAME!?!?)
-	env.push_back("PATH_INFO=place_holder");
 	env.push_back("CONTENT_TYPE=" + std::string(httpReq.getHeaderVal("Content-Type")));
 	env.push_back("CONTENT_LENGTH=" + std::string(httpReq.getHeaderVal("Content-Length")));
 	env.push_back("SERVER_NAME=webserv");
-	// env.push_back("REDIRECT_STATUS=200");
 	// env.push_back("SERVER_NAME=" + httpReq.getHeaderVal("Host"));
 	// std::map<std::string, std::string, CaseInsensitiveCompare> _reqHeader = httpReq.getHeader();
 	// //SOME PROBLEM IN CONVERT FORMAT THAT CHANGES THE STANDARD OUTPUT!?!? WHY DO WE NEED THIS CONVERTED HEADERS IF WE HAVE ASSIGNED THEM BEFORE?!?!?!?
@@ -50,6 +52,39 @@ void CgiProcess::createEnv(HttpRequest& httpReq, const std::string &req_url)
 	// }
 	_convertToEnvp(env);
 }
+
+// bool	CgiProcess::_noPathInfo(const std::string& req_url)
+// {
+// 	std::string tmp = std::string(req_url);
+// 	size_t pos = tmp.rfind(".");
+// 	std::string check = tmp.substr(pos);//should be ".**"
+// 	if (check == (".py") || check == (".php") || check == (".sh")) { //nothing after cgi.ext, no PATH_INFO
+// 		return true;
+// 	}
+// 	return false;
+// }
+
+// std::string	CgiProcess::_splitPathInfo(const std::string& req_url)
+// {
+// 	std::string tmp = std::string(req_url);
+// 	if (tmp.find(".py")) {
+// 		std::string pathinfo = tmp.substr(tmp.find(".py") + 3);
+// 		std::cout << "checking extracted pathinf: " << pathinfo << '\n';
+// 		return pathinfo;
+// 	}
+// 	else if (tmp.find(".sh")) {
+// 		std::string pathinfo = tmp.substr(tmp.find(".sh") + 3);
+// 		std::cout << "checking extracted pathinf: " << pathinfo << '\n';
+// 		return pathinfo;
+// 	}
+// 	// else if (tmp.find(".php")) {
+// 	else {
+// 		std::string pathinfo = tmp.substr(tmp.find(".php") + 4);
+// 		std::cout << "checking extracted pathinf: " << pathinfo << '\n';
+// 		return pathinfo;
+// 	}
+// 	throw std::runtime_error("Error: invalid cgi uri passed!\n");
+// }
 
 void	CgiProcess::_convertToEnvp(std::vector<std::string>& envStr)
 {

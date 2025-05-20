@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/18 11:53:00 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/20 11:19:04 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,7 @@ bool	HttpReqParser::_isPathSafe(std::string normalizedUri, const std::string &do
 
 std::string	HttpReqParser::_mapSysPathFromUri(Client &client)
 {
+	//idea: getUri() either ends at cgi script name or normal static request! never contains extra info(path_info or query)
 	std::string normalizedUri = _normalizeUriPath(client.getRequest().getUri());
 	client.getRequest().setUri(normalizedUri);
 
@@ -201,11 +202,38 @@ std::string	HttpReqParser::_takeLine()
 	return (cur_line);
 }
 
+size_t	HttpReqParser::_countCgiEnd(const std::string& uri)
+{
+	std::string tmp = std::string(uri);
+	const std::string extension[] = {".py", ".sh", ".php"};
+	for (size_t i = 0; i < sizeof(extension)/sizeof(extension[0]); ++i)
+	{
+		size_t pos = tmp.find(extension[i]);
+		if (pos != std::string::npos) {
+			size_t cgi_end = pos + extension[i].length();
+			return cgi_end;
+		}
+	}
+	// if (tmp.find(".py") != std::string::npos) {
+	// 	size_t cgi_end = tmp.find(".py") + 3;
+	// 	return cgi_end;
+	// }
+	// else if (tmp.find(".sh") != std::string::npos) {
+	// 	size_t cgi_end = tmp.find(".sh") + 3;
+	// 	return cgi_end;
+	// }
+	// else if (tmp.find(".php") != std::string::npos) {
+	// 	size_t cgi_end = tmp.find(".php") + 4;
+	// 	return cgi_end;
+	// }
+	return std::string::npos;
+}
+
 void HttpReqParser::_parseReqLine(HttpRequest &request)
 {
 	LOG_DEBUG("PARSING REQ LINE");
 	std::string method;
-	std::string url;
+	std::string uri;
 	std::string ver;
 
 	std::string cur_line = _takeLine();
@@ -213,20 +241,37 @@ void HttpReqParser::_parseReqLine(HttpRequest &request)
 		return ;
 
 	std::istringstream tmp(cur_line);
-	tmp >> method >> url >> ver;
-	if (method.empty() || url.empty() || ver.empty()) {
-		std::cerr << "PARSE_Error: invalid request line. should be M U V";
+	tmp >> method >> uri >> ver;
+	if (method.empty() || uri.empty() || ver.empty()) {
+		std::cerr << "PARSE_Error: invalid request line. should be Method Uri Version";
 		_stage = PARSE_ERROR;
 		return ;
 	}
 	request.setMethod(method);
 	
-	size_t questionSign = url.find('?');
-	if (questionSign != std::string::npos) { //url is: xxxxx?xxxxx format
-		request.setUri(url.substr(0, questionSign + 1));
-		request.setQueryPart(url.substr(questionSign + 1));
-	} else
-		request.setUri(url);
+	size_t pos = _countCgiEnd(uri);//if is CGI, uri==scriptname, use 2 setters
+	if (pos != std::string::npos) { //the pos of cgi_ext end returned
+		if (pos == uri.length()) {//uri ends at script name!
+			request.setUri(uri);//in this case. make uri==script name
+			request.setScriptName(uri);
+			request.setPathInfo("");
+			request.setQueryPart("");
+		} else {
+			request.setUri(uri.substr(0, pos));
+			request.setScriptName(uri.substr(0, pos));
+			std::string _leftoverUri = uri.substr(pos);
+			size_t questionSign = _leftoverUri.find('?');
+			if (questionSign != std::string::npos) { //leftover part is: xxxxx?xxxxx format
+				request.setPathInfo(_leftoverUri.substr(0, questionSign));
+				request.setQueryPart(_leftoverUri.substr(questionSign + 1));
+			} else {
+				request.setPathInfo(_leftoverUri);
+			}
+		}
+	}
+	else { //non cgi case, simply seturi = request-uri
+		request.setUri(uri);	
+	}
 	std::string tmp_v = "HTTP/1.1";
 	if (tmp_v.compare(ver) != 0) {
 		std::cerr << "PARSE_Error: invalid HTTP version";

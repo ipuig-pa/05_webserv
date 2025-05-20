@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/15 12:51:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/18 15:35:48 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,19 @@ private:
 	char		**_envp;
 
 	void				createEnv(HttpRequest& httpReq, const std::string &req_url);
+	// bool				_noPathInfo(const std::string& req_url);
+	// std::string			_splitPathInfo(const std::string& req_url);
 	void				_convertToEnvp(std::vector<std::string>& envStr);
 	void				_cleanEnvp(void);
 	// std::string			_getExtSysPath(std::string script_path);
 	std::string			_getExtSysPath(Client *client);
-	std::string		_getScriptDir(std::string path);
+	std::string			_getScriptDir(std::string path);
 	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
-	void			_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes);
-	void			_cgiHeadersToResponse();
-	void			_addHeaderToResponse(const std::string& line, HttpResponse& response);
-	void			_checkChunkedTransfer(HttpResponse &response);
-	bool			_checkHeaderCompletion();
+	void				_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes);
+	void				_cgiHeadersToResponse();
+	void				_addHeaderToResponse(const std::string& line, HttpResponse& response);
+	void				_checkChunkedTransfer(HttpResponse &response);
+	bool				_checkHeaderCompletion();
 
 public:
 	CgiProcess(Client *client);

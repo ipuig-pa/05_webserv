@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 10:06:12 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/20 11:21:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,11 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 HttpRequest::HttpRequest()
-	: _header(), _method(INVALID), _uri(""), _path(""), _queryPart(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false)
+	: _header(), _method(INVALID), _uri(""), _queryPart(""), _path(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false)
 {
 	_body.reserve(BUFF_SIZE);
+	_scriptname = "";
+	_pathinfo = "";
 }
 
 HttpRequest::~HttpRequest()
@@ -53,16 +55,23 @@ void HttpRequest::setUri(const std::string uri)
 {
 	this->_uri = uri;
 }
-
+void HttpRequest::setScriptName(const std::string cgiScript)
+{
+	this->_scriptname = cgiScript;
+}
+void	HttpRequest::setPathInfo(const std::string pathinfo)
+{
+	this->_pathinfo = pathinfo;
+}
+void HttpRequest::setQueryPart(const std::string s)
+{
+	this->_queryPart = s;
+}
 void HttpRequest::setPath(const std::string path)
 {
 	this->_path = path;
 }
 
-void HttpRequest::setQueryPart(const std::string s)
-{
-	this->_queryPart = s;
-}
 
 void HttpRequest::setVersion(const std::string s)
 {
@@ -138,14 +147,22 @@ std::string	HttpRequest::getUri(void)
 	return _uri;
 }
 
-std::string	HttpRequest::getPath(void)
+std::string HttpRequest::getScriptName(void) const
 {
-	return _path;
+	return _scriptname;
 }
-
+std::string HttpRequest::getPathInfo(void) const
+{
+	return _pathinfo;	
+}
 std::string HttpRequest::getQueryPart() const
 {
 	return _queryPart;
+}
+
+std::string	HttpRequest::getPath(void)
+{
+	return _path;
 }
 
 std::string HttpRequest::getVersion()
@@ -184,8 +201,10 @@ void HttpRequest::reset()
 	_header = Header(); //call default cons
 	_method = INVALID;
 	_uri.clear();
-	_path.clear();
+	_scriptname.clear();
+	_pathinfo.clear();
 	_queryPart.clear();
+	_path.clear();
 	_version.clear();
 	_upload_path.clear();
 	_body.clear();

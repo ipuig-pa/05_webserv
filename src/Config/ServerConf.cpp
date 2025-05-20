@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/18 11:02:52 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/18 12:21:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,11 @@ void ServerConf::setSrvUpload(std::string s)
 		throw std::runtime_error("Error: missing ';' after upload_store value.");
 	}
 	s = rmvSemicolon(s);
-	if (FileUtils::_pathType(s) != 3) {
-		s = _root_dir + s;
-		if (FileUtils::_pathType(s) != 3)
-		throw std::runtime_error("Error: Server level: upload_store value is not dir." + s);
-	}
+	// if (FileUtils::_pathType(s) != 3) {
+	// 	s = _root_dir + s;
+	// 	if (FileUtils::_pathType(s) != 3)
+	// 	throw std::runtime_error("Error: Server level: upload_store value is not dir." + s);
+	// }
 	this->_upload = s;
 }
 
@@ -192,19 +192,20 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		loc.setLocRoot(_root_dir);
 	}
 	if (loc.getLocUpload().empty() == false) {
-		if (FileUtils::_pathType(loc.getLocUpload()) != 3) {
-			std::string tmp = loc.getLocRoot() + loc.getLocPath() + loc.getLocUpload();
-			if (FileUtils::_pathType(tmp) != 3) {
-				throw std::runtime_error("Error: Location: upload value is not a dir: " + tmp);
-			}
-			loc.setLocUpload(tmp);
-			std::cout << "loction upload full path is: " << loc.getLocUpload() << "\n";
+		std::string s = loc.getLocUpload();
+		if (s[0] != '/') {
+			s = loc.getLocRoot() + "/" + s;
 		}
+		if (FileUtils::_pathType(s) != 3) {
+			throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
+		}
+		loc.setLocUpload(s);
+		std::cout << "loction upload full path is: " << loc.getLocUpload() << "\n";
 	}
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
 	}
-	if (loc.getCgiExtension().size() != 0) {
+	if (loc.getCgiExtension().size() != 0 && loc.getCgiSysPath().size() != 0) {
 		loc.setPathExMap(loc.getCgiExtension(), loc.getCgiSysPath());
 		CgiChecker::checkCGI(loc);
 	}
@@ -275,13 +276,13 @@ void ServerConf::parseLocUpload(LocationConf& loc, std::vector<std::string>& loc
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	std::string tmp = rmvSemicolon(loc_tks[i]);
-	if (FileUtils::_pathType(tmp) != 3) {
+	// if (FileUtils::_pathType(tmp) != 3) {
 		// std::cout << "loction root is: " << _locRoot << "\n";
 		// s = _locRoot + _locPath + s;
 		// if (FileUtils::_pathType(s)) {
 		// 	throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
 		// }
-	}
+	// }
 	loc.setLocUpload(tmp);
 }
 
