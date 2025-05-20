@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 15:27:37 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/19 19:42:10 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,13 @@ bool CgiProcess::initCgi()
 	int pipToCgi[2] = {-1, -1};
 	
 	LocationConf* locConf = _client->getLocationConf();
-	std::cout << "\033[32mcurrent location is: \033[0m" << locConf->getLocPath() << "\n";
 	if (!locConf) {
 		//std::cerr << "Location{} block is NULL!\n";
 		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
 		return false;
 	}
+	// std::cout << "\033[32mcurrent location is: \033[0m" << locConf->getLocPath() << "\n";
 	else if (!CgiChecker::validCgiScript(_client)) //Check CGI removed, as it is already checked in wrapLocChecker (in ServerConf creation at parsing)
 		return false;
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {

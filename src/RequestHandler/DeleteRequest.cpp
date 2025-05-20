@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   DeleteRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 14:04:16 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/18 12:43:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,47 @@
 //idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
 void	RequestHandler::handleDeleteRequest(Client &client)
 {
-	// std::string uploadPath = client.getRequest().getUpload();
-	std::string uploadPath = client.getRequest().getPath(); // Should not be path, but uploadPath, as soon as we have it implemented in Conf file Parsing
+	std::string path = client.getRequest().getPath();
+	if (!_deleteAttempt(client, path)) {
+		std::string uploadpath = client.getRequest().getUpload();
+		if (uploadpath[uploadpath.size() - 1] != '/')
+			uploadpath += '/';
+		std::string filename;
+		size_t lastSlash = path.find_last_of('/');
+		if (lastSlash != std::string::npos && lastSlash != path.size() - 1) {
+			filename += path.substr(lastSlash + 1);
+			uploadpath += filename;
+			_deleteAttempt(client, uploadpath);
+		}
+	}
+}
 
-	if (access(uploadPath.c_str(), F_OK) != 0) {
+bool	RequestHandler::_deleteAttempt(Client &client, const std::string &path)
+{
+	if (access(path.c_str(), F_OK) != 0) {
 		client.sendErrorResponse(404, ""); //Not found
-		return;
+		return false;
 	}
 	struct stat file_stat;
-	stat(uploadPath.c_str(), &file_stat);
-	if ((access(uploadPath.c_str(), W_OK) != 0) || S_ISDIR(file_stat.st_mode)) {
+	stat(path.c_str(), &file_stat);
+	if ((access(path.c_str(), W_OK) != 0) || S_ISDIR(file_stat.st_mode)) {
 		client.sendErrorResponse(403, ""); //Forbidden
-		return;
+		return true;
 	}
 	try
 	{
-		if (std::remove(uploadPath.c_str()) == 0) {
+		if (std::remove(path.c_str()) == 0) {
 			client.sendErrorResponse(204, ""); // Success - No Content
-			return ;
+			return true;
 		} else {
 			client.sendErrorResponse(500, ""); //internal server error
-			return ;
+			return true;
 		}
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		LOG_ERR("Error deleting file " + path + ":" + e.what());
+		client.sendErrorResponse(500, "Error deleting file"); //internal server error
+		return true;
 	}
 }

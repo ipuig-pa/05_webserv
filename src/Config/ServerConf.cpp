@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/18 12:21:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/20 11:29:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -515,7 +515,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	for(size_t i = 0; i < _location.size(); ++i)
 	{
 		std::cout << _location[i].getLocPath() << std::endl;
-		if ((_location[i]).getLocPath().compare(uripath) == 0)
+		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().compare(uripath) == 0)
 		{
 			std::cout << i << std::endl;
 			return (&_location[i]);
@@ -524,7 +524,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	match = 0;
 	for(size_t i = 0; i < _location.size(); ++i)
 	{
-		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size()] == '/')
+		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size() - 1] == '/')
 		{
 			if (_location[i].getLocPath().size() > match)
 			{
