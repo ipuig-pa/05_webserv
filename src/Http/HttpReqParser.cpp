@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/20 11:30:06 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/20 12:02:54 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,6 +254,7 @@ void HttpReqParser::_parseReqLine(HttpRequest &request)
 				request.setQueryPart(_leftoverUri.substr(questionSign + 1));
 			} else {
 				request.setPathInfo(_leftoverUri);
+				LOG_INFO("\033[32;1mpathinfo is: \033[0m" + _leftoverUri);
 			}
 		}
 	}
