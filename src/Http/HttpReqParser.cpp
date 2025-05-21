@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpReqParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/20 12:02:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 15:57:45 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -309,7 +309,6 @@ void HttpReqParser::_parseHeader(HttpRequest &request, Client &client)
 	}
 }
 
-
 void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
 {
 	client.setServerConf(client.getListenSocket()->getConf(request.getHeaderVal("Host")));
@@ -320,11 +319,10 @@ void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
 	client.defineMaxBodySize();
 }
 
-
 void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 {
-	std::string _content_len = request.getHeaderVal("Content-Length"); // case sensitive or not?
-	if (_content_len.empty()) {
+	std::string content_len = request.getHeaderVal("Content-Length"); // case sensitive or not?
+	if (content_len.empty()) {
 		if (request.getHeaderVal("Transfer-Encoding") == "chunked") {
 			_chunked = true;
 			_stage = BODY;
@@ -343,7 +341,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 	}
 	else {
 		try {
-			_bodyLength = std::stoul(_content_len);
+			_bodyLength = std::stoul(content_len);
 			if (_bodyLength >= 0 && static_cast<size_t>(_bodyLength) <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
 					_stage = BODY;
 				if (_bodyLength == 0)

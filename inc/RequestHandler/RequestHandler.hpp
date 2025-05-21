@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/18 13:21:56 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 18:47:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,14 @@ private:
 	std::string			getPathFromUri(Client &client);
 	bool				checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
-	std::string			_getAbsoluteUrl(Client& client, const std::string &path);
+	std::string			_getAbsoluteUrl(Client& client, std::string uri);
+	std::string			_getContentType(HttpRequest &request, size_t i);
+	std::string			_getFilename(HttpRequest &request, size_t i);
 	bool				_deleteAttempt(Client &client, const std::string &path);
 	std::string			_generateUniqueFilename();
+	void				_handleMultipart(HttpRequest &request, Client &client);
+	void				_handleFileUpload(Client &client, Part &part);
+
 	
 public:
 	RequestHandler();
@@ -50,7 +55,7 @@ public:
 	void				processRequest(Client &client);
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
-	bool				handleFileWrite(Client &client); //client or fd or what?
+	bool				handleFileWrite(Client &client, size_t i); //client or fd or what?
 
 	bool				validCgi(Client& client);
 	// bool 		_forkErr(int& pip1, int& pip2);

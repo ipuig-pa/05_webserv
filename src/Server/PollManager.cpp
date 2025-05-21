@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/19 19:51:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 17:05:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,19 @@ void	MultiServer::_eraseFromPoll(int fd)
 
 void	MultiServer::_newFdsToPoll(Client *client)
 {
-	//push file fds to poll
-	int	file_fd = (client)->getFileFd();
+	//push GET file fds to poll
+	int	file_fd = client->getFileFd();
 	if (file_fd != -1) {
-		LOG_INFO("File " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
-		if (client->getRequest().getMethod() == POST)
-			_poll.push_back((struct pollfd) {file_fd, POLLOUT, 0});
-		else
-			_poll.push_back((struct pollfd) {file_fd, POLLIN, 0});
+		LOG_INFO("Input file " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
+		_poll.push_back((struct pollfd) {file_fd, POLLIN, 0});
+	}
+
+	//push POST file fds to poll
+	size_t i;
+	for (i = 0; i < client->getPostFd().size(); ++i) {
+		file_fd = client->getPostFd()[i];
+		LOG_INFO("Output file " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
+		_poll.push_back((struct pollfd) {file_fd, POLLOUT, 0});
 	}
 
 	//push cgi_fds to _poll

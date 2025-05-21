@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:08:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 19:15:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,19 @@ Client::Client(int socket, ListenSocket *listenSocket)
 	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _listenSocket(listenSocket), _currentServerConf(nullptr), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
 {
 	_error_handler = new ErrorPageHandler(this);
+	_post_fd.reserve(3);
 }
 
 Client::~Client()
 {
 	if (_file_fd != -1)
 		close(_file_fd);
-	delete (_error_handler);
+	for (i = 0; i < _post_fd.size(); ++i) {
+		int file_fd = _post_fd[i];
+		close(file_fd);
+	}
+	if (_error_handler)
+		delete (_error_handler);
 	if (_cgi) {
 		_cgi->cleanCloseCgi();
 		delete (_cgi);
@@ -86,6 +92,12 @@ int	Client::getFileFd(void)
 	return (_file_fd);
 }
 
+std::vector<int>	Client::getPostFd(void)
+{
+	return (_post_fd);
+}
+
+
 int	Client::getSocket(void)
 {
 	return (_socket);
@@ -124,6 +136,13 @@ size_t	Client::getMaxBodySize(void)
 void	Client::setFileFd(int file_fd)
 {
 	_file_fd = file_fd;
+}
+
+void	Client::setPostFd(int post_fd)
+{
+	if (_post_fd.capacity() < _post_fd.size() + 1)
+		_post_fd.reserve(_post_fd.size() + 3);
+	_post_fd.push_back(post_fd);
 }
 
 void	Client::setCgiProcess(CgiProcess *cgi)
