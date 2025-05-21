@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FileUtils.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/09 12:26:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:30:59 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ FileUtils::~FileUtils() {}
  * int stat(const char *restrict pathname, struct stat *restrict statbuf);
  * returns info about the file PTR-ed by 'pathname'
  */
-int FileUtils::_pathType(const std::string _filePath)
+int FileUtils::pathType(const std::string _filePath)
 {
 	struct stat _info;
 	int _type;
@@ -42,13 +42,13 @@ int FileUtils::_pathType(const std::string _filePath)
 	}
 }
 
-int FileUtils::_pathValid(const std::string _filePath, int _permission)
+int FileUtils::pathValid(const std::string _filePath, int _permission)
 {
 	int _validity = access(_filePath.c_str(), _permission);
 	return _validity; //fail on -1, success on 0
 }
 
-int FileUtils::_isExec(const std::string _filePath)
+int FileUtils::isExec(const std::string _filePath)
 {
 	struct stat info;
 	int type;
@@ -61,7 +61,7 @@ int FileUtils::_isExec(const std::string _filePath)
 	return -1;
 }
 
-int FileUtils::_blockPathValid(std::string _path, std::string _index)
+int FileUtils::blockPathValid(std::string _path, std::string _index)
 {
 	if (!_index.empty() && _index[0] != '/' && _path.back() != '/') {
 		_index = "/" + _index;
@@ -74,12 +74,12 @@ int FileUtils::_blockPathValid(std::string _path, std::string _index)
 		_fullPath.pop_back();
 		// std::cout << "this is new full " << _fullPath << '\n';
 	}
-	if (_pathType(_index) == 2 && _pathValid(_index, R_OK) == 0)
+	if (pathType(_index) == 2 && pathValid(_index, R_OK) == 0)
 	{	
 		// std::cout << "check which branch 1 am: branch index\n";
 		return 0;
 	}
-	else if (_pathType(_fullPath) == 2 && _pathValid(_fullPath, R_OK) == 0)
+	else if (pathType(_fullPath) == 2 && pathValid(_fullPath, R_OK) == 0)
 	{
 		// std::cout << "check which branch 2 am: branch full\n";
 		return 0;
@@ -87,7 +87,7 @@ int FileUtils::_blockPathValid(std::string _path, std::string _index)
 	return -1;
 }
 
-void FileUtils::_trimLeadBack(std::string& s)
+void FileUtils::trimLeadBack(std::string& s)
 {
 	size_t start = s.find_first_not_of(" \t");
 	s.erase(0, start);
@@ -95,7 +95,7 @@ void FileUtils::_trimLeadBack(std::string& s)
 	s.erase(end + 1);
 }
 
-std::string FileUtils::_resolvePath(const std::string& _filePath)
+std::string FileUtils::resolvePath(const std::string& _filePath)
 {
 	char* tmp;
 	tmp = realpath(_filePath.c_str(), NULL);

@@ -6,13 +6,13 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/20 11:23:27 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 11:08:28 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
 
-void CgiProcess::createEnv(HttpRequest& httpReq, const std::string &req_url) //url here is WITHOUT query part
+void CgiProcess::_createEnv(HttpRequest& httpReq, const std::string &req_url) //url here is WITHOUT query part
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");

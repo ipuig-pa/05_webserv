@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiReader.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:04:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:30:18 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,9 +113,9 @@ void CgiProcess::_addHeaderToResponse(const std::string& line, HttpResponse& res
 	}
 	std::string name = line.substr(0, pos);
 	std::string val = line.substr(pos + 1);
-	FileUtils::_trimLeadBack(val);
+	FileUtils::trimLeadBack(val);
 	if (name == "Status") {
-		if (!ServerConf::_codeRange(val)) {
+		if (!ServerConf::codeRange(val)) {
 			LOG_ERR("invalid status code from cgi output.");
 			return ;
 		}

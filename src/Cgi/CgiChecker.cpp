@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiChecker.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 15:24:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:29:38 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,12 @@ bool CgiChecker::_validCgiIndex(const LocationConf& loc)
 	std::string loc_index = loc.getLocIndex();
 	if (!loc_index.empty()) {
 		std::string full_path = loc.getLocRoot() + loc.getLocPath() + "/" + loc_index;
-		if (FileUtils::_pathValid(loc_index, R_OK) == 0 &&
-			FileUtils::_pathType(loc_index) == 2) {
+		if (FileUtils::pathValid(loc_index, R_OK) == 0 &&
+			FileUtils::pathType(loc_index) == 2) {
 				return true;
 		} //if index is full path and works case
-		if (FileUtils::_pathValid(full_path, R_OK) == 0 &&
-		FileUtils::_pathType(full_path) == 2) {
+		if (FileUtils::pathValid(full_path, R_OK) == 0 &&
+		FileUtils::pathType(full_path) == 2) {
 			return true;
 		} //if root+path+index is full path and works case
 		char* tmpCwd = getcwd(NULL, 0);
@@ -74,8 +74,8 @@ bool CgiChecker::_validCgiIndex(const LocationConf& loc)
 		} //if non above work, use getcwd() to get CWD, and cate with path+index
 		std::string cwd_path = std::string(tmpCwd) + loc.getLocPath() + "/" + loc_index;
 		free(tmpCwd);
-		return (FileUtils::_pathValid(cwd_path, R_OK) == 0 &&
-		FileUtils::_pathType(cwd_path) == 2);
+		return (FileUtils::pathValid(cwd_path, R_OK) == 0 &&
+		FileUtils::pathType(cwd_path) == 2);
 	}
 	return true;
 }
@@ -84,7 +84,7 @@ bool CgiChecker::_validCgiPath(const std::vector<std::string>& _cgipath)
 {
 	for (size_t i = 0; i < _cgipath.size(); ++i)
 	{
-		if (FileUtils::_pathType(_cgipath[i]) == -1) { //returns fail
+		if (FileUtils::pathType(_cgipath[i]) == -1) { //returns fail
 			return false;
 		}
 	}
@@ -153,12 +153,12 @@ bool CgiChecker::_matchSize(const LocationConf& loc)
 bool CgiChecker::validCgiScript(Client* client)
 {
 	std::string cgiScriptPath = client->getRequest().getPath();
-	if (FileUtils::_pathType(cgiScriptPath) == -1) {
+	if (FileUtils::pathType(cgiScriptPath) == -1) {
 		client->sendErrorResponse(404, "CGI path not found");
 		LOG_ERR("\033[31mError in cgi script path type. Path is: " + cgiScriptPath + "\033[0m");
 		return false;
 	}
-	if (FileUtils::_isExec(cgiScriptPath) == -1) {
+	if (FileUtils::isExec(cgiScriptPath) == -1) {
 		client->sendErrorResponse(403, "CGI path is not executable");
 		LOG_ERR("\033[31mErrror in cgi script path not excutable. Path is: " + cgiScriptPath + "\033[0m");
 		return false;

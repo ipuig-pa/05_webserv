@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   GetHeadRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 18:19:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:44:27 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-void	RequestHandler::handleGetRequest(Client &client)
+void	RequestHandler::_handleGetRequest(Client &client)
 {
 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
 	
@@ -30,7 +30,7 @@ void	RequestHandler::handleGetRequest(Client &client)
 	stat(path.c_str(), &file_stat);
 	if (S_ISDIR(file_stat.st_mode))
 	{
-		handleDirectoryRequest(client);
+		_handleDirectoryRequest(client);
 		return ;
 	}
 	int file_fd = open(path.c_str(), O_RDONLY);
@@ -71,7 +71,7 @@ void	RequestHandler::handleGetRequest(Client &client)
 }
 
 //We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUri to point to LocationConf??)
-void	RequestHandler::handleDirectoryRequest(Client &client)
+void	RequestHandler::_handleDirectoryRequest(Client &client)
 {
 	LOG_DEBUG("Handling directory request");
 
@@ -107,7 +107,7 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 			// Update the request path to include the index file ???
 			client.getRequest().setPath(fullPath); // ???
 			// Process as a normal file GET request
-			handleGetRequest(client);
+			_handleGetRequest(client);
 			return;
 		}
 	}
@@ -124,13 +124,13 @@ void	RequestHandler::handleDirectoryRequest(Client &client)
 	// 		// Update the request path to include the index file
 	// 		client.getRequest().setPath(path + indexFiles[i]);
 	// 		// Process as a normal file GET request
-	// 		handleGetRequest(client, client.getResponse(), client.getServerConf());
+	// 		_(client, client.getResponse(), client.getServerConf());
 	// 		return;
 	// 	}
 	// }
 	// No index file found, check if directory listing is enabled
 	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf()->getAutoIndex()))
-		handleDirectoryListing(client);
+		_handleDirectoryListing(client);
 	else {
 		// Directory listing is disabled and no index file exists
 		client.sendErrorResponse(403, ""); // Forbidden

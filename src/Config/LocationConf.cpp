@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/18 15:35:08 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 12:28:26 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ LocationConf::LocationConf()
 
 LocationConf::~LocationConf() {}
 
-// void LocationConf::_cleanLocTk(std::string& tk)
+// void LocationConf::cleanLocTk(std::string& tk)
 // {
-// 	if (!ServerConf::_hasSemicolon(tk)) {
+// 	if (!ServerConf::hasSemicolon(tk)) {
 // 		throw std::runtime_error("Error: debug message from cleaner.");
 // 	}
 // 	tk = ServerConf::rmvSemicolon(tk);
@@ -50,14 +50,15 @@ void LocationConf::setLocPath(std::string s)
 // 	}
 // 	return _methods[_m];
 // }
-bool LocationConf::_isSet() const
-{
-	return _methodSet;
-}
-// bool LocationConf::isMethodSet() const
+// bool LocationConf::_isSet() const
 // {
 // 	return _methodSet;
 // }
+
+bool LocationConf::isMethodSet() const
+{
+	return _methodSet;
+}
 
 void LocationConf::setMethod(std::vector<std::string>& s)
 {
@@ -83,21 +84,21 @@ void LocationConf::setMethod(std::vector<std::string>& s)
 }
 void LocationConf::setLocRoot(std::string s)
 {
-	if (FileUtils::_pathType(s) != 3) {
+	if (FileUtils::pathType(s) != 3) {
 		throw std::runtime_error("Error: invalid root of location at setter stage: " + s);
 	}
 	this->_locRoot = s;
 }
 
-bool LocationConf::_cmbsSet() const
+bool LocationConf::isCmbsSet() const
 {
 	return _cmbsFlag; //default false
 }
 // void LocationConf::setLocCMBS(std::string s);
 void LocationConf::setLocCMBS(unsigned long long _size)
 {
-	// _cleanLocTk(s);
-	// if (!ServerConf::_allDigit(s)) {
+	// cleanLocTk(s);
+	// if (!ServerConf::allDigit(s)) {
 	// 	throw std::runtime_error("Error: client max body size value must be all numeric.");
 	// }
 	// unsigned long long tmp = std::stoll(s);
@@ -116,16 +117,16 @@ void LocationConf::setCgiSysPath(std::vector<std::string> s)
 			LOG_ERR("\033[31mInvalid CGI executable path!\033[0m");
 		}
 	}
-	this->cgi_sys_path = s;
-	for (size_t i = 0; i < cgi_sys_path.size(); ++i) {
-		std::cout << cgi_sys_path[i] << "\n";
+	this->_cgiSysPath = s;
+	for (size_t i = 0; i < _cgiSysPath.size(); ++i) {
+		std::cout << _cgiSysPath[i] << "\n";
 	}
 }
 void LocationConf::setCgiExtenion(std::vector<std::string> s)
 {
-	this->cgi_extension = s;
-	for (size_t i = 0; i < cgi_extension.size(); ++i) {
-		std::cout << cgi_extension[i] << "\n";
+	this->_cgiExtension = s;
+	for (size_t i = 0; i < _cgiExtension.size(); ++i) {
+		std::cout << _cgiExtension[i] << "\n";
 	}
 }
 void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std::vector<std::string>& cgiSys)
@@ -162,10 +163,10 @@ const std::map<std::string, std::string>& LocationConf::getPathExMap() const
 
 void LocationConf::setLocIndex(std::string s)
 {
-	// _cleanLocTk(s);
+	// cleanLocTk(s);
 	this->_locIndex = s;
 }
-bool LocationConf::_autoSet() const
+bool LocationConf::autoSet() const
 {
 	return _autoflag;
 }
@@ -274,12 +275,12 @@ std::string LocationConf::getRetUrl() const
 // const std::string& LocationConf::getCgiPath() const;
 const std::vector<std::string>& LocationConf::getCgiSysPath() const
 {
-	return this->cgi_sys_path;
+	return this->_cgiSysPath;
 }
 // const std::string& LocationConf::getCgiExtension() const;
 const std::vector<std::string>& LocationConf::getCgiExtension() const
 {
-	return this->cgi_extension;
+	return this->_cgiExtension;
 }
 
 std::string	LocationConf::getErrPageCode(int status_code)

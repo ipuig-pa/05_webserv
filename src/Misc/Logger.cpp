@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Logger.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:14 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/09 12:12:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/20 14:10:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ std::string Logger::getTimestamp()
 std::string Logger::levelToString(LogLevel level)
 {
 	switch (level) {
-		case DEBUG:		return "DEBUG";
-		case INFO:		return "INFO";
-		case WARNING:	return "WARNING";
-		case ERROR:		return "ERROR";
-		case FATAL:		return "FATAL";
+		case DEBUG:		return "\033[35;4mDEBUG\033[0m";
+		case INFO:		return "\033[32;4mINFO\033[0m";
+		case WARNING:	return "\033[31;4mWARNING\033[0m";
+		case ERROR:		return "\033[31;4mERROR\033[0m";
+		case FATAL:		return "\033[31;4mFATAL\033[0m";
 		default:		return "UNKNOWN";
 	}
 }
@@ -74,8 +74,8 @@ void Logger::log(LogLevel level, const std::string &msg)
 		return;
 		
 	std::stringstream log_message;
-	log_message << "[" << getTimestamp() << "] "
-				<< "[" << levelToString(level) << "] "
+	log_message << "\033[36m[" << getTimestamp() << "] "
+				<< "[" << levelToString(level) << "\033[36m]\033[0m "
 				<< msg;
 				
 	if (_console_output)

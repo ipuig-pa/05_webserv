@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectionHandler.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 16:51:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/20 14:17:40 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	MultiServer::_handleConnections(void)
 	std::map<int, Client*>::iterator it_c;
 	std::map<int, Client*>::iterator current;
 
-	LOG_DEBUG("Handling connections");
+	LOG_DEBUG("\033[32mHandling connections\033[0m");
 	it_c = _clients.begin();
 	while(it_c != _clients.end()){
 		if (it_c->second->getState() == CONNECTION_CLOSED) {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ListenSocket.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:05:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:42:45 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ ListenSocket::ListenSocket(std::vector<ServerConf> &config)
 	int opt = 1;
 	setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	//set up the address structure to use
-	setaddress(config[0]);
+	_setaddress(config[0]);
 	// Bind socket to the address and port
 	if (bind(_socket_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 		// Handle listen error -> throw exception / runtime error!?!?!?
@@ -51,7 +51,7 @@ ListenSocket::~ListenSocket()
 	close(_socket_fd);
 }
 
-void	ListenSocket::setaddress(const ServerConf& config)
+void	ListenSocket::_setaddress(const ServerConf& config)
 {
 	(void) config;
 	memset(&_address, 0, sizeof(_address));

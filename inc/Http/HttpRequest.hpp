@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/20 11:13:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 12:21:48 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,38 +46,38 @@ public:
 	~HttpRequest();
 
 	//setters
-	void	setHeaderField(const std::string name, const std::string value);
-	void	setMethod(std::string s); //set as methodType type
-	void	setUri(const std::string uri);
-	void	setScriptName(const std::string cgiScript);
-	void	setPathInfo(const std::string pathinfo);
-	void	setPath(const std::string path);
-	void	setQueryPart(const std::string s);
-	void	setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
-	void	setBody(const std::vector<char> &body);
-	void	appendBody(const std::vector<char> &chunk, size_t length);
-	void	addPostBytesWritten(size_t bytesWritten);
-	void	setComplete(bool flag); //flag for finsihing parsing or not
-	void	setUpload(std::string upload_path);
+	void				setComplete(bool flag);
+	void				setMethod(std::string s);
+	void				setUri(const std::string uri);
+	void				setVersion(const std::string s);
+	void				setPath(const std::string path);
+	void				setUpload(std::string upload_path);
+	void				setPathInfo(const std::string pathinfo);
+	void				setScriptName(const std::string cgiScript);
+	void				setQueryPart(const std::string s);
+	void				setHeaderField(const std::string name, const std::string value);
+	void				setBody(const std::vector<char> &body);
+	void				appendBody(const std::vector<char> &chunk, size_t length);
+	void				addPostBytesWritten(size_t bytesWritten);
 	
 	//getters
-	std::string			getHeaderVal(const std::string& name) const;//needed?!!? -yes, this will check is there has a body or not
-	// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????
+	bool				isComplete(void);
 	int					getMethod(void) const;
-	std::string			getMethodStr() const; //to get the string, not int from enum
+	size_t				getPostBytesWritten(void);
 	std::string			getUri(void);
+	std::string			getPath(void);
+	std::string			getVersion(void);
+	std::string			getUpload(void);
+	std::vector<char>	&getBody(void);
+	std::string			getMethodStr(void) const;
 	std::string			getScriptName(void) const;
 	std::string			getPathInfo(void) const;
-	std::string			getPath(void);
-	std::string			getQueryPart() const;
-	std::string			getVersion();
-	std::vector<char>	&getBody();
-	size_t				getPostBytesWritten();
-	std::string			getUpload();
-	bool				isComplete();
-
+	std::string			getQueryPart(void) const;
+	std::string			getHeaderVal(const std::string& name) const;
+	
 	//method: reset status
-	void				reset();
+	void				reset(void);
 };
 
 #endif
+// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????

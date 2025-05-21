@@ -6,25 +6,25 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/20 11:29:53 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 12:46:21 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConf.hpp"
 
 ServerConf::ServerConf()
-	: _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _srv_autoindex(false), _upload("")
+	: _srv_autoindex(false), _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _upload("")
 {
 }
 // ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
 ServerConf::~ServerConf() {}
 
-bool ServerConf::_allDigit(const std::string& s)//return true if all digit
+bool ServerConf::allDigit(const std::string& s)//return true if all digit
 {
 	return std::all_of(s.begin(), s.end(), ::isdigit);
 }
 
-bool ServerConf::_hasSemicolon(const std::string& s)
+bool ServerConf::hasSemicolon(const std::string& s)
 {
 	if (!s.empty() && s.back() == ';') {
 		return true;
@@ -41,11 +41,11 @@ std::string ServerConf::rmvSemicolon(const std::string& token)
 //TODO: im always kind hesitate to decide pass by ref or copy, so may check and change later
 void ServerConf::setPort(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	s = rmvSemicolon(s);
-	if (!_allDigit(s)) {
+	if (!allDigit(s)) {
 		throw std::runtime_error("Error: invalid port value, should be all numeric");
 	}
 	unsigned int tmp = std::stoi(s);
@@ -55,7 +55,7 @@ void ServerConf::setPort(std::string s)
 }
 void ServerConf::setSrvName(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	s = rmvSemicolon(s);
@@ -63,7 +63,7 @@ void ServerConf::setSrvName(std::string s)
 }
 void ServerConf::setHost(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	s = rmvSemicolon(s);
@@ -71,7 +71,7 @@ void ServerConf::setHost(std::string s)
 }
 void ServerConf::setRoot(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	s = rmvSemicolon(s);
@@ -79,7 +79,7 @@ void ServerConf::setRoot(std::string s)
 }
 void ServerConf::setIndex(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	s = rmvSemicolon(s);
@@ -88,21 +88,21 @@ void ServerConf::setIndex(std::string s)
 
 void ServerConf::setSrvUpload(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' after upload_store value.");
 	}
 	s = rmvSemicolon(s);
-	// if (FileUtils::_pathType(s) != 3) {
+	// if (FileUtils::pathType(s) != 3) {
 	// 	s = _root_dir + s;
-	// 	if (FileUtils::_pathType(s) != 3)
+	// 	if (FileUtils::pathType(s) != 3)
 	// 	throw std::runtime_error("Error: Server level: upload_store value is not dir." + s);
 	// }
 	this->_upload = s;
 }
 
-void ServerConf::_cleanLocTk(std::string& tk)
+void ServerConf::cleanLocTk(std::string& tk)
 {
-	if (!_hasSemicolon(tk)) {
+	if (!hasSemicolon(tk)) {
 		throw std::runtime_error("Error: location: invalid 'root' token.");
 	}
 	tk = rmvSemicolon(tk);
@@ -115,9 +115,9 @@ valid range : 100-599
 400-499: Client error responses
 500-599: Server error responses
 */
-bool ServerConf::_codeRange(const std::string& errtoken)
+bool ServerConf::codeRange(const std::string& errtoken)
 {
-	if (!_allDigit(errtoken)) {
+	if (!allDigit(errtoken)) {
 		// throw std::runtime_error("Error: error code must be all digits.");
 		LOG_ERR("error code must be all digits.");
 		return false;
@@ -138,7 +138,7 @@ void ServerConf::setErr(std::vector<std::string>& errTokens)
 	
 	for (size_t i = 0; i < errTokens.size() - 1; ++i)
 	{
-		if (!_codeRange(errTokens[i])) {
+		if (!codeRange(errTokens[i])) {
 			throw std::runtime_error("Error: invalid error code range, must be within 100-599.");
 		}
 		int errCode = std::stoi(errTokens[i]);
@@ -151,11 +151,11 @@ void ServerConf::setAutoIndex(bool _flag)
 }
 void ServerConf::setCMBS(std::string s)
 {
-	if (!_hasSemicolon(s)) {
+	if (!hasSemicolon(s)) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	s = rmvSemicolon(s);
-	if (!_allDigit(s)) {
+	if (!allDigit(s)) {
 		throw std::runtime_error("Error: client max body size value must be all numeric.");
 	}
 	unsigned long long tmp = std::stoll(s);
@@ -174,7 +174,7 @@ void ServerConf::setCMBS(std::string s)
  */
 //after parsing, check1: cgi, if not CGI, check static
 
-bool ServerConf::_locReturnCheck(LocationConf& loc)
+bool ServerConf::locReturnCheck(LocationConf& loc)
 {
 	//return value be std::vector or reture_code + return_html??
 	//implement later
@@ -182,7 +182,7 @@ bool ServerConf::_locReturnCheck(LocationConf& loc)
 	return true;
 }
 
-void ServerConf::_wrapLocChecker(LocationConf& loc)
+void ServerConf::wrapLocChecker(LocationConf& loc)
 {
 	//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
 	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
@@ -196,7 +196,7 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		if (s[0] != '/') {
 			s = loc.getLocRoot() + "/" + s;
 		}
-		if (FileUtils::_pathType(s) != 3) {
+		if (FileUtils::pathType(s) != 3) {
 			throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
 		}
 		loc.setLocUpload(s);
@@ -224,17 +224,17 @@ void ServerConf::_wrapLocChecker(LocationConf& loc)
 		loc.setLocRoot(this->_root_dir);//not extra root passedinheritance from server{}
 	}
 	//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
-	// if (FileUtils::_blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
+	// if (FileUtils::blockPathValid(loc.getLocRoot() + loc.getLocPath(), loc.getLocIndex()) == -1) {//debug check slash
 	// 	throw std::runtime_error("Error: path in loction is invalid: ");
 	// }
-	if (!_locReturnCheck(loc)) {
+	if (!locReturnCheck(loc)) {
 		throw std::runtime_error("Error: invalid return parameter.");
 	}
 	this->_location.push_back(loc);
 }
 
 //use ofstd::map<string, std::function<void<>>
-void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
+void ServerConf::addLocation(std::string& _path, std::vector<std::string>& loc_tokens)
 {
 	LocationConf locBlock;
 	locBlock.setLocPath(_path);
@@ -260,7 +260,7 @@ void ServerConf::_addLocation(std::string& _path, std::vector<std::string>& loc_
 			throw std::runtime_error("Error: passed parameter in location is invalid" + _key);
 		}
 	}
-	_wrapLocChecker(locBlock); //checks validity after parsing (cgi an static) and return err_msg
+	wrapLocChecker(locBlock); //checks validity after parsing (cgi an static) and return err_msg
 }
 
 void ServerConf::parseLocUpload(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
@@ -272,14 +272,14 @@ void ServerConf::parseLocUpload(LocationConf& loc, std::vector<std::string>& loc
 		throw std::runtime_error("Error: 'upload' in location already defined.");
 	}
 	++i;
-	if (!_hasSemicolon(loc_tks[i])) {
+	if (!hasSemicolon(loc_tks[i])) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	std::string tmp = rmvSemicolon(loc_tks[i]);
-	// if (FileUtils::_pathType(tmp) != 3) {
+	// if (FileUtils::pathType(tmp) != 3) {
 		// std::cout << "loction root is: " << _locRoot << "\n";
 		// s = _locRoot + _locPath + s;
-		// if (FileUtils::_pathType(s)) {
+		// if (FileUtils::pathType(s)) {
 		// 	throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
 		// }
 	// }
@@ -296,11 +296,11 @@ void ServerConf::parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_t
 	 	throw std::runtime_error("Error: 'root' in location already exist.");
 	}
 	++i;
-	if (!_hasSemicolon(loc_tks[i])) {
+	if (!hasSemicolon(loc_tks[i])) {
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	loc_tks[i] = rmvSemicolon(loc_tks[i]);
-	if (FileUtils::_pathType(loc_tks[i]) == 3) {
+	if (FileUtils::pathType(loc_tks[i]) == 3) {
 		loc.setLocRoot(loc_tks[i]);
 	}
 	else {
@@ -313,13 +313,13 @@ void ServerConf::parseMethod(LocationConf& loc, std::vector<std::string>& loc_tk
 	if (i + 1 >= loc_tks.size()){
 		throw std::runtime_error("Error: location: no parameter after 'methods'.");
 	}
-	if (loc._isSet()) {
+	if (loc.isMethodSet()) {
 	 	throw std::runtime_error("Error: 'method' in location already defined.");
 	}
 	std::vector<std::string> tmp;
 	while (++i < loc_tks.size())
 	{
-		if (_hasSemicolon(loc_tks[i])) {
+		if (hasSemicolon(loc_tks[i])) {
 			loc_tks[i] = rmvSemicolon(loc_tks[i]);
 			tmp.push_back(loc_tks[i]);
 			break ;//end of method category (method POST DELETE;)
@@ -338,14 +338,14 @@ void ServerConf::parseLocAuto(LocationConf& loc, std::vector<std::string>& loc_t
 	if (i + 1 >= loc_tks.size()) {
 		throw std::runtime_error("Error: no parameter after 'autoindex'.");
 	}
-	if (loc._autoSet()) {
+	if (loc.autoSet()) {
 		throw std::runtime_error("Error: 'autoindex' already set.");
 	}
 	if (loc.getLocPath() == "/cgi") {
 		throw std::runtime_error("Error: CGI called, no autoindex.");
 	}
 	++i;
-	if (!_hasSemicolon(loc_tks[i])) {
+	if (!hasSemicolon(loc_tks[i])) {
 		throw std::runtime_error("Error: invalid parameter format for autoindex.");
 	}
 	std::string tmp_auto = rmvSemicolon(loc_tks[i]);
@@ -370,7 +370,7 @@ void ServerConf::parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_
 	 	throw std::runtime_error("Error: 'index' in location already defined.");
 	}
 	i++;
-	if (!_hasSemicolon(loc_tks[i])) {
+	if (!hasSemicolon(loc_tks[i])) {
 		throw std::runtime_error("Error: missing ';' at index passed.");
 	}
 	loc_tks[i] = rmvSemicolon(loc_tks[i]);
@@ -382,15 +382,15 @@ void ServerConf::parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_t
 	if (i + 1 >= loc_tks.size()) {
 		throw std::runtime_error("Error: no parameter after 'client_max_body_size'.");
 	}
-	if (loc._cmbsSet() == true) {
+	if (loc.isCmbsSet() == true) {
 		throw std::runtime_error("Error: 'client xxx' in location already defined.");
 	}
 	++i;
-	if (!_hasSemicolon(loc_tks[i])) {
+	if (!hasSemicolon(loc_tks[i])) {
 		throw std::runtime_error("Error: invalid parameter format for autoindex.");
 	}
 	loc_tks[i] = rmvSemicolon(loc_tks[i]);
-	if (!_allDigit(loc_tks[i])) {
+	if (!allDigit(loc_tks[i])) {
 		throw std::runtime_error("Error: client max body size value must be all numeric.");
 	}
 	unsigned long long tmp = std::stoll(loc_tks[i]);
@@ -407,7 +407,7 @@ void ServerConf::parseCgiSysPath(LocationConf& loc, std::vector<std::string>& lo
 	std::vector<std::string> _cgiPath;
 	while (++i < loc_tks.size())
 	{
-		if (_hasSemicolon(loc_tks[i])) {
+		if (hasSemicolon(loc_tks[i])) {
 			loc_tks[i] = rmvSemicolon(loc_tks[i]);
 			_cgiPath.push_back(loc_tks[i]);
 			break ;
@@ -430,7 +430,7 @@ void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& 
 	std::vector<std::string> _cgiExtend;
 	while (++i < loc_tks.size())
 	{
-		if (_hasSemicolon(loc_tks[i])) {
+		if (hasSemicolon(loc_tks[i])) {
 			loc_tks[i] = rmvSemicolon(loc_tks[i]);
 			_cgiExtend.push_back(loc_tks[i]);
 			break ;
@@ -459,12 +459,12 @@ void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tk
 		throw std::runtime_error("Error: CGI called.");
 	}
 	i++;
-	if (!_codeRange(loc_tks[i])) {
+	if (!codeRange(loc_tks[i])) {
 		throw std::runtime_error("Invalid Redirect code!");
 	}
 	loc.setRetCode(std::stoi(loc_tks[i]));
 	i++;
-	if (!_hasSemicolon(loc_tks[i])) {
+	if (!hasSemicolon(loc_tks[i])) {
 		throw std::runtime_error("Syntax error: return url must end with ';'");
 	}
 	loc.setRetUrl(rmvSemicolon(loc_tks[i]));

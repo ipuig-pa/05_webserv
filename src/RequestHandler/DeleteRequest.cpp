@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   DeleteRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/18 12:43:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:46:55 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
 //idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
-void	RequestHandler::handleDeleteRequest(Client &client)
+void	RequestHandler::_handleDeleteRequest(Client &client)
 {
 	std::string path = client.getRequest().getPath();
 	if (!_deleteAttempt(client, path)) {

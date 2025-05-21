@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 16:50:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 11:12:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,33 +70,33 @@ private:
 	Client(int fd, ListenSocket *listenSocket);
 	~Client();
 	
-	HttpRequest		&getRequest(void);
-	HttpResponse	&getResponse(void);
-	int				getSocket(void);
-	clientState		getState(void);
-	std::string		getStateString(clientState state);
-	int				getFileFd(void);
-	bool			getEmptyBuffer(void);
-	ListenSocket	*getListenSocket(void);
-	ServerConf		*getServerConf(void);
-	LocationConf	*getLocationConf(void);
-	HttpReqParser	&getParser(void);
+	HttpRequest			&getRequest(void);
+	HttpResponse		&getResponse(void);
+	int					getSocket(void);
+	clientState			getState(void);
+	std::string			getStateString(clientState state);
+	int					getFileFd(void);
+	bool				getEmptyBuffer(void);
+	ListenSocket		*getListenSocket(void);
+	ServerConf			*getServerConf(void);
+	LocationConf		*getLocationConf(void);
+	HttpReqParser		&getParser(void);
 	ConnectionTracker	&getTracker(void);
-	CgiProcess		*getCgiProcess(void);
-	size_t			getMaxBodySize(void);
+	CgiProcess			*getCgiProcess(void);
+	size_t				getMaxBodySize(void);
 	
-	void			setState(clientState state);
-	void			setFileFd(int file_fd);
-	void			setBuffer(char *buffer, size_t bytesRead);
-	void			setEmptyBuffer(bool value);
-	void			setServerConf(ServerConf *conf);
-	void			setLocationConf(LocationConf *conf);
-	void			setCgiProcess(CgiProcess *cgi);
+	void				setState(clientState state);
+	void				setFileFd(int file_fd);
+	void				setBuffer(char *buffer, size_t bytesRead);
+	void				setEmptyBuffer(bool value);
+	void				setServerConf(ServerConf *conf);
+	void				setLocationConf(LocationConf *conf);
+	void				setCgiProcess(CgiProcess *cgi);
 	
-	bool			sendResponseChunk(void);
-	bool			sendContinue(void);
-	void			sendErrorResponse(int code, std::string message);
-	void			defineMaxBodySize(void);
+	bool				sendResponseChunk(void);
+	bool				sendContinue(void);
+	void				sendErrorResponse(int code, std::string message);
+	void				defineMaxBodySize(void);
 };
 
 #endif

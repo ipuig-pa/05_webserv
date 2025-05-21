@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/18 13:21:56 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:40:47 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,20 +27,20 @@
 class RequestHandler
 {
 private:
-	void				handleGetRequest(Client &client);
-	void				handlePostRequest(Client &client);
-	void				handleDeleteRequest(Client &client);
-	void				handleInvalidRequest(Client &client);
-	void				handleDirectoryRequest(Client &client);
-	void				handleDirectoryListing(Client &client);
+	void				_handleGetRequest(Client &client);
+	void				_handlePostRequest(Client &client);
+	void				_handleDeleteRequest(Client &client);
+	void				_handleInvalidRequest(Client &client);
+	void				_handleDirectoryRequest(Client &client);
+	void				_handleDirectoryListing(Client &client);
 	void				_handleCgiRequest(Client &client);
 	bool				_handleRedirection(Client& client);
-	std::string			getPathFromUri(Client &client);
-	bool				checkAllowedMethod(Client &client);
+	bool				_checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
-	std::string			_getAbsoluteUrl(Client& client, const std::string &path);
 	bool				_deleteAttempt(Client &client, const std::string &path);
+	std::string			_getAbsoluteUrl(Client& client, const std::string &path);
 	std::string			_generateUniqueFilename();
+	std::string			_getPathFromUri(Client &client);
 	
 public:
 	RequestHandler();
@@ -51,16 +51,14 @@ public:
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
 	bool				handleFileWrite(Client &client); //client or fd or what?
-
-	bool				validCgi(Client& client);
-	// bool 		_forkErr(int& pip1, int& pip2);
-
-	HttpResponse		_convertToResponse(std::string cgiOutBuff);
-	// void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
-	void				_cgiHeaderScope(const std::string& line, HttpResponse& response);
-	std::string			_getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
-	std::string			_extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
-	std::string			_getScriptDir(std::string &path);
 };
 
 #endif
+
+//all following removed to cgi process
+// bool				validCgi(Client& client);
+// void				cgiHeaderScope(const std::string& line, HttpResponse& response);
+// HttpResponse		convertToResponse(std::string cgiOutBuff);
+// std::string			getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
+// std::string			extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
+// std::string			getScriptDir(std::string &path);

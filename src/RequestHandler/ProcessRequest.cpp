@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 16:06:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 12:40:28 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,11 @@
 void	RequestHandler::processRequest(Client &client)
 {
 	void	(RequestHandler::*handleMethod[])(Client &) = {
-		&RequestHandler::handleGetRequest, 
-		&RequestHandler::handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
-		&RequestHandler::handlePostRequest, 
-		&RequestHandler::handleDeleteRequest, 
-		&RequestHandler::handleInvalidRequest};
+		&RequestHandler::_handleGetRequest, 
+		&RequestHandler::_handleGetRequest, // for both GET and HEAD request, redirect to handle GetRequest, and there is checked to set body presence
+		&RequestHandler::_handlePostRequest, 
+		&RequestHandler::_handleDeleteRequest, 
+		&RequestHandler::_handleInvalidRequest};
 
 	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
 
@@ -27,7 +27,7 @@ void	RequestHandler::processRequest(Client &client)
 		client.setState(SENDING_RESPONSE);
 		return ;
 	}
-	bool method_allowed = checkAllowedMethod(client);
+	bool method_allowed = _checkAllowedMethod(client);
 	if (method_allowed) {
 		if (_isCgiRequest(client) == true) {
 			_handleCgiRequest(client);
@@ -42,7 +42,7 @@ void	RequestHandler::processRequest(Client &client)
 	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
 
-bool	RequestHandler::checkAllowedMethod(Client &client)
+bool	RequestHandler::_checkAllowedMethod(Client &client)
 {
 	bool	method_allowed = false;
 

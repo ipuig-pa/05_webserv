@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Logger.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:42 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/30 13:54:58 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:33:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,24 +33,21 @@ class Logger
 	static bool				_console_output;
 	static bool				_append;
 
-	static std::string getTimestamp();
-	static std::string levelToString(LogLevel level);
-	static void log(LogLevel level, const std::string& msg);
+	static std::string		getTimestamp();
+	static std::string		levelToString(LogLevel level);
+	static void				log(LogLevel level, const std::string& msg);
 
 public:
 	~Logger();
 
-	static Logger& getInstance();
-
-	static void	init(LogLevel level, const std::string& log_file_path, bool console_output, bool append);
-
-	static void	debug(const std::string& msg);
-	static void	info(const std::string& msg);
-	static void	warning(const std::string& msg);
-	static void	error(const std::string& msg);
-	static void	fatal(const std::string& msg);
-
-	static void cleanup();
+	static Logger&			getInstance();
+	static void				init(LogLevel level, const std::string& log_file_path, bool console_output, bool append);
+	static void				debug(const std::string& msg);
+	static void				info(const std::string& msg);
+	static void				warning(const std::string& msg);
+	static void				error(const std::string& msg);
+	static void				fatal(const std::string& msg);
+	static void				cleanup();
 };
 
 #define LOG_INIT(level, log_file_path, console_output, append) Logger::getInstance().init(level, log_file_path, console_output, append)

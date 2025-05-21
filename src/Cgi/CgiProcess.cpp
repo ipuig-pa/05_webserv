@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/19 19:42:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:39:28 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ bool CgiProcess::initCgi()
 		return false;
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
 		LOG_ERR("\033[32mDEBUG message in pipe_CGI in requesthandler\033[0m"); //CHANGE MESSAGE!
-		cleanupCgiPipe(pipFromCgi, pipToCgi);
+		_cleanupCgiPipe(pipFromCgi, pipToCgi);
 		return false;
 	}
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
@@ -105,14 +105,14 @@ bool CgiProcess::initCgi()
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 	// av[1] = strdup(_client->getRequest().getPath().c_str());
 	av[2] = NULL;
-	createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
+	_createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 
 	// std::cout << "about to INIT CGI" << std::endl;
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
 		LOG_ERR("\033[32mDEBUG messaga in fork_CGI in requesthandler\033[0m"); //runtime error or LOG_ERR?!?!?
-		cleanupCgiPipe(pipFromCgi, pipToCgi);
+		_cleanupCgiPipe(pipFromCgi, pipToCgi);
 		return false;
 	}
 	if (cgiPid == 0) {
@@ -186,7 +186,7 @@ bool CgiProcess::initCgi()
 	return true;
 }
 
-void	CgiProcess::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
+void	CgiProcess::_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 {
 	if (pipFromCgi[0] != -1)
 		close(pipFromCgi[0]);

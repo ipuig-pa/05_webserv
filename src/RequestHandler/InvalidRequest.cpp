@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   InvalidRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:31:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:47:31 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-void	RequestHandler::handleInvalidRequest(Client &client)
+void	RequestHandler::_handleInvalidRequest(Client &client)
 {
 	std::vector<std::string>	methods;
 
