@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/20 11:29:53 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 19:50:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -524,7 +524,7 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 	match = 0;
 	for(size_t i = 0; i < _location.size(); ++i)
 	{
-		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size() - 1] == '/')
+		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && (_location[i].getLocPath()[_location[i].getLocPath().size() - 1] == '/' || uripath[_location[i].getLocPath().size()] == '/'))
 		{
 			if (_location[i].getLocPath().size() > match)
 			{

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/19 19:42:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 19:41:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,10 @@ bool CgiProcess::initCgi()
 	//av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
 	// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
 	// av[0] = strdup(cgiSysFromConf.c_str());
-	av[0] = strdup(_getExtSysPath(_client).c_str());
+	std::string	cgi_ext = _getExtSysPath();
+	if (cgi_ext.empty())
+		return false;
+	av[0] = strdup(cgi_ext.c_str());
 	// std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
 	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
 	// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
@@ -203,26 +206,30 @@ void	CgiProcess::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 //scalable function
 //SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
 // std::string CgiProcess::_getExtSysPath(std::string	script_path)
-std::string	CgiProcess::_getExtSysPath(Client* client)
+std::string	CgiProcess::_getExtSysPath()
 {
 	std::string	cgiExt = "";
 
-	size_t pos = client->getRequest().getUri().rfind('.');
+	size_t pos = _client->getRequest().getUri().rfind('.');
 	if (pos != std::string::npos) {
-		cgiExt = client->getRequest().getUri().substr(pos); //eg: ".php"	
+		cgiExt = _client->getRequest().getUri().substr(pos); //eg: ".php"	
 	}
 	std::cout << "CGI EXT: " << cgiExt << std::endl;
 	//Get from config file!!! 
 	//should we restrict the cgi we are handling?!?!??
-	std::map<std::string, std::string> pair = client->getLocationConf()->getPathExMap();
-	if (pair.empty())
+	std::cout << _client->getLocationConf()->getLocPath() << std::endl;
+	std::map<std::string, std::string> pair = _client->getLocationConf()->getPathExMap();
+	if (pair.empty()) {
 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		return "";
+	}
 	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
 	if (it != pair.end())
 		return (it->second);
 	else {
 		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
 		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		return "";
 	}
 	return cgiExt;
 }

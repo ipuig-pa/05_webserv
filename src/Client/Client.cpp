@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 19:15:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 19:24:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ Client::~Client()
 {
 	if (_file_fd != -1)
 		close(_file_fd);
-	for (i = 0; i < _post_fd.size(); ++i) {
+	for (size_t i = 0; i < _post_fd.size(); ++i) {
 		int file_fd = _post_fd[i];
 		close(file_fd);
 	}
