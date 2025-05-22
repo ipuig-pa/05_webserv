@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 16:51:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 16:06:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ void	MultiServer::_acceptNewConnection(ListenSocket *listen_socket)
 	if (cli_socket == -1) {
 		LOG_ERR("Failed to accept client on socket " + std::to_string(listen_socket->getFd()));
 		throw std::runtime_error("Invalid socket file descriptor");
-		return ;
 	}
 	Client *client = new Client(cli_socket, listen_socket);
 	_clients.insert(std::pair<int, Client*>(cli_socket, client));
@@ -114,7 +113,17 @@ void	MultiServer::_closeClientConnection(Client *client)
 	if (file_fd != -1) {
 		_eraseFromPoll(file_fd);
 		close(file_fd);
+		client->setFileFd(-1);
 	}
+
+	//close associated post file fd
+	file_fd = -1;
+	for (auto it = client->getPostFdMap().begin(); it != client->getPostFdMap().end(); ++it) {
+		file_fd = it->first;
+		_eraseFromPoll(file_fd);
+		close(file_fd);
+	}
+	client->clearPostFdMap();
 
 	//close associated CGI fd
 	if (CgiProcess *cgi = client->getCgiProcess())
@@ -178,7 +187,7 @@ void	MultiServer::_closeListeningSocket(ListenSocket *socket)
 		if (_sockets.empty()) {
 			LOG_WARN("No listening sockets remain - server running in drain mode, new connections won't be accepted");
 			_drain_mode = true;
-			_shutdown_time = time(NULL) + _timeouts.getGracefulShutdown();
+			_shutdown_time = time(NULL) + TimeoutConf::getGracefulShutdown();
 		}
 	}
 }

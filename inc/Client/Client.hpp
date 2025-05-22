@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 11:53:14 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 14:47:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ public:
 	bool			sendContinue(void);
 	void			sendErrorResponse(int code, std::string message);
 	void			defineMaxBodySize(void);
+	void			clearPostFdMap(void);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 12:44:22 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 14:32:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,10 +264,10 @@ void	CgiProcess::cleanCloseCgi(void)
 		int result = waitpid(_cgiPid, &status, WNOHANG);
 		if (result == 0) {
 			LOG_WARN("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
-			kill(_cgiPid, SIGTERM); 
-			usleep(100000); // 100ms as grace period
+			kill(_cgiPid, SIGTERM);
+			usleep(200000); // 200ms as grace period
 			if (waitpid(_cgiPid, &status, WNOHANG) == 0)
-				kill(_cgiPid, SIGKILL); 
+				kill(_cgiPid, SIGKILL);
 			waitpid(_cgiPid, &status, 0); //make sure it's really dead
 		}
 		else if (result > 0) {

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 11:52:41 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 16:05:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,6 @@
 
 
 /*-------------METHODS--------------------------------------------------------*/
-
-void	MultiServer::_eraseFromPoll(int fd)
-{
-	for (int i = getPoll().size() - 1; i > 0; i--) {
-		if (getPoll().data()[i].fd == fd) {
-			getPoll().erase(getPoll().begin() + i);
-			return ;
-		}
-	}
-}
 
 void	MultiServer::_newFdsToPoll(Client *client)
 {
@@ -56,6 +46,16 @@ void	MultiServer::_newFdsToPoll(Client *client)
 	}
 }
 
+void	MultiServer::_eraseFromPoll(int fd)
+{
+	for (int i = _poll.size() - 1; i > 0; i--) {
+		if (_poll.data()[i].fd == fd) {
+			_poll.erase(_poll.begin() + i);
+			return ;
+		}
+	}
+}
+
 void	MultiServer::_handlePollErr(int fd, int i)
 {
 	std::map<int, Client*>::iterator it_c;
@@ -65,8 +65,6 @@ void	MultiServer::_handlePollErr(int fd, int i)
 			if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getFromCgi() == fd) {
 				LOG_DEBUG("CGI pipe end at " + std::to_string(fd) + " closed (POLLHUP)");
 				it_c->second->getCgiProcess()->readCgiOutput();
-				// it_c->second->getCgiProcess()->setActive(false);
-				// it_c->second->getResponse().setState(READ);
 				if (it_c->second->getCgiProcess()->isActive() == false)
 					_eraseFromPoll(fd);
 				return ;

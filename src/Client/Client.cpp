@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 12:44:32 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 14:47:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,17 @@ Client::~Client()
 {
 	if (_file_fd != -1)
 		close(_file_fd);
-	for (size_t i = 0; i < _post_fd.size(); ++i) {
-		int file_fd = _post_fd[i];
+	
+	int file_fd = -1;
+	for (auto it = _post_fd.begin(); it != _post_fd.end(); ++it) {
+		file_fd = it->first;
 		close(file_fd);
 	}
+	_post_fd.clear();
+
 	if (_error_handler)
 		delete (_error_handler);
+
 	if (_cgi) {
 		_cgi->cleanCloseCgi();
 		delete (_cgi);
@@ -295,4 +300,9 @@ void	Client::_reset(void)
 		delete (_cgi);
 		_cgi = nullptr;
 	}
+}
+
+void	Client::clearPostFdMap(void)
+{
+	_post_fd.clear();
 }

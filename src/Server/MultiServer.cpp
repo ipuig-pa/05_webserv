@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:05:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 16:03:44 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
-	:_serv_config(serv_config), _timeouts(), _drain_mode(false), _shutdown_time(-1)
+	:_serv_config(serv_config), _drain_mode(false), _shutdown_time(-1)
 {
 	_init_sockets(_serv_config);
 }
@@ -47,12 +47,7 @@ MultiServer::~MultiServer()
 
 /*-------------ACCESSORS------------------------------------------------------*/
 
-std::vector<struct pollfd>	&MultiServer::getPoll(void)
-{
-	return (_poll);
-}
-
-std::map<int, Client*>	&MultiServer::getClients(void)
+const std::map<int, Client*>	&MultiServer::getClients(void) const
 {
 	return (_clients);
 }
@@ -72,15 +67,10 @@ void	MultiServer::run()
 			break;
 		}
 
-		// std::cout << "POLL data " << _poll.data() << std::endl;
-		// std::cout << "POLL revents " << _poll.size() << std::endl;
-
 		for (int i = _poll.size() - 1; i >= 0; i--) {
 			int fd = _poll[i].fd;
-	
-			// std::cout << "POLL revents[" << i << "]: " << _poll[i].fd << std::endl;
 			if (_poll[i].revents & POLLIN) { //ready for reading / receiving
-				if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listenint socket case
+				if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listening socket case
 					LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
 					_acceptNewConnection(it_s->second);
 				}
@@ -104,7 +94,6 @@ void	MultiServer::run()
 				_handlePollErr(fd, i);
 		}
 		_checkTimeouts();
-		// _checkCgi(); //ADD THIS FUNCTION TO MONITOR PERIODICALLY CGI STATE (Waitpid)
 		_handleConnections();
 	}
 	return ;

@@ -6,43 +6,39 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 17:05:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 16:06:34 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ListenSocket.hpp"
 
-/**
- * TASK:
- * set up basic socket, bind to config port (fron config_file)
- * listen to upcoming connection (non-blocking)
-*/
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 ListenSocket::ListenSocket(std::vector<ServerConf> &config)
 	:_socket_fd(-1), _port(config[0].getPort()), _conf(config)
 {
-	//creating socket on IP "???" and port "_port"
 	_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (_socket_fd == -1)
 		throw std::runtime_error("Socket creation failed: " + std::string(strerror(errno)));
 
-	// Set socket options
-	int opt = 1;
-	setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-	//set up the address structure to use
-	setaddress(config[0]);
-	// Bind socket to the address and port
-	if (bind(_socket_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
-		// Handle listen error -> throw exception / runtime error!?!?!?
-		close(_socket_fd);
-		return ;
+	try {
+		int opt = 1;
+		setsockopt(_socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+		_setaddress(config[0]);
+		if (bind(_socket_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) 
+			throw std::runtime_error("Socket binding failed: " + std::string(strerror(errno)));
+		if (listen(_socket_fd, SOMAXCONN) < 0)
+			throw std::runtime_error("Socket listening failed: " + std::string(strerror(errno)));
+		if (fcntl(_socket_fd, F_SETFL, O_NONBLOCK) == -1)
+			throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
+		if (fcntl(_socket_fd, F_SETFD, FD_CLOEXEC) == -1)
+			throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 	}
-	// Start listening
-	if (listen(_socket_fd, SOMAXCONN) < 0) {
-		// Handle listen error -> throw exception / runtime error!?!?!?
+	catch (const std::exception& e) {
 		close(_socket_fd);
-		return ;
+		_socket_fd = -1;
+		throw;
 	}
 }
 
@@ -51,15 +47,7 @@ ListenSocket::~ListenSocket()
 	close(_socket_fd);
 }
 
-void	ListenSocket::setaddress(const ServerConf& config)
-{
-	(void) config;
-	memset(&_address, 0, sizeof(_address));
-	_address.sin_family = AF_INET;
-	//CREATE THE FUNCTION TO Convert HOST IP to uint32_t!!!!
-	// _address.sin_addr.s_addr = htonl(config.getHost());// Convert IP to network byte order 
-	_address.sin_port = htons(_port);// Convert port to network byte order
-}
+/*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
 int	ListenSocket::getFd()
 {
@@ -96,4 +84,36 @@ ServerConf	*ListenSocket::getConf(std::string name)
 std::vector<ServerConf>	&ListenSocket::getConfVector()
 {
 	return _conf;
+}
+
+/*-------------METHODS--------------------------------------------------------*/
+
+void	ListenSocket::_setaddress(const ServerConf& config)
+{
+	(void) config;
+	memset(&_address, 0, sizeof(_address));
+	_address.sin_family = AF_INET;
+	_address.sin_addr.s_addr = _getInetAddr(config.getHost());// Convert IP to network byte order 
+	_address.sin_port = htons(_port);// Convert port to network byte order
+}
+
+uint32_t	ListenSocket::_getInetAddr(const std::string& host)
+{
+	struct addrinfo hints, *result;
+	
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET; // IPv4
+	hints.ai_socktype = SOCK_STREAM; // TCP
+	
+	int status = getaddrinfo(host.c_str(), nullptr, &hints, &result);
+	if (status != 0) {
+		throw std::runtime_error(gai_strerror(status));
+	}
+
+	struct sockaddr_in* addr = (struct sockaddr_in*)result->ai_addr;
+	uint32_t network_addr = addr->sin_addr.s_addr;
+	
+	freeaddrinfo(result);
+	
+	return network_addr;
 }
