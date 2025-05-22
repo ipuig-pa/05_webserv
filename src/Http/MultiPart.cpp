@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Multipart.cpp                                      :+:      :+:    :+:   */
+/*   MultiPart.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 10:07:20 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 18:22:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 10:25:40 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,11 @@ void	MultiPart::_parsePartHeaders(size_t i)
 				}
 				size_t	filename_pos = content_disp.find("filename=\"");
 				if (filename_pos != std::string::npos) {
+					_parts[i].setIsUpload(true);
 					std::string filename = content_disp.substr(filename_pos + 10, content_disp.find("\"", filename_pos + 10) - (filename_pos + 10));
+					size_t lastSlash = filename.find_last_of("/\\");
+					if (lastSlash != std::string::npos)
+						filename = filename.substr(lastSlash + 1);
 					_parts[i].setFilename(filename); //parse name here or inside part?!?!
 				}
 			}

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 10:41:47 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 10:40:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ public:
 	void		setChunked(bool chunked);
 
 	//getters
-	std::string	getHeader(const std::string& name);
+	std::string	getHeader(const std::string &name);
 	responseState	getState(void) const;
 	size_t		getBodyLength(void) const;
 	size_t		getBytesRead(void);
@@ -69,6 +69,7 @@ public:
 	std::string	statusToString() const;
 	std::string	headersToString() const;
 	void		checkMandatoryHeaders();
+	void		removeHeader(const std::string &name);
 	void		reset();
 };
 

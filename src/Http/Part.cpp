@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 09:45:56 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 19:08:35 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 11:59:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 Part::Part()
-	: _header(), _body(), _name(""), _filename("")
+	: _header(), _body(), _name(""), _filename(""), _isUpload(false)
 {
 	_body.reserve(BUFF_SIZE);
 }
@@ -49,6 +49,11 @@ void	Part::setBody(const std::vector<char> &body, size_t length)
 	_body.insert(_body.end(), body.begin(), body.begin() + length);
 }
 
+void	Part::setIsUpload(bool upload)
+{
+	_isUpload = upload;
+}
+
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
 std::string	Part::getHeaderVal(std::string name) const
@@ -69,4 +74,9 @@ const std::string	&Part::getName(void) const
 const std::string	&Part::getFilename(void) const
 {
 	return _filename;
+}
+
+bool	Part::isUpload()
+{
+	return _isUpload;
 }

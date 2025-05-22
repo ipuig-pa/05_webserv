@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 16:10:17 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 11:53:14 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,14 +60,16 @@ private:
 	int					_socket; //use directly socket fd or whole socket object? Should socket be a virtual and both client and server inherit from it, being socket_fd a protected attribute? (then for server listening socket will be this socket fd)?!??!
 	clientState			_state;
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
-	std::vector<int>	_post_fd;
+	std::map<int, int>	_post_fd; //map each post_fd to the position (i) of the corresponding part in the multipart request
 	ListenSocket		*_listenSocket;
 	ServerConf			*_currentServerConf; //idea: maybe create a upper class
 	LocationConf		*_currentLocConf;
 	CgiProcess			*_cgi;
 	ConnectionTracker	_tracker;
 
-	public:
+	void				_reset(void);
+
+public:
 	Client(int fd, ListenSocket *listenSocket);
 	~Client();
 	
@@ -77,7 +79,8 @@ private:
 	clientState		getState(void);
 	std::string		getStateString(clientState state);
 	int				getFileFd(void);
-	std::vector<int>	getPostFd(void);
+	int				getPostFd(int fd);
+	const std::map<int, int>	&getPostFdMap(void);
 	bool			getEmptyBuffer(void);
 	ListenSocket	*getListenSocket(void);
 	ServerConf		*getServerConf(void);
@@ -89,7 +92,7 @@ private:
 	
 	void			setState(clientState state);
 	void			setFileFd(int file_fd);
-	void			setPostFd(int post_fd);
+	void			setPostFd(int post_fd, size_t i);
 	void			setBuffer(char *buffer, size_t bytesRead);
 	void			setEmptyBuffer(bool value);
 	void			setServerConf(ServerConf *conf);

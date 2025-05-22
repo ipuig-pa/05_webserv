@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 17:05:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 11:52:41 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,8 @@ void	MultiServer::_newFdsToPoll(Client *client)
 	}
 
 	//push POST file fds to poll
-	size_t i;
-	for (i = 0; i < client->getPostFd().size(); ++i) {
-		file_fd = client->getPostFd()[i];
+	for (auto it = client->getPostFdMap().begin(); it != client->getPostFdMap().end(); ++it) {
+		file_fd = it->first;
 		LOG_INFO("Output file " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
 		_poll.push_back((struct pollfd) {file_fd, POLLOUT, 0});
 	}

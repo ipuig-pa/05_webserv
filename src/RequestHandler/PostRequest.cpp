@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 19:21:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 11:59:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,38 @@ void	RequestHandler::handlePostRequest(Client &client)
 		_handleMultipart(request, client);
 		return ;
 	}
+	else if (!content_type.empty()) {
+		_handleRegularPost(client, content_type, -1);
+		client.getResponse().setState(READ);
+		return ;
+	}
 	LOG_ERR("Unsupported media type: " + content_type);
 	client.sendErrorResponse(415, ""); //unsupported media type
+}
+
+void	RequestHandler::_handleRegularPost(Client &client, const std::string& contentType, int i)
+{
+	std::string responseBody;
+	
+	std::vector<char> req_body = client.getRequest().getBody();
+	if (i >= 0)
+		req_body = client.getRequest().getMultipart()->getParts()[i].getBody();
+	std::string req_body_str(req_body.begin(), req_body.end());
+
+	if (contentType.find("application/x-www-form-urlencoded") != std::string::npos) {
+		responseBody = "<html><body><h1>Form Data Received</h1><p>" + req_body_str + "</p></body></html>";
+	} else if (contentType.find("application/json") != std::string::npos) {
+		responseBody = "<html><body><h1>JSON Received</h1><pre>" + req_body_str + "</pre></body></html>";
+	} else if (contentType.find("form-data") != std::string::npos) {
+		responseBody = "<html><body><h1>Form data:</h1><pre>" + client.getRequest().getMultipart()->getParts()[i].getName(); + ": " + req_body_str + "</pre></body></html>";
+	} else {
+		responseBody = "<html><body><h1>Data Received</h1><p>" + req_body_str + "</p></body></html>";
+	}
+
+	client.getResponse().setStatusCode(200); // OK
+	client.getResponse().setHeaderField("Content-Type", "text/html");
+	std::vector<char> responseVector(responseBody.begin(), responseBody.end());
+	client.getResponse().appendBodyBuffer(responseVector, responseBody.length(), true);
 }
 
 void	RequestHandler::_handleMultipart(HttpRequest &request, Client &client)
@@ -43,11 +73,14 @@ void	RequestHandler::_handleMultipart(HttpRequest &request, Client &client)
 	request.getMultipart()->parseMultipart(client);
 	std::vector<Part> parts = request.getMultipart()->getParts();
 	for (size_t i = 0; i < parts.size(); ++i) {
-		_handleFileUpload(client, parts[i]);
+		if (parts[i].isUpload())
+			_handleFileUpload(client, parts[i], i);
+		else 
+			_handleRegularPost(client, "form-data", i);
 	}
 }
 
-void	RequestHandler::_handleFileUpload(Client &client, Part &part)
+void	RequestHandler::_handleFileUpload(Client &client, Part &part, size_t i)
 {
 	std::string uploadPath = client.getRequest().getUpload();
 	std::string reqPath = client.getRequest().getPath();
@@ -96,13 +129,18 @@ void	RequestHandler::_handleFileUpload(Client &client, Part &part)
 	if (fcntl(file_fd, F_SETFD, FD_CLOEXEC) == -1)
 		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 
-	client.setPostFd(file_fd);
+	client.setPostFd(file_fd, i);
 }
 
 std::string RequestHandler::_getAbsoluteUrl(Client& client, std::string uri)
 {
 	std::string scheme = "http://";
 	std::string host= client.getRequest().getHeaderVal("Host");
+
+	std::string uploadPath = client.getRequest().getUpload();
+	std::string reqPath = client.getRequest().getPath();
+	if (uploadPath.empty())
+		uploadPath = reqPath;
 
 	if (host.empty()) {
 		host = client.getServerConf()->getHost();
@@ -114,9 +152,8 @@ std::string RequestHandler::_getAbsoluteUrl(Client& client, std::string uri)
 }
 
 
-bool	RequestHandler::handleFileWrite(Client &client, size_t i)
+bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 {
-	int file_fd = client.getPostFd()[i];
 	std::vector<char> body = client.getRequest().getBody();
 
 	if (client.getRequest().getMultipart())
@@ -137,28 +174,22 @@ bool	RequestHandler::handleFileWrite(Client &client, size_t i)
 	}
 	if (client.getRequest().getPostBytesWritten() == body.size()) {
 		close(file_fd);
-		client.getResponse().setStatusCode(201); // succesfully created
-		client.getResponse().setHeaderField("Location", _getAbsoluteUrl(client, client.getRequest().getUri()));
-		client.getResponse().setHeaderField("Content-Type", _getContentType(client.getRequest(), i));
-		std::string responseBody = "File \"" + _getFilename(client.getRequest(), i) + "\" was successfully uploaded.\n";
+		if (client.getResponse().getStatus().getStatusCode() == 201) {
+			client.getResponse().setStatusCode(200); // OK
+			client.getResponse().setHeaderField("Location", _getAbsoluteUrl(client, client.getRequest().getUri()));
+		}
+		else {
+			client.getResponse().setStatusCode(201); // succesfully created
+			client.getResponse().removeHeader("Location");
+		}
+		client.getResponse().setHeaderField("Content-Type", "text/html");
+		std::string responseBody = "<html><body><h1>Successful Upload:</h1><pre>" + _getFilename(client.getRequest(), i) + "</pre></body></html>";
 		std::vector<char> responseVector(responseBody.begin(), responseBody.end());
 		client.getResponse().appendBodyBuffer(responseVector, responseBody.length(), true);
 		client.getResponse().setState(READ);
 		return true;
 	}
 	return false;
-}
-
-std::string	RequestHandler::_getContentType(HttpRequest &request, size_t i)
-{
-	std::string content_type;
-	if (request.getMultipart()) {
-		const Part &part = request.getMultipart()->getParts()[i];
-		content_type = part.getHeaderVal("Content-Type");
-	}
-	else
-		content_type = request.getHeaderVal("Content-Type");
-	return (content_type);
 }
 
 std::string	RequestHandler::_getFilename(HttpRequest &request, size_t i)

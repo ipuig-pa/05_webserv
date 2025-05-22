@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/16 14:27:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 10:41:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,11 @@ void	HttpResponse::checkMandatoryHeaders()
 	if (getHeader("Content-Length").empty() && !_chunked)
 		setHeaderField("Content-Length", std::to_string(_body_length));
 	// also include Connection: keep-alive or close?
+}
+
+void	HttpResponse::removeHeader(const std::string &name)
+{
+	_header.remove(name);
 }
 
 void	HttpResponse::reset()

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 19:24:44 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 12:33:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ Client::Client(int socket, ListenSocket *listenSocket)
 	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _listenSocket(listenSocket), _currentServerConf(nullptr), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
 {
 	_error_handler = new ErrorPageHandler(this);
-	_post_fd.reserve(3);
 }
 
 Client::~Client()
@@ -92,11 +91,18 @@ int	Client::getFileFd(void)
 	return (_file_fd);
 }
 
-std::vector<int>	Client::getPostFd(void)
+const std::map<int, int>	&Client::getPostFdMap(void)
 {
-	return (_post_fd);
+	return _post_fd;
 }
 
+int	Client::getPostFd(int fd)
+{
+	std::map<int, int>::const_iterator it = _post_fd.find(fd);
+	if (it != _post_fd.end())
+		return it->second;
+	return -1;
+}
 
 int	Client::getSocket(void)
 {
@@ -122,9 +128,8 @@ void	Client::setState(clientState state)
 	if (state == SENDING_RESPONSE)
 		this->_tracker.setResponseStart();
 	else if (state == NEW_REQUEST) {
-		this->getParser().reset();
-		this->getRequest().reset();
-		this->getResponse().reset();
+		this->_reset();
+		this->getTracker().setLastActivity();
 	}
 }
 
@@ -138,11 +143,9 @@ void	Client::setFileFd(int file_fd)
 	_file_fd = file_fd;
 }
 
-void	Client::setPostFd(int post_fd)
+void	Client::setPostFd(int post_fd, size_t i)
 {
-	if (_post_fd.capacity() < _post_fd.size() + 1)
-		_post_fd.reserve(_post_fd.size() + 3);
-	_post_fd.push_back(post_fd);
+	_post_fd[post_fd] = i;
 }
 
 void	Client::setCgiProcess(CgiProcess *cgi)
@@ -198,8 +201,7 @@ bool	Client::sendResponseChunk(void)
 		}
 		else if (_file_fd == -1 && _response.getState() == READ) //or handle the case where there was a fd and is already sent!
 		{
-			_state = NEW_REQUEST;
-			this->getTracker().setLastActivity();
+			this->setState(NEW_REQUEST);
 			return true;
 		}
 		// else
@@ -277,3 +279,19 @@ void	Client::defineMaxBodySize(void)
 		_max_body_size = DEFAULT_MAX_CLIENT_BODY;
 }
 
+void	Client::_reset(void)
+{
+	_req_parser.reset();
+	_request.reset();
+	_response.reset();
+	_file_fd = -1;
+	_post_fd.clear();
+	_max_body_size = -1;
+	_currentServerConf = nullptr;
+	_currentLocConf = nullptr;
+	if (_cgi) {
+		_cgi->cleanCloseCgi();
+		delete (_cgi);
+		_cgi = nullptr;
+	}
+}

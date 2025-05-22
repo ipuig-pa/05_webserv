@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 17:42:04 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 11:54:03 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,17 +42,16 @@ void	MultiServer::_handleInputFd(int fd, RequestHandler &req_hand)
 
 void	MultiServer::_handleOutputFd(int fd, RequestHandler &req_hand)
 {
-	size_t	i;
+	int	i;
 	std::map<int, Client*>::iterator it_c = _clients.begin();
 	while (it_c != _clients.end())
 	{
-		for (i = 0; i < it_c->second->getPostFd().size(); ++i) {
-			if (it_c->second->getPostFd()[i] == fd) {
-				LOG_DEBUG("File " + std::to_string(fd) + " is ready to be written");
-				if (req_hand.handleFileWrite(*(it_c->second), i))
-					_eraseFromPoll(fd);
-				return ;
-			}
+		i = it_c->second->getPostFd(fd);
+		if (i != -1) {
+			LOG_DEBUG("File " + std::to_string(fd) + " is ready to be written");
+			if (req_hand.handleFileWrite(*(it_c->second), fd, i))
+				_eraseFromPoll(fd);
+			return ;
 		}
 		if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getToCgi() == fd && it_c->second->getState() == WRITING_CGI) {
 			LOG_DEBUG("Cgi input " + std::to_string(fd) + " is ready to be written");

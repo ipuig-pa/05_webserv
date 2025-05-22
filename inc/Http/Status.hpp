@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:17:44 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/30 14:06:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 10:35:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ public:
 	std::string toString() const;
 	void	setStatusCode(int code);
 	std::string	&getStatusMessage(void);
+	int		getStatusCode(void);
 };
 
 #endif
