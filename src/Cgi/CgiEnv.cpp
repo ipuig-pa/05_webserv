@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/20 11:23:27 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/22 12:44:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,5 +107,6 @@ void CgiProcess::_cleanEnvp(void)
 			delete[] _envp[i];
 		}
 		delete[] _envp;
+		_envp = nullptr;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 12:33:09 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 12:44:32 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ Client::~Client()
 	if (_cgi) {
 		_cgi->cleanCloseCgi();
 		delete (_cgi);
+		_cgi = nullptr;
 	}
 }
 

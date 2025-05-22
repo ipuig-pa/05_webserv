@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 19:41:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 12:44:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 CgiProcess::CgiProcess(Client *client)
-	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(42), _cgiBuffer(), _cgiActive(false), _headers_sent(false), _envp(nullptr)
+	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(-1), _cgiBuffer(), _cgiActive(false), _headers_sent(false), _envp(nullptr)
 {
 	_script_path = client->getRequest().getPath();
 }
@@ -259,33 +259,34 @@ void	CgiProcess::cleanCloseCgi(void)
 	_pipToCgi = -1;
 
 	//check child process
-	int status;
-	int result = waitpid(_cgiPid, &status, WNOHANG);
-	if (result == 0) {
-		LOG_WARN("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
-		kill(_cgiPid, SIGTERM); 
-		usleep(100000); // 100ms as grace period
-		if (waitpid(_cgiPid, &status, WNOHANG) == 0)
-			kill(_cgiPid, SIGKILL); 
-		waitpid(_cgiPid, &status, 0); //make sure it's really dead
-	}
-	else if (result > 0) {
-		if (WIFEXITED(status)) {
-			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with: \033[0m" + std::to_string(WEXITSTATUS(status)));
-		} else if (WIFSIGNALED(status)) {
-			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal: \033[0m" + std::to_string(WTERMSIG(status)));
+	if (_cgiPid != -1) {
+		int status;
+		int result = waitpid(_cgiPid, &status, WNOHANG);
+		if (result == 0) {
+			LOG_WARN("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
+			kill(_cgiPid, SIGTERM); 
+			usleep(100000); // 100ms as grace period
+			if (waitpid(_cgiPid, &status, WNOHANG) == 0)
+				kill(_cgiPid, SIGKILL); 
+			waitpid(_cgiPid, &status, 0); //make sure it's really dead
 		}
-		LOG_INFO("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " has terminated");
-		// _client->setState(SENDING_RESPONSE);
+		else if (result > 0) {
+			if (WIFEXITED(status)) {
+				LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with: \033[0m" + std::to_string(WEXITSTATUS(status)));
+			} else if (WIFSIGNALED(status)) {
+				LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal: \033[0m" + std::to_string(WTERMSIG(status)));
+			}
+			LOG_INFO("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " has terminated");
+			// _client->setState(SENDING_RESPONSE);
+		}
+		else if (result < 0) {
+			// Error occurred
+			LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
+			_client->sendErrorResponse(500, "");
+		}
+		_cgiActive = false;
+		_cgiPid = -1;
 	}
-	else if (result < 0) {
-		// Error occurred
-		LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
-		_client->sendErrorResponse(500, "");
-	}
-	_cgiActive = false;
-	_cgiPid = -1;
-
 	//clean env var pointer
 	_cleanEnvp();
 }
