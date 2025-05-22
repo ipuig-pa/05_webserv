@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 16:03:44 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 18:57:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,26 +23,24 @@ MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
 
 MultiServer::~MultiServer()
 {
+	LOG_DEBUG("Destructing multiserver");
 	std::map<int, ListenSocket*>::iterator it_s;
 	std::map<int, Client*>::iterator it_c;
 
-	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
-	{
+	while (!_sockets.empty()) {
+		auto it_s = _sockets.begin();
 		if (it_s->second) {
-			if (int fd = it_s->second->getFd() != -1) {
-				close(fd);
-			}
+			int old_fd = it_s->second->getFd();	
 			delete (it_s->second);
+			_sockets.erase(old_fd);
 		}
 	}
-	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
-	{
+	while (!_clients.empty()) {
+		auto it_c = _clients.begin();
 		if (it_c->second)
 			_closeClientConnection(it_c->second);
 	}
 	_poll.clear();
-	_clients.clear();
-	_sockets.clear();
 }
 
 /*-------------ACCESSORS------------------------------------------------------*/

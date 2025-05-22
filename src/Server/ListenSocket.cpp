@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 16:06:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 18:57:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ ListenSocket::ListenSocket(std::vector<ServerConf> &config)
 
 ListenSocket::~ListenSocket()
 {
-	close(_socket_fd);
+	if (_socket_fd != -1)
+		close(_socket_fd);
 }
 
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
