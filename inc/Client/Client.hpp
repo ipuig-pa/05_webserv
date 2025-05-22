@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 11:12:25 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 13:34:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,6 @@
 class ErrorPageHandler;
 class CgiProcess;
 
-/**
- * accept (new) client connection,
- * read from and write to clients,
- * keep non-blocking
-*/
-
 enum clientState
 {
 	NEW_CONNECTION,
@@ -49,7 +43,7 @@ enum clientState
 	BOUNCED //when!?!?!?
 };
 
-class Client //or struct?
+class Client
 {
 private:
 	HttpRequest			_request;
@@ -61,7 +55,7 @@ private:
 	clientState			_state;
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
 	ListenSocket		*_listenSocket;
-	ServerConf			*_currentServerConf; //idea: maybe create a upper class
+	ServerConf			*_currentServerConf;
 	LocationConf		*_currentLocConf;
 	CgiProcess			*_cgi;
 	ConnectionTracker	_tracker;
@@ -100,3 +94,10 @@ private:
 };
 
 #endif
+
+/**
+ * accept (new) client connection,
+ * read from and write to clients,
+ * keep non-blocking
+ * 
+*/

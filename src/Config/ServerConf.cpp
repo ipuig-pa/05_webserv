@@ -6,20 +6,21 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:46:21 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 15:26:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConf.hpp"
 
 ServerConf::ServerConf()
-	: _srv_autoindex(false), _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _upload("")
+	: _srv_autoindex(false), _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _upload("")
 {
 }
 // ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
+
 ServerConf::~ServerConf() {}
 
-bool ServerConf::allDigit(const std::string& s)//return true if all digit
+bool ServerConf::allDigit(const std::string& s)
 {
 	return std::all_of(s.begin(), s.end(), ::isdigit);
 }
@@ -31,6 +32,7 @@ bool ServerConf::hasSemicolon(const std::string& s)
 	}
 	return false;
 }
+
 std::string ServerConf::rmvSemicolon(const std::string& token)
 {
 	if (!token.empty() && token.back() == ';') {
@@ -38,7 +40,7 @@ std::string ServerConf::rmvSemicolon(const std::string& token)
 	}
 	return token;
 }
-//TODO: im always kind hesitate to decide pass by ref or copy, so may check and change later
+
 void ServerConf::setPort(std::string s)
 {
 	if (!hasSemicolon(s)) {
@@ -53,6 +55,7 @@ void ServerConf::setPort(std::string s)
 		throw std::runtime_error("Error: too big port number.");
 	this->_port = tmp;
 }
+
 void ServerConf::setSrvName(std::string s)
 {
 	if (!hasSemicolon(s)) {
@@ -61,6 +64,7 @@ void ServerConf::setSrvName(std::string s)
 	s = rmvSemicolon(s);
 	this->_server_name = s;
 }
+
 void ServerConf::setHost(std::string s)
 {
 	if (!hasSemicolon(s)) {
@@ -69,6 +73,7 @@ void ServerConf::setHost(std::string s)
 	s = rmvSemicolon(s);
 	this->_host = s; //127.0.0.0 or localhost, getaddrinfo() can resolve insocket binding
 }
+
 void ServerConf::setRoot(std::string s)
 {
 	if (!hasSemicolon(s)) {
@@ -77,12 +82,13 @@ void ServerConf::setRoot(std::string s)
 	s = rmvSemicolon(s);
 	this->_root_dir = s;
 }
-void ServerConf::setIndex(std::string s)
+
+void ServerConf::setIndex(std::vector<std::string> s)
 {
-	if (!hasSemicolon(s)) {
-		throw std::runtime_error("Error: missing ';' at value passed.");
-	}
-	s = rmvSemicolon(s);
+	// if (!hasSemicolon(s)) {
+	// 	throw std::runtime_error("Error: missing ';' at value passed.");
+	// }
+	// s = rmvSemicolon(s);
 	this->_index = s;
 }
 
@@ -92,11 +98,6 @@ void ServerConf::setSrvUpload(std::string s)
 		throw std::runtime_error("Error: missing ';' after upload_store value.");
 	}
 	s = rmvSemicolon(s);
-	// if (FileUtils::pathType(s) != 3) {
-	// 	s = _root_dir + s;
-	// 	if (FileUtils::pathType(s) != 3)
-	// 	throw std::runtime_error("Error: Server level: upload_store value is not dir." + s);
-	// }
 	this->_upload = s;
 }
 
@@ -107,19 +108,12 @@ void ServerConf::cleanLocTk(std::string& tk)
 	}
 	tk = rmvSemicolon(tk);
 }
-/**
-valid range : 100-599
-100-199: Informational responses
-200-299: Successful responses
-300-399: Redirection messages
-400-499: Client error responses
-500-599: Server error responses
-*/
+
 bool ServerConf::codeRange(const std::string& errtoken)
 {
 	if (!allDigit(errtoken)) {
-		// throw std::runtime_error("Error: error code must be all digits.");
-		LOG_ERR("error code must be all digits.");
+		throw std::runtime_error("Error: error code must be all digits.");
+		LOG_ERR("code must be all digits.");
 		return false;
 	}
 	int tmp = std::stoi(errtoken);
@@ -128,6 +122,7 @@ bool ServerConf::codeRange(const std::string& errtoken)
 	}
 	return false;
 }
+
 //err_tks passed here is: "err_code" "err_page", semicolon rmved
 void ServerConf::setErr(std::vector<std::string>& errTokens)
 {
@@ -145,10 +140,12 @@ void ServerConf::setErr(std::vector<std::string>& errTokens)
 		this->_error_page[errCode] = errPage;
 	}
 }
+
 void ServerConf::setAutoIndex(bool _flag)
 {
 	this->_srv_autoindex = _flag;
 }
+
 void ServerConf::setCMBS(std::string s)
 {
 	if (!hasSemicolon(s)) {
@@ -161,19 +158,15 @@ void ServerConf::setCMBS(std::string s)
 	unsigned long long tmp = std::stoll(s);
 	if (tmp >= INT_MAX) {
 		throw std::runtime_error("Error: too large number of CMBS.");
-	} //is this necessary?? not sure...
+	}
 	this->_max_body_size = (unsigned int)tmp;
 }
 
-/** TASKS:
- * 1. check CGI parameters: CGI path/extension/index.html //done
- * 	 - FileUtils class is called for path checking!
- * 2. compare CGI_path and Cgi extension(.php, .py, .sh [...]) //done
- * 3. normal path check: 
- * 		- root: start with '/', or root var is empty //done
- */
-//after parsing, check1: cgi, if not CGI, check static
-
+//checing THIS location{} has return or not
+// bool ServerConf::locReturnCheck(LocationConf& loc)
+// {
+// 	return loc.checkRet();
+// }
 bool ServerConf::locReturnCheck(LocationConf& loc)
 {
 	//return value be std::vector or reture_code + return_html??
@@ -186,7 +179,7 @@ void ServerConf::wrapLocChecker(LocationConf& loc)
 {
 	//SHOULD NOT BE COMMENTED. IRENE COMMENTED TO BE ABLE TO TEST AUTOINDEX>HOW SHOULD AUTOINDEX BE HANDLED OTHERWISE???
 	if (loc.getLocPath() != "/cgi" && loc.getLocIndex().empty()) {
-		loc.setLocIndex(this->_index); //not dynamic, and no index provided, inheritance //handle it in the directory request better?!?!?
+		loc.setLocIndex(_index); //not dynamic, and no index provided, inheritance //handle it in the directory request better?!?!?
 	}
 	if (loc.getLocRoot().empty() == true) {
 		loc.setLocRoot(_root_dir);
@@ -209,14 +202,6 @@ void ServerConf::wrapLocChecker(LocationConf& loc)
 		loc.setPathExMap(loc.getCgiExtension(), loc.getCgiSysPath());
 		CgiChecker::checkCGI(loc);
 	}
-	//debug message, remove later
-	// std::map<std::string, std::string> _map = loc.getPathExMap();
-	// for (auto it = _map.begin(); it != _map.end(); ++it) {
-	// 	std::cout << "\033[31mKey: " << it->first << "\nValue: \033[0m" << it->second << std::endl;
-	// }
-	// if (loc.getCgiExtension().size() != 0 && loc.getCgiSysPath().size() != 0) {
-	// 	loc.createCgiMatch();
-	// }
 	if (loc.getLocPath()[0] != '/') {
 		throw std::runtime_error("Error: path should start with '/'.");
 	}
@@ -276,13 +261,6 @@ void ServerConf::parseLocUpload(LocationConf& loc, std::vector<std::string>& loc
 		throw std::runtime_error("Error: missing ';' at value passed.");
 	}
 	std::string tmp = rmvSemicolon(loc_tks[i]);
-	// if (FileUtils::pathType(tmp) != 3) {
-		// std::cout << "loction root is: " << _locRoot << "\n";
-		// s = _locRoot + _locPath + s;
-		// if (FileUtils::pathType(s)) {
-		// 	throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
-		// }
-	// }
 	loc.setLocUpload(tmp);
 }
 
@@ -333,6 +311,7 @@ void ServerConf::parseMethod(LocationConf& loc, std::vector<std::string>& loc_tk
 	}
 	loc.setMethod(tmp);
 }
+
 void ServerConf::parseLocAuto(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()) {
@@ -361,6 +340,7 @@ void ServerConf::parseLocAuto(LocationConf& loc, std::vector<std::string>& loc_t
 	}
 	loc.setLocAuto(_flag);
 }
+
 void ServerConf::parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()){
@@ -369,12 +349,27 @@ void ServerConf::parseLocIndex(LocationConf& loc, std::vector<std::string>& loc_
 	if (loc.getLocIndex().empty() == false) {
 	 	throw std::runtime_error("Error: 'index' in location already defined.");
 	}
-	i++;
-	if (!hasSemicolon(loc_tks[i])) {
-		throw std::runtime_error("Error: missing ';' at index passed.");
+	std::vector<std::string> tmp;
+	while (++i < loc_tks.size())
+	{
+		if (hasSemicolon(loc_tks[i])) {
+			loc_tks[i] = rmvSemicolon(loc_tks[i]);
+			tmp.push_back(loc_tks[i]);
+			break ;
+		} else {
+			tmp.push_back(loc_tks[i]);
+			if (i + 1 >= loc_tks.size()) {
+				throw std::runtime_error("Error: index parameter invalid.");
+			}
+		}
 	}
-	loc_tks[i] = rmvSemicolon(loc_tks[i]);
-	loc.setLocIndex(loc_tks[i]);
+	loc.setLocIndex(tmp);
+	// i++;
+	// if (!hasSemicolon(loc_tks[i])) {
+	// 	throw std::runtime_error("Error: missing ';' at index passed.");
+	// }
+	// loc_tks[i] = rmvSemicolon(loc_tks[i]);
+	// loc.setLocIndex(loc_tks[i]);
 }
 
 void ServerConf::parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
@@ -399,6 +394,7 @@ void ServerConf::parseLocCMBS(LocationConf& loc, std::vector<std::string>& loc_t
 	}
 	loc.setLocCMBS(tmp);
 }
+
 void ServerConf::parseCgiSysPath(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()) {
@@ -422,6 +418,7 @@ void ServerConf::parseCgiSysPath(LocationConf& loc, std::vector<std::string>& lo
 	std::cout << "check semicolone romoved or not: path " << loc_tks[i] << "\n";
 	loc.setCgiSysPath(_cgiPath);
 }
+
 void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 1 >= loc_tks.size()) {
@@ -445,11 +442,12 @@ void ServerConf::parseCgiExtension(LocationConf& loc, std::vector<std::string>& 
 	std::cout << "check semicolone romoved or not: extension" << loc_tks[i] << "\n";
 	loc.setCgiExtenion(_cgiExtend);
 }
+
 void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i)
 {
 	if (i + 2 >= loc_tks.size()) {
 		LOG_ERR("Invalid return directive: return code + url.");
-		// throw std::runtime_error("Error: no parameter after 'return'.");
+		throw std::runtime_error("Error: no parameter after 'return'.");
 	}
 	if (loc.getRetUrl().empty() == false) {
 		LOG_ERR("return value already set.");
@@ -475,36 +473,39 @@ int ServerConf::getPort() const
 {
 	return this->_port;
 }
+
 int ServerConf::getCMBS() const {
 	return this->_max_body_size;
 }
+
 bool ServerConf::getAutoIndex() const {
 	return this->_srv_autoindex;
 }
+
 std::string ServerConf::getRoot() const {
 	return this->_root_dir;
 }
+
 std::string ServerConf::getHost() const {
 	return this->_host;
 }
-std::string ServerConf::getIndex() const {
+
+std::vector<std::string> ServerConf::getIndex() const {
 	return this->_index;
 }
+
 std::string ServerConf::getSrvName() const {
 	return this->_server_name;
 }
+
 const std::map<int, std::string>& ServerConf::getErrPage() const {
 	return this->_error_page;
 }
-// const std::map<std::string, LocationConf>& ServerConf::getLocation() const {
-// 	return this->_location;
-// }
+
 const std::vector<LocationConf>& ServerConf::getLocation() const {
 	return this->_location;
 }
 
-
-//todo: instead of full-match, for redirection, as long as the "request uri" is included in locPath, go REDIRECTION
 LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 {
 	LocationConf	*longest_match = nullptr;
@@ -512,22 +513,17 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 
 	std::cout << "finding " << uripath << " location" << std::endl;
 	std::cout << _location.size() << std::endl;
-	for(size_t i = 0; i < _location.size(); ++i)
-	{
+	for(size_t i = 0; i < _location.size(); ++i) {
 		std::cout << _location[i].getLocPath() << std::endl;
-		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().compare(uripath) == 0)
-		{
+		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().compare(uripath) == 0) {
 			std::cout << i << std::endl;
 			return (&_location[i]);
 		}
 	}
 	match = 0;
-	for(size_t i = 0; i < _location.size(); ++i)
-	{
-		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size() - 1] == '/')
-		{
-			if (_location[i].getLocPath().size() > match)
-			{
+	for(size_t i = 0; i < _location.size(); ++i) {
+		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size() - 1] == '/') {
+			if (_location[i].getLocPath().size() > match) {
 				match = _location[i].getLocPath().size();
 				longest_match = &_location[i];
 				std::cout << "longest match for " + uripath + " is location num. " << i << std::endl;
@@ -557,3 +553,21 @@ unsigned int	ServerConf::getMaxBodySize() const
 {
 	return _max_body_size;
 }
+
+
+/** TASKS:
+ * 1. check CGI parameters: CGI path/extension/index.html //done
+ * 	 - FileUtils class is called for path checking!
+ * 2. compare CGI_path and Cgi extension(.php, .py, .sh [...]) //done
+ * 3. normal path check: 
+ * 		- root: start with '/', or root var is empty //done
+*/
+/**
+valid range : 100-599
+100-199: Informational responses
+200-299: Successful responses
+300-399: Redirection messages
+400-499: Client error responses
+500-599: Server error responses
+*/
+//after parsing, check1: cgi, if not CGI, check static

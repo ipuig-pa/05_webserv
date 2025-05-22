@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:01:36 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/22 12:34:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 
 class LocationConf;
 
-//setter for varible, set val to an instance of server
 class ServerConf
 {
 private:
@@ -30,8 +29,8 @@ private:
 	std::string							_server_name;
 	std::string							_root_dir;
 	std::string							_host;
-	std::string							_index;
 	std::string							_upload;
+	std::vector<std::string>			_index;
 	std::map<int, std::string>			_error_page;
 	std::vector<LocationConf>			_location; //a set of location_blocks in server_configuration //todo check how to read specific loc
 	
@@ -41,8 +40,8 @@ public:
 	~ServerConf();
 	
 	//checker
-	int									cgiValid();
-	static int							validPath();
+	// int									cgiValid();
+	// static int							validPath();
 	bool								locReturnCheck(LocationConf& loc);
 	void								wrapLocChecker(LocationConf& loc);
 	static bool							allDigit(const std::string& s);
@@ -59,11 +58,11 @@ public:
 	void								setSrvName(std::string s);
 	void								setRoot(std::string s);
 	void								setCMBS(std::string s);
-	void								setIndex(std::string s);
+	void								setIndex(std::vector<std::string> s);
 	void								setAutoIndex(bool _flag);
 	void								setErr(std::vector<std::string>& errTokens); //return std::map<> pair??
 	void								setSrvUpload(std::string s);
-	void								addLocation(std::string& _path, std::vector<std::string>& loc_tokens); //todo: setter for var in this class
+	void								addLocation(std::string& _path, std::vector<std::string>& loc_tokens);
 	
 	//getters
 	int									getPort() const;
@@ -72,7 +71,7 @@ public:
 	unsigned int						getMaxBodySize() const;
 	std::string							getRoot() const;
 	std::string							getHost() const; //at socket binding part, use getaddrindo() to resolve!
-	std::string							getIndex() const;
+	std::vector<std::string>			getIndex() const;
 	std::string							getSrvName() const;
 	std::string							getSrvUpload() const;
 	std::string							getErrPageCode(int status_code);
@@ -93,6 +92,8 @@ public:
 	LocationConf						*getMatchingLocation(std::string uripath);
 };
 
+#endif
+
 /**
  * Response Codes:
 	2xx: Success (200 OK, 201 Created)
@@ -108,7 +109,6 @@ public:
  * 		- return customize HTML
  * 		- login sys, search feature in WEB, contact form in WEB
  */
-#endif
 
 // std::vector<std::string>& getErrPage() const;
 // ServerConf(const ServerConf& other);

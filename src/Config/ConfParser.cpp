@@ -6,22 +6,20 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:28:11 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 15:25:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConfParser.hpp"
 
-//parser for config, read, tokenize, and store the data
 ConfParser::ConfParser() : _server_count(0) {
-	// _initHandler(); or put this in mainparse???
+	// _initHandler();
 }
 ConfParser::~ConfParser() {}
 
 // if multi 'server{}' found, split it, and add to the std::vector<std::string> _single_server
 void ConfParser::split(const std::vector<std::string>& tokens)
-{	
-	// iterator to search 'server'
+{
 	if (std::find(tokens.begin(), tokens.end(), "server") == tokens.end()) {
 		throw std::runtime_error("Error: cannot find server."); //will be caught by try-catch block
 	}
@@ -88,7 +86,7 @@ std::vector<std::string> ConfParser::tokenize(const std::string& srv_block)
 //create instance of ServeConf 'servConf'
 void ConfParser::createServBlock()
 {
-	if (_single_server.size() != _server_count) //use size_t directly? //the number of svr_block != srv_count, throw error, is this check necessary???
+	if (_single_server.size() != _server_count)
 		throw std::runtime_error("Error: size does not match.");
 	if (_handlers.empty())
 		initHandler();
@@ -112,14 +110,17 @@ void ConfParser::createServBlock()
 	}
 		// servConf = parseToServ(tokens);
 }
+
 std::vector<std::string>& ConfParser::getSrvBlock()
 {
 	return _single_server;
 }
+
 std::vector<std::vector<ServerConf>> & ConfParser::getServers()
 {
 	return _servers;
 }
+
 //listen; server_name; host; root; CMBS; index; error_page; location; autoindex
 //use func pointer directing to sub-category
 //tok
@@ -201,7 +202,7 @@ size_t ConfParser::parseListen(const std::vector<std::string>& tokens, size_t i,
 	i += 1;
 	return i;
 }
-//str.empty() => return true if empty, false if non-empty
+
 size_t ConfParser::parseHost(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()) {
@@ -214,6 +215,7 @@ size_t ConfParser::parseHost(const std::vector<std::string>& tokens, size_t i, S
 	i += 1;
 	return i;
 }
+
 size_t ConfParser::parseRoot(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()) {
@@ -226,6 +228,7 @@ size_t ConfParser::parseRoot(const std::vector<std::string>& tokens, size_t i, S
 	i += 1;
 	return i;
 }
+
 size_t ConfParser::parseSvrName(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()) {
@@ -238,6 +241,7 @@ size_t ConfParser::parseSvrName(const std::vector<std::string>& tokens, size_t i
 	i += 1;
 	return i;
 }
+
 size_t ConfParser::parseCMBS(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()) {
@@ -250,6 +254,7 @@ size_t ConfParser::parseCMBS(const std::vector<std::string>& tokens, size_t i, S
 	i += 1;
 	return i;
 }
+
 size_t ConfParser::parseIndex(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()) {
@@ -258,10 +263,26 @@ size_t ConfParser::parseIndex(const std::vector<std::string>& tokens, size_t i, 
 	if (servConf.getIndex().empty() == false) {
 		throw std::runtime_error("Error: 'index' already exist.");
 	}
-	servConf.setIndex(tokens[i + 1]);
-	i += 1;
+	std::vector<std::string> tmp;
+	while (++i < tokens.size())
+	{
+		if (ServerConf::hasSemicolon(tokens[i])) {
+			if (!tokens[i].empty() && tokens[i].back() == ';') {
+				std::string tk = tokens[i].substr(0, tokens[i].size() - 1);
+				tmp.push_back(tk);
+				break ;
+			}
+		} else {
+			tmp.push_back(tokens[i]);
+			if (i + 1 >= tokens.size()) {
+				throw std::runtime_error("Error: Server level: index parameter invalid.");
+			}
+		}
+	}
+	servConf.setIndex(tmp);
 	return i;
 }
+
 size_t ConfParser::parseAutoIndex(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	if (i + 1 >= tokens.size()) {
@@ -289,7 +310,7 @@ size_t ConfParser::parseAutoIndex(const std::vector<std::string>& tokens, size_t
 	i += 1;
 	return i;
 }
-//std::map<int, std::string>& getErrPage() const;
+
 size_t ConfParser::parseErrPage(const std::vector<std::string>& tokens, size_t i, ServerConf& servConf)
 {
 	std::vector<std::string> err_tks;
@@ -321,8 +342,6 @@ size_t ConfParser::parseLocation(const std::vector<std::string>& tokens, size_t 
 	servConf.addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
 	return _locEnd;
 }
-
-
 
 // size_t ConfParser::leftBracket(std::string& lines, size_t pos)
 // {

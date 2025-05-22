@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:18:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 13:37:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ class Client;
 
 enum reqStage {
 	REQ_LINE,
-	//raw lines of http request
 	HEADERS,
 	BODY,
 	FINISH,
@@ -61,21 +60,18 @@ public:
 	~HttpReqParser();
 	
 	void								reset();
+	bool								checkFinish();
 	bool								httpParse(Client &client);
 	void								appendBuffer(const std::vector<char> &new_data);
-
-	//setter
-	// bool _setFinish(bool _flag);
-	// void setMethd(std::string& s); //set as methodType type
-	// void setUrl(std::string& s);
-	// void setVersion(std::string& s); //return version like '/1.1', check validity
-	
-	//getter
-	bool checkFinish();
-	HttpRequest getHttpRequest() const;
+	HttpRequest							getHttpRequest() const;
 };
 
+#endif
 // methodType& getMethd();
 // std::string& getVersion();
 // std::string& getPath(); //url
-#endif
+//setter
+// bool _setFinish(bool _flag);
+// void setMethd(std::string& s); //set as methodType type
+// void setUrl(std::string& s);
+// void setVersion(std::string& s); //return version like '/1.1', check validity

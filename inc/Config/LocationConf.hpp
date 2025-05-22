@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 11:44:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/22 16:02:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,45 +18,44 @@
 
 class LocationConf
 {
-	private:
-	std::string									_locPath;
-	std::string									_locRoot;
+private:
 	bool										_methods[4];
 	bool										_methodSet;
 	bool										_cmbsFlag;
+	int											_retCode;
+	bool										_hasReturn;
+	bool										_locAuto;
+	bool										_autoflag;
 	unsigned long long							_locCMBS;
+	std::string									_locUp;
+	std::string									_retUrl;
+	std::string									_locPath;
+	std::string									_locRoot;
+	std::string									_idxExt;
+	std::vector<std::string>					_locIndex;
 	std::vector<std::string>					_cgiSysPath;
 	std::vector<std::string>					_cgiExtension;
 	std::map<std::string, std::string>			_cgiExPathMap;
-	bool										_locAuto;
-	bool										_autoflag;
-	std::string									_locIndex; 
-	//should be a vector? (there can be more that one index files??)
-	
-	std::string									_locUp;
-	int											_retCode;
-	bool										_hasReturn;
-	std::string									_retUrl;
 	std::map<int, std::string>					_locReturn;
 	std::map<int, std::string>					_error_page;
 	
-	public:
+public:
 	enum mType									{ GET, HEAD, POST, DELETE, INVALID };
 	LocationConf();
 	~LocationConf();
 	
 	//setters
+	bool										autoSet() const;
+	bool										isCmbsSet() const;
+	bool										isMethodSet() const;
+	void										setLocAuto(bool _flag);
 	void										setLocPath(std::string s);
 	void										setLocRoot(std::string s);
-	bool										isMethodSet() const;
-	void										setMethod(std::vector<std::string>& s);
-	bool										isCmbsSet() const;
-	void										setLocCMBS(unsigned long long _size);
-	void										setLocIndex(std::string s);
-	bool										autoSet() const;
-	void										setLocAuto(bool _flag);
-	
 	void										setLocUpload(std::string s);
+	void										setMethod(std::vector<std::string>& s);
+	void										setLocCMBS(unsigned long long _size);
+	void										setIdxExt(std::string s);
+	void										setLocIndex(std::vector<std::string> s);
 	
 	//return
 	bool										checkRet();
@@ -64,8 +63,8 @@ class LocationConf
 	void										setRetUrl(std::string s);
 	
 	//CGI
-	void										setPathExMap(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
 	bool										isValidExPathMap(const std::string& urlFromConf, std::string& ConfSysPath); //to check config file path, and assign the execuve path
+	void										setPathExMap(const std::vector<std::string>& ext, const std::vector<std::string>& cgiSys);
 	void										setCgiSysPath(std::vector<std::string> s);
 	void										setCgiExtenion(std::vector<std::string> s);
 	
@@ -76,11 +75,12 @@ class LocationConf
 	bool										getLocAuto() const;
 	std::string									getErrPageCode(int status_code);
 	std::string									getRetUrl() const;
-	const std::string							getLocIndex() const;
 	const std::string							getLocPath() const;
 	const std::string							getLocRoot() const;
 	const std::string							getLocUpload() const;
+	const std::string							getIdxExt() const;
 	std::vector<std::string>					getMethodStr() const;
+	const std::vector<std::string>&				getLocIndex() const;
 	const std::vector<std::string>&				getCgiSysPath() const;
 	const std::vector<std::string>&				getCgiExtension() const;
 	const std::map<std::string, std::string>&	getPathExMap() const;

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:21:48 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 13:38:10 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ public:
 	std::string			getQueryPart(void) const;
 	std::string			getHeaderVal(const std::string& name) const;
 	
-	//method: reset status
+	//reset status
 	void				reset(void);
 };
 

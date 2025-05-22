@@ -6,14 +6,10 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 11:20:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 13:35:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// the case of MULTI serves!!
-// extrac and populate data to serverConf
-// include getters of all 'var' (root/port/location [...])
-// nested block also need handle
 #ifndef CONFPARSER_HPP
 #define CONFPARSER_HPP
 
@@ -36,7 +32,7 @@ public:
 	ConfParser();
 	~ConfParser();
 	
-	// getter for test private attribute
+	// getter
 	std::vector<std::string> 				&getSrvBlock();
 	std::vector<std::vector<ServerConf>>	&getServers();
 
@@ -60,6 +56,12 @@ public:
 };
 
 #endif
+
+// the case of MULTI serves!!
+// extrac and populate data to serverConf
+// include getters of all 'var' (root/port/location [...])
+// nested block also need handle
+
 // ServerConf parseToServ(const std::vector<std::string>& tokens);
 // void parseToServ(std::string& serv_block, ServerConf& servConf);
 // std::vector<std::string> tokToParse(std::string& clean_lines);

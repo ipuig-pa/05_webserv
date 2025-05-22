@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:30:59 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 14:48:50 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int FileUtils::pathType(const std::string _filePath)
 		}
 	}
 	else {
-		return -1; //reture _type;
+		return -1; //error type;
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 11:35:28 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 12:29:38 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/22 12:59:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,16 @@
 #include "LocationConf.hpp"
 #include "Client.hpp"
 
-//change cerr for LOG_ERR if needed?!
-
 bool CgiChecker::checkCGI(const LocationConf& loc)
 {
 	if (!_hasCgiPara(loc)) {
 		throw std::runtime_error("Error: missing CGI parameter.");
 		return false;
 	}
-	if (!_validCgiIndex(loc)) {
-		throw std::runtime_error("Error: invalid cgi index page.");
-		return false;
-	}
+	// if (!_validCgiIndex(loc)) {
+	// 	throw std::runtime_error("Error: invalid cgi index page.");
+	// 	return false;
+	// }
 	if (!_validCgiPath(loc.getCgiSysPath())) {
 		throw std::runtime_error("Error: invalid cgi path."); //usr/bin/php
 		return false;
@@ -34,10 +32,6 @@ bool CgiChecker::checkCGI(const LocationConf& loc)
 		throw std::runtime_error("Error: invalid cgi surffix.");
 		return false;
 	}
-	// if (!_mapPathExtension(loc)) {
-	// 	std::cerr << "Error: unmatched cgi path with extension.";
-	// 	return false;
-	// }
 	if (!_matchSize(loc)) {
 		throw std::runtime_error("Error: unmacth size of cig path with extension.");
 		return false;
@@ -47,35 +41,8 @@ bool CgiChecker::checkCGI(const LocationConf& loc)
 
 bool CgiChecker::_hasCgiPara(const LocationConf& loc)
 {
-	// return (!loc.getCgiSysPath().empty() &&
-	// 		!loc.getCgiExtension().empty() &&
-	// 		!loc.getLocIndex().empty());
 	if (loc.getCgiExtension().empty() || loc.getCgiSysPath().empty()) {
 		return false;
-	}
-	return true;
-}
-bool CgiChecker::_validCgiIndex(const LocationConf& loc)
-{
-	std::string loc_index = loc.getLocIndex();
-	if (!loc_index.empty()) {
-		std::string full_path = loc.getLocRoot() + loc.getLocPath() + "/" + loc_index;
-		if (FileUtils::pathValid(loc_index, R_OK) == 0 &&
-			FileUtils::pathType(loc_index) == 2) {
-				return true;
-		} //if index is full path and works case
-		if (FileUtils::pathValid(full_path, R_OK) == 0 &&
-		FileUtils::pathType(full_path) == 2) {
-			return true;
-		} //if root+path+index is full path and works case
-		char* tmpCwd = getcwd(NULL, 0);
-		if (!tmpCwd) {
-			return false;
-		} //if non above work, use getcwd() to get CWD, and cate with path+index
-		std::string cwd_path = std::string(tmpCwd) + loc.getLocPath() + "/" + loc_index;
-		free(tmpCwd);
-		return (FileUtils::pathValid(cwd_path, R_OK) == 0 &&
-		FileUtils::pathType(cwd_path) == 2);
 	}
 	return true;
 }
@@ -84,7 +51,7 @@ bool CgiChecker::_validCgiPath(const std::vector<std::string>& _cgipath)
 {
 	for (size_t i = 0; i < _cgipath.size(); ++i)
 	{
-		if (FileUtils::pathType(_cgipath[i]) == -1) { //returns fail
+		if (FileUtils::pathType(_cgipath[i]) == -1) {
 			return false;
 		}
 	}
@@ -93,12 +60,63 @@ bool CgiChecker::_validCgiPath(const std::vector<std::string>& _cgipath)
 bool CgiChecker::_validExtension(const std::vector<std::string>& _cgiextend)
 {
 	for (size_t i = 0; i < _cgiextend.size(); ++i) {
-		if (_cgiextend[i] == ".php" || _cgiextend[i] == ".py" || _cgiextend[i] == ".sh") {//idea: if more extension wanted, add '||' check
+		if (_cgiextend[i] == ".php" || _cgiextend[i] == ".py" || _cgiextend[i] == ".sh") {
 			return true;
 		}
 	}
 	return false;
 }
+
+bool CgiChecker::_matchSize(const LocationConf& loc)
+{
+	if (loc.getCgiSysPath().size() == loc.getPathExMap().size()) {
+		return true;
+	}
+	return false;
+}
+
+bool CgiChecker::validCgiScript(Client* client)
+{
+	std::string cgiScriptPath = client->getRequest().getPath();
+	if (FileUtils::pathType(cgiScriptPath) == -1) {
+		client->sendErrorResponse(404, "CGI path not found");
+		LOG_ERR("\033[31mError in cgi script path type. Path is: " + cgiScriptPath + "\033[0m");
+		return false;
+	}
+	if (FileUtils::isExec(cgiScriptPath) == -1) {
+		client->sendErrorResponse(403, "CGI path is not executable");
+		LOG_ERR("\033[31mErrror in cgi script path not excutable. Path is: " + cgiScriptPath + "\033[0m");
+		return false;
+	}
+	return true;
+}
+
+// bool CgiChecker::_validCgiIndex(const LocationConf& loc)
+// {
+// 	std::vector<std::string> loc_index = loc.getLocIndex();
+// 	for (size_t i = 0; i < loc_index.size(); ++i) {
+// 		if (!loc_index[i].empty()) {
+// 			std::string full_path = loc.getLocRoot() + loc.getLocPath() + "/" + loc_index[i];
+// 			if (FileUtils::pathValid(loc_index[i], R_OK) == 0 &&
+// 				FileUtils::pathType(loc_index[i]) == 2) {
+// 					return true;
+// 			} //if index is full path and works case
+// 			if (FileUtils::pathValid(full_path, R_OK) == 0 &&
+// 			FileUtils::pathType(full_path) == 2) {
+// 				return true;
+// 			} //if root+path+index is full path and works case
+// 			char* tmpCwd = getcwd(NULL, 0);
+// 			if (!tmpCwd) {
+// 				return false;
+// 			} //if non above work, use getcwd() to get CWD, and cate with path+index
+// 			std::string cwd_path = std::string(tmpCwd) + loc.getLocPath() + "/" + loc_index[i];
+// 			free(tmpCwd);
+// 			return (FileUtils::pathValid(cwd_path, R_OK) == 0 &&
+// 			FileUtils::pathType(cwd_path) == 2);
+// 		}
+// 		return true;
+// 	}
+// }
 // bool CgiChecker::_mapPathExtension(const LocationConf& loc)
 // {
 // 	const std::vector<std::string>& _cgipath = loc.getCgiSysPath();
@@ -119,15 +137,6 @@ bool CgiChecker::_validExtension(const std::vector<std::string>& _cgiextend)
 // 	loc.setPathExMap(_path_extend);//check this setter
 // 	return !_path_extend.empty();
 // }
-
-bool CgiChecker::_matchSize(const LocationConf& loc)
-{
-	if (loc.getCgiSysPath().size() == loc.getPathExMap().size()) {
-		return true;
-	}
-	return false;
-}
-
 
 //singularly check .php only
 // bool CgiChecker::_mapPathExtension(LocationConf& loc)
@@ -150,18 +159,3 @@ bool CgiChecker::_matchSize(const LocationConf& loc)
 // }
 
 //When is it used?!?!?!? Move to CgiChecker?!? Remove?!!?
-bool CgiChecker::validCgiScript(Client* client)
-{
-	std::string cgiScriptPath = client->getRequest().getPath();
-	if (FileUtils::pathType(cgiScriptPath) == -1) {
-		client->sendErrorResponse(404, "CGI path not found");
-		LOG_ERR("\033[31mError in cgi script path type. Path is: " + cgiScriptPath + "\033[0m");
-		return false;
-	}
-	if (FileUtils::isExec(cgiScriptPath) == -1) {
-		client->sendErrorResponse(403, "CGI path is not executable");
-		LOG_ERR("\033[31mErrror in cgi script path not excutable. Path is: " + cgiScriptPath + "\033[0m");
-		return false;
-	}
-	return true;
-}

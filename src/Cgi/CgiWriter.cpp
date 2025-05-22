@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   CgiWriter.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:36 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 16:19:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 13:57:21 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
 
-//Check!?!?
 bool CgiProcess::writeToCgi(void)
 {
 	if (_pipToCgi == -1) {

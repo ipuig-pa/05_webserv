@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ReadConf.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:58:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/08 13:17:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 14:08:11 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,11 @@ std::string read_conf(const std::string& confFile)
 		throw std::runtime_error("Error: cannot open .conf"); //or auto call default
 	}
 	std::stringstream tmp;
-	tmp << config.rdbuf(); //read whole config file into 'tmp'; << stream insertion operator
-	std::string lines = tmp.str(); //extract str from 'tmp'
-	
+	tmp << config.rdbuf();
+	std::string lines = tmp.str();
 	return lines;
 }
 
-// std::string rmHash(std::string& single_line)
 void rmHash(std::string& single_line)
 {
 	size_t pos = single_line.find('#');
@@ -34,13 +32,11 @@ void rmHash(std::string& single_line)
 	{
 		single_line = single_line.substr(0, pos);
 	}
-	// return single_line;
 }
 
-// std::string rmSpace(std::string& single_line)
 void rmSpace(std::string& single_line)
 {
-	size_t pos = single_line.find_first_not_of(" \t\r\n"); //if cannt find non-space, rt: npos
+	size_t pos = single_line.find_first_not_of(" \t\r\n");
 	if (pos != std::string::npos)
 	{
 		size_t end = single_line.find_last_not_of(" \t\r\n");
@@ -48,7 +44,7 @@ void rmSpace(std::string& single_line)
 		single_line = single_line.substr(pos, len);
 	}
 	else
-		single_line = ""; //it's empty line
+		single_line = "";
 }
 
 void createTokens(const std::string& lines, std::vector<std::string>& tokens)
@@ -60,7 +56,7 @@ void createTokens(const std::string& lines, std::vector<std::string>& tokens)
 	{
 		rmHash(single_line);
 		rmSpace(single_line);
-		if (!single_line.empty()) //if not empty, put line into vector (store the tokens parsed to serverconf)
+		if (single_line.empty() == false) //if not empty, put line into vector (store the tokens parsed to serverconf)
 		{
 			std::string token;
 			std::stringstream tk_line(single_line);//remove inside spaces and create tokens
@@ -72,8 +68,13 @@ void createTokens(const std::string& lines, std::vector<std::string>& tokens)
 	}
 }
 
+// tmp << config.rdbuf();
+//read whole config file into 'tmp'; << stream insertion operator
+// std::string lines = tmp.str();
+//extract str from 'tmp'
+
 // return single_line;
-	
+
 // void cleanConf(std::string& lines)
 // {
 // 	std::string clean_lines;

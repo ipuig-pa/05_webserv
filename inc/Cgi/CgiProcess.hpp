@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:39:33 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 13:33:05 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ class CgiProcess
 {
 private:
 	Client				*_client;
-	int					_pipFromCgi;//read from cgi stdout
-	int					_pipToCgi; //for POST body -> stdin
+	int					_pipFromCgi;
+	int					_pipToCgi;
 	int					_cgiPid;
 	std::vector<char>	_cgiBuffer;
 	bool				_cgiActive;

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:30:18 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/21 13:57:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,18 @@
 void	CgiProcess::readCgiOutput()
 {
 	std::vector<char> buffer(BUFF_SIZE);
-	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));//check
-	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
-	// std::cout << "buffer is: \033[0m" << buffer << std::endl;
+	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));
 	if (bytes_read > 0) {
 		buffer.resize(bytes_read);
 		// std::cout << "READ: " << buffer << std::endl;
 		_appendCgiOutputBuff(buffer, bytes_read);
-		// std::cout << "\033[31mCGI buff in bytes_read > 0 block: \033[0m\n" << buffer << std::endl;
 	}
 	else if (bytes_read == 0) { //reach EOF
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
 		std::cout << "reached EOF" << std::endl;
 		_cgiActive = false;
 		_client->getResponse().setState(READ);
-		// cleanCloseCgi();//close and clean
+		// cleanCloseCgi();
 	}
 	else {
 		LOG_ERR("\033[31mError in reading CGI (pipe)\033[0m\n");
@@ -64,7 +61,6 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 	}
 	else
 		_client->getResponse().appendBodyBuffer(buffer, bytes, true);
-	// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
 }
 
 void	CgiProcess::_cgiHeadersToResponse()
@@ -90,14 +86,12 @@ void	CgiProcess::_cgiHeadersToResponse()
 		}
 		if (HeaderScope == true) {
 			_addHeaderToResponse(line, response);
-		}
-		else { //not in header scope
+		} else { //not in header scope
 			content << line << "\n";
 		}
 	}
 	_cgiBuffer.clear();
 	_checkChunkedTransfer(response);
-
 	std::string content_str = content.str();
 	std::vector<char> content_vector(content_str.begin(), content_str.end());
 	response.appendBodyBuffer(content_vector, content.str().length(), true);
@@ -134,3 +128,9 @@ void	CgiProcess::_checkChunkedTransfer(HttpResponse &response)
 		response.setChunked(true);
 	}
 }
+
+// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
+// std::cout << "buffer is: \033[0m" << buffer << std::endl;
+// std::cout << "\033[31mCGI buff in bytes_read > 0 block: \033[0m\n" << buffer << std::endl;
+// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
+
