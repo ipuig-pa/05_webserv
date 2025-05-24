@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:10:27 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:23:04 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,15 +100,24 @@ bool CgiProcess::initCgi()
 	int pipFromCgi[2] = {-1, -1};
 	int pipToCgi[2] = {-1, -1};
 	
+	// LOG_INFO("entering cgi init");
+	// LOG_INFO("print this 1");
 	LocationConf* locConf = _client->getLocationConf();
+	//LOG_DEBUG("\033[32mcurrent location is: \033[0m" + locConf->getIdxExt());
+	// LOG_INFO("print this 22");
+	
 	if (!locConf) {
 		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
 		return false;
 	}
-	// std::cout << "\033[32mcurrent location is: \033[0m" << locConf->getLocPath() << "\n";
-	else if (!CgiChecker::validCgiScript(_client)) //Check CGI removed, as it is already checked in wrapLocChecker (in ServerConf creation at parsing)
+	else if (!CgiChecker::validCgiScript(_client)) { //Check CGI removed, as it is already checked in wrapLocChecker (in ServerConf creation at parsing)
+	// if (!CgiChecker::validCgiScript(_client)) {
 		return false;
+	}
+	// LOG_INFO("print this 333");
+	//LOG_DEBUG("\033[32mcurrent cgi script path is: \033[0m" + _client->getRequest().getPath());
+	
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
 		LOG_ERR("\033[32mFailed to create pipe for CGI process\033[0m");
 		_cleanupCgiPipe(pipFromCgi, pipToCgi);
@@ -120,7 +129,9 @@ bool CgiProcess::initCgi()
 	//av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
 	// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
 	// av[0] = strdup(cgiSysFromConf.c_str());
-	std::string	cgi_ext = _getExtSysPath();
+	std::string	cgi_ext = _getExtSysPath(_client);
+	//std::cout << "cgi_ext from _getextsyspath() is: \033[0m" << cgi_ext << std::endl;
+	
 	if (cgi_ext.empty())
 		return false;
 	av[0] = strdup(cgi_ext.c_str());
@@ -129,7 +140,7 @@ bool CgiProcess::initCgi()
 	// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 	av[2] = NULL;
-	_createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
+	_createEnv(_client->getRequest(), _client->getRequest().getPath()); //store this envp somehow to be able to free it later
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 
 	// std::cout << "about to INIT CGI" << std::endl;
@@ -220,35 +231,39 @@ void	CgiProcess::_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 //scalable function
 //SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
 // std::string CgiProcess::_getExtSysPath(std::string	script_path)
-std::string	CgiProcess::_getExtSysPath()
+std::string	CgiProcess::_getExtSysPath(Client *client)
 {
 	std::string	cgiExt = "";
 
-	size_t pos = _client->getRequest().getUri().rfind('.');
+	// size_t pos = _client->getRequest().getUri().rfind('.');
+	size_t pos = client->getRequest().getPath().rfind('.');
 	if (pos != std::string::npos) {
-		cgiExt = _client->getRequest().getUri().substr(pos); //eg: ".php"	
+		// cgiExt = _client->getRequest().getUri().substr(pos); //eg: ".php"
+		cgiExt = client->getRequest().getPath().substr(pos);
 	}
-	// else if (client->getLocationConf()->getLocIndex().size() != 0) {
-	// 	std::vector<std::string> tmp = client->getLocationConf()->getLocIndex();
-	// 	for (size_t i = 0; i < tmp.size(); ++i) {
-	// 		if (FileUtils::isIndexCgi(tmp[i]) == true) {
-	// 			size_t extDot = tmp[i].rfind('.');
-	// 			if (extDot != std::string::npos)
-	// 				cgiExt = tmp[i].substr(extDot);
-	// 			break ;
-	// 		}
-	// 	}
-	// 	if (cgiExt.empty() == true) {
-	// 		cgiExt = client->getLocationConf()->getIdxExt();
-	// 	}
-	// }
+	else if (client->getLocationConf()->getLocIndex().size() != 0) {
+		std::vector<std::string> tmp = client->getLocationConf()->getLocIndex();
+		for (size_t i = 0; i < tmp.size(); ++i) {
+			if (FileUtils::isIndexCgi(tmp[i]) == true) {
+				size_t extDot = tmp[i].rfind('.');
+				if (extDot != std::string::npos)
+					cgiExt = tmp[i].substr(extDot);
+				break ;
+			}
+		}
+		if (cgiExt.empty() == true) {
+			cgiExt = client->getLocationConf()->getIdxExt();
+		}
+	}
 	std::cout << "CGI EXT: " << cgiExt << std::endl;
 	//Get from config file!!! 
 	//should we restrict the cgi we are handling?!?!??
-	std::cout << _client->getLocationConf()->getLocPath() << std::endl;
+	// std::cout << _client->getLocationConf()->getLocPath() << std::endl;
+	//std::cout << client->getLocationConf()->getLocPath() << std::endl;
 	std::map<std::string, std::string> pair = _client->getLocationConf()->getPathExMap();
 	if (pair.empty()) {
-		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		// _client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		client->sendErrorResponse(501, "CGI execution is not configured for this location");
 		return "";
 	}
 	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
@@ -256,7 +271,8 @@ std::string	CgiProcess::_getExtSysPath()
 		return (it->second);
 	else {
 		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
-		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		// _client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
 		return "";
 	}
 	return cgiExt;

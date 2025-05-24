@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:08:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:18:45 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,16 +73,11 @@ public:
 	std::string			getPath(void);
 	std::string			getVersion(void);
 	std::string			getUpload(void);
-	std::vector<char>	&getBody(void);
 	std::string			getMethodStr(void) const;
 	std::string			getScriptName(void) const;
 	std::string			getPathInfo(void) const;
-	std::string			getPath(void);
 	std::string			getQueryPart() const;
-	std::string			getVersion();
 	const std::vector<char>	&getBody() const;
-	size_t				getPostBytesWritten();
-	std::string			getUpload();
 	bool				isComplete();
 	MultiPart			*getMultipart();
 

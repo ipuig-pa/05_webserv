@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/19 19:40:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 15:04:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	RequestHandler::_handleCgiRequest(Client &client)
 
 bool RequestHandler::_isCgiRequest(Client& client)
 {
-	std::string tmp = client.getRequest().getUri();
+	std::string tmp = client.getRequest().getPath();
 	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
 	// if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos) {
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos || tmp.find(".sh") != std::string::npos) {

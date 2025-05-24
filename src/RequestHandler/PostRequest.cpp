@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:12:40 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:20:49 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 //todo: need change
 //idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
-void	RequestHandler::handlePostRequest(Client &client)
+void	RequestHandler::_handlePostRequest(Client &client)
 {
 	LOG_DEBUG("Handling POST request");
 	HttpRequest &request = client.getRequest();

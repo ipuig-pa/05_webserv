@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 10:17:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:24:00 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,18 @@ std::string FileUtils::validIndex(const std::string idx, std::string path)
 	if (path[path.length() - 1] != '/') {
 		path += "/";
 	}
+	// if (uri[uri.length() - 1] != '/') {
+	// 	uri += "/";
+	// }
+	std::cout << "path is: " << path << "\n";
+	std::cout << "index is: " << idx << "\n";
 	std::string full_path = path + idx;
+	// std::string	full_uri = uri + idx;
+	//std::cout << "combined version is: " << full_path << std::endl;
 	//if index is full path and works case
 	if (access(idx.c_str(), F_OK | R_OK) == 0 && pathType(idx) == 2) {
 		std::cout << "NON VALID" << std::endl;
-		return idx;
+		return idx; //erase before the root from the location
 	}
 	//if root+path+index is full path and works case
 	if (access(full_path.c_str(), F_OK | R_OK) == 0 && pathType(full_path) == 2) {

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:40:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 14:45:33 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ void	RequestHandler::processRequest(Client &client)
 	} else {
 		(this->*handleMethod[4])(client); // invalid request
 	}
-	client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
+	if (!_isCgiRequest(client))
+		client.setState(SENDING_RESPONSE); //Make the functions bool and just pass to send response if the request handling has correclty worked?
 }
 
 bool	RequestHandler::_checkAllowedMethod(Client &client)

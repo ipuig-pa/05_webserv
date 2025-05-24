@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:10:19 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:01:59 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ void CgiProcess::_cleanEnvp(void)
 			delete[] _envp[i];
 		}
 		delete[] _envp;
+		_envp = nullptr;
 	}
 }
-
 
 // bool	CgiProcess::_noPathInfo(const std::string& req_url)
 // {
@@ -110,27 +110,3 @@ void CgiProcess::_cleanEnvp(void)
 // 	throw std::runtime_error("Error: invalid cgi uri passed!\n");
 // }
 
-void	CgiProcess::_convertToEnvp(std::vector<std::string>& envStr)
-{
-	_envp = new char*[envStr.size() + 1];
-
-	for (size_t i = 0; i < envStr.size(); ++i) {
-		size_t len = envStr[i].size();
-		_envp[i] = new char[len + 1]; //null-term each directive
-		std::strncpy(_envp[i], envStr[i].c_str(), len);
-		_envp[i][len] = '\0';
-		// std::cout << "envp[" << i <<"] = " << _envp[i] << std::endl;
-	}
-	_envp[envStr.size()] = nullptr;
-}
-
-void CgiProcess::_cleanEnvp(void)
-{
-	if (_envp) {
-		for (size_t i = 0; _envp[i] != nullptr; ++i) {
-			delete[] _envp[i];
-		}
-		delete[] _envp;
-		_envp = nullptr;
-	}
-}

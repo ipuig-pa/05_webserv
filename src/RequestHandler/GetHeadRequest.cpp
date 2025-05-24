@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 10:30:19 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:26:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	RequestHandler::_handleGetRequest(Client &client)
 	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getPath());
 	
 	std::string path = client.getRequest().getPath();
-
+	
 	if (access(path.c_str(), F_OK) != 0) {
 		client.sendErrorResponse(404, ""); // Not found
 		return ;
@@ -78,40 +78,47 @@ void	RequestHandler::_handleDirectoryRequest(Client &client)
 	std::string path;
 	if (client.getLocationConf())
 	{
+		//LOG_DEBUG("LocConf is still found in " + client.getLocationConf()->getLocPath());
 		indexFile = client.getLocationConf()->getLocIndex();
+		//LOG_DEBUG(std::to_string(indexFile.size()));
 		path = client.getLocationConf()->getLocRoot() + client.getLocationConf()->getLocPath();
-		// for (size_t i =0; i < indexFile.size(); ++i) {
-		// 	std::cout << "index file (location conf) at " << path << " is: " << indexFile[i] << std::endl;
-		// }
+		for (size_t i =0; i != indexFile.size(); ++i) {
+			LOG_DEBUG("index file (location conf) at " + path + " is: " + indexFile[i]);
+		}
 	}
 	if (indexFile.empty()) //case of no-index in cur_location conf
 	{
 		indexFile = client.getServerConf()->getIndex();
 		path = client.getServerConf()->getRoot();
-		// for (size_t i = 0; i < indexFile.size(); ++i) {
-		// 	std::cout << "index file (server conf) at " << path << " is: " << indexFile[i] << std::endl;
-		// }
+		for (size_t i = 0; i < indexFile.size(); ++i) {
+			std::cout << "index file (server conf) at " << path << " is: " << indexFile[i] << std::endl;
+		}
 	}
 	if (!indexFile.empty()) //have index either in loc or serv level
 	{
 		std::cout << "entering index exec" << std::endl;
 		for (size_t i = 0; i < indexFile.size(); ++i) {
 			std::string tmpIndex = FileUtils::validIndex(indexFile[i], path);
-			if (tmpIndex.empty() == false) {
+			//LOG_DEBUG("INDEX FULL PATH is: " + tmpIndex);
+			if (tmpIndex.empty() == false)
+			{
+				// client.getRequest().setUri(tmpIndex);
+				// client.getRequest().setPath(client.getParser().mapSysPathFromUri(client));
 				client.getRequest().setPath(tmpIndex);
-				client.getRequest().setUri(tmpIndex);
-				// if (FileUtils::isIndexCgi(tmpIndex) == true)
-				// {
-				// 	std::string idxext = tmpIndex.substr(tmpIndex.rfind("."));
-				// 	std::cout <<"The idxext is: " << idxext << "\n";
-				// 	client.getLocationConf()->setIdxExt(idxext);
-				// 	std::cout <<"The idxext is: " << client.getLocationConf()->getIdxExt() << " from handlerDirectory function\n";
-				// 	_handleCgiRequest(client);
-				// 	return ;
-				// } else { //not CGI case
-				_handleGetRequest(client);
-				return ;
-				// }
+				if (FileUtils::isIndexCgi(tmpIndex) == true)
+				{
+					// client.getRequest().setUri(tmpIndex);
+			
+					std::string idxext = tmpIndex.substr(tmpIndex.rfind("."));
+					std::cout <<"The idxext is: " << idxext << "\n";
+					client.getLocationConf()->setIdxExt(idxext);
+
+					_handleCgiRequest(client);
+					return ;
+				} else { //not CGI case
+					_handleGetRequest(client);
+					return ;
+				}
 			}
 		}
 	}
