@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 19:31:04 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:28:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,27 @@
 
 class Client;
 
+enum cgiState
+{
+	UNINITIALIZED,
+	READING_CGI,
+	READ_CGI,
+	WRITING_CGI //POST
+};
+
 class CgiProcess
 {
 private:
-	Client		*_client;
-	int			_pipFromCgi;//read from cgi stdout
-	int			_pipToCgi; //for POST body -> stdin
-	int			_cgiPid;
+	Client				*_client;
+	int					_pipFromCgi;//read from cgi stdout
+	int					_pipToCgi; //for POST body -> stdin
+	int					_cgiPid;
 	std::vector<char>	_cgiBuffer;
-	bool		_cgiActive;
-	bool		_headers_sent;
-	std::string	_script_path;
-	char		**_envp;
+	bool				_cgiActive;
+	cgiState			_state;
+	bool				_headers_sent;
+	std::string			_script_path;
+	char				**_envp;
 
 	void				createEnv(HttpRequest& httpReq, const std::string &req_url);
 	// bool				_noPathInfo(const std::string& req_url);
@@ -52,21 +61,25 @@ public:
 
 	//setters
 	void			setActive(bool active);
+	void			setState(cgiState state);
 
 	//getters
-	bool			isActive();
-	int				getCgiPid();
+	Client			*getClient();
 	int				getFromCgi();
 	int				getToCgi();
+	int				getCgiPid();
+	bool			isActive();
+	cgiState		getState();
+	std::string		getStateString(cgiState state);
 	bool			getHeadersSent();
 	std::string		getScriptPath();
 
+
 	//methods
-	bool			initCgi(void);
-	void			readCgiOutput(void);
-	bool			writeToCgi(void);
-	Client			*getClient(void);
-	void			cleanCloseCgi(void);
+	bool			initCgi();
+	void			readCgiOutput();
+	bool			writeToCgi();
+	void			cleanCloseCgi();
 };
 
 #endif

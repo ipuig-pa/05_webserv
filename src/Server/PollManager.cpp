@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 16:05:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:18:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@ void	MultiServer::_handlePollErr(int fd, int i)
 		for (it_c = _clients.begin(); it_c != _clients.end(); ++it_c) {
 			if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getFromCgi() == fd) {
 				LOG_DEBUG("CGI pipe end at " + std::to_string(fd) + " closed (POLLHUP)");
-				it_c->second->getCgiProcess()->readCgiOutput();
+				if (it_c->second->getCgiProcess()->getState() == READING_CGI)
+					it_c->second->getCgiProcess()->readCgiOutput();
 				if (it_c->second->getCgiProcess()->isActive() == false)
 					_eraseFromPoll(fd);
 				return ;

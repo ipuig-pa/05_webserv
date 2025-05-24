@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:52:31 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/23 08:46:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:16:29 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	MultiServer::_handleInputFd(int fd, RequestHandler &req_hand)
 				_eraseFromPoll(fd);
 			return ;
 		}
-		else if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getFromCgi() == fd && it_c->second->getState() == READING_CGI) {
+		else if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getFromCgi() == fd && it_c->second->getCgiProcess()->getState() == READING_CGI) {
 			LOG_DEBUG("Cgi output " + std::to_string(fd) + " is ready to read");
 			it_c->second->getCgiProcess()->readCgiOutput();
 			if (it_c->second->getCgiProcess()->isActive() == false)
@@ -50,11 +50,11 @@ void	MultiServer::_handleOutputFd(int fd, RequestHandler &req_hand)
 				_eraseFromPoll(fd);
 			return ;
 		}
-		if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getToCgi() == fd && it_c->second->getState() == WRITING_CGI) {
+		if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getToCgi() == fd && it_c->second->getCgiProcess()->getState() == WRITING_CGI) {
 			LOG_DEBUG("Cgi input " + std::to_string(fd) + " is ready to be written");
 			if (it_c->second->getCgiProcess()->writeToCgi()) {
 				_eraseFromPoll(fd);
-				it_c->second->setState(READING_CGI);
+				it_c->second->getCgiProcess()->setState(READING_CGI);
 			}
 			return ;
 		}

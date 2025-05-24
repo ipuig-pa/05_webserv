@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 14:47:53 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:09:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@ enum clientState
 	CONTINUE_REQUEST,
 	READING_REQUEST,
 	PROCESSING,
-	READING_CGI,
-	WRITING_CGI, //POST
 	SENDING_RESPONSE,
 	SENDING_CONTINUE,
 	CONNECTION_CLOSED,

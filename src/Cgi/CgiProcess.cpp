@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 14:32:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:30:09 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 CgiProcess::CgiProcess(Client *client)
-	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(-1), _cgiBuffer(), _cgiActive(false), _headers_sent(false), _envp(nullptr)
+	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(-1), _cgiBuffer(), _cgiActive(false), _state(UNINITIALIZED), _headers_sent(false), _envp(nullptr)
 {
 	_script_path = client->getRequest().getPath();
 }
@@ -32,7 +32,20 @@ void	CgiProcess::setActive(bool active)
 	_cgiActive = active;
 }
 
+void	CgiProcess::setState(cgiState state)
+{
+	if (_state != state) {
+		_state = state;
+		LOG_INFO("Cgi process linked with client at socket " + std::to_string(_client->getSocket()) + " change state to " + getStateString(state));
+	}
+}
+
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
+
+Client	*CgiProcess::getClient()
+{
+	return (_client);
+}
 
 int	CgiProcess::getFromCgi()
 {
@@ -44,22 +57,31 @@ int	CgiProcess::getToCgi()
 	return _pipToCgi;
 }
 
-bool	CgiProcess::isActive()
-{
-	return (_cgiActive);
-}
-
 int	CgiProcess::getCgiPid()
 {
 	return (_cgiPid);
 }
 
-Client	*CgiProcess::getClient(void)
+bool	CgiProcess::isActive()
 {
-	return (_client);
+	return (_cgiActive);
 }
 
-bool	CgiProcess::getHeadersSent(void)
+cgiState	CgiProcess::getState()
+{
+	return (_state);
+}
+
+std::string	CgiProcess::getStateString(cgiState state) {
+	switch (state) {
+		case UNINITIALIZED: return "UNINITIALIZED";
+		case READING_CGI: return "READING_CGI";
+		case READ_CGI: return "READ_CGI";
+		case WRITING_CGI: return "WRITING_CGI";
+	}
+}
+
+bool	CgiProcess::getHeadersSent()
 {
 	return (_headers_sent);
 }
@@ -68,6 +90,7 @@ std::string	CgiProcess::getScriptPath()
 {
 	return (_script_path);
 }
+
 
 /*-------------METHODS--------------------------------------------------------*/
 
@@ -182,10 +205,10 @@ bool CgiProcess::initCgi()
 			throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 		close(pipToCgi[0]);
 		_pipToCgi = pipToCgi[1];
-		_client->setState(WRITING_CGI);
+		this->setState(WRITING_CGI);
 	}
 	else
-		_client->setState(READING_CGI); //check later
+		this->setState(READING_CGI); //check later
 	return true;
 }
 

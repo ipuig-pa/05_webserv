@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:54:19 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 14:52:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 10:01:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,28 +32,28 @@ void	MultiServer::_checkTimeouts()
 		// Check connection establishment timeout
 		if (client->getState() == NEW_CONNECTION && 
 			(current_time - client->getTracker().getConnectionStart() > TimeoutConf::getConnection())) {
-			LOG_ERR("Connection establishment timeout for client at socket" + std::to_string(client->getSocket()));
+			LOG_ERR("Connection establishment timeout for client at socket " + std::to_string(client->getSocket()));
 			should_close = true;
 		}
 		
 		// Check read timeout
 		if (client->getState() == READING_REQUEST && 
 			(current_time - client->getTracker().getLastActivity() > TimeoutConf::getRead())) {
-			LOG_ERR("Reading request timeout for client at socket" + std::to_string(client->getSocket()));
+			LOG_ERR("Reading request timeout for client at socket " + std::to_string(client->getSocket()));
 			should_close = true;
 		}
 		
 		// Check write timeout
 		if (client->getState() == SENDING_RESPONSE && 
 			(current_time - client->getTracker().getResponseStart() > TimeoutConf::getWrite())) {
-			LOG_ERR("Sending response timeout for client at socket" + std::to_string(client->getSocket()));
+			LOG_ERR("Sending response timeout for client at socket " + std::to_string(client->getSocket()));
 			should_close = true;
 		}
 		
 		// Check keep-alive timeout
 		if (client->getState() == NEW_REQUEST && 
 			(current_time - client->getTracker().getLastActivity() > TimeoutConf::getKeepAlive())) {
-			LOG_ERR("Keep-alive timeout for client at socket" + std::to_string(client->getSocket()));
+			LOG_ERR("Keep-alive timeout for client at socket " + std::to_string(client->getSocket()));
 			should_close = true;
 		}
 

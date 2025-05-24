@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 14:47:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:10:31 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,6 @@ std::string	Client::getStateString(clientState state) {
 		case CONTINUE_REQUEST: return "CONTINUE_REQUEST";
 		case READING_REQUEST: return "READING_REQUEST";
 		case PROCESSING: return "PROCESSING";
-		case READING_CGI: return "READING_CGI";
-		case WRITING_CGI: return "WRITING_CGI";
 		case SENDING_RESPONSE: return "SENDING_RESPONSE";
 		case SENDING_CONTINUE: return "SENDING_CONTINUE";
 		case CONNECTION_CLOSED: return "CONNECTION_CLOSED";

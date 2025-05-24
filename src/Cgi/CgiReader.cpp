@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 09:00:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:19:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	CgiProcess::readCgiOutput()
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
 		std::cout << "reached EOF" << std::endl;
 		_cgiActive = false;
+		this->setState(READ_CGI);
 		_client->getResponse().setState(READ);
 		// cleanCloseCgi();//close and clean
 	}
