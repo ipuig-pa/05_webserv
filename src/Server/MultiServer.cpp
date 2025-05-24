@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/20 14:18:37 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:04:15 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,43 +16,36 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 MultiServer::MultiServer(std::vector<std::vector<ServerConf>> serv_config)
-	:_serv_config(serv_config), _timeouts(), _drain_mode(false), _shutdown_time(-1)
+	:_serv_config(serv_config), _drain_mode(false), _shutdown_time(-1)
 {
 	_init_sockets(_serv_config);
 }
 
 MultiServer::~MultiServer()
 {
+	LOG_DEBUG("Destructing multiserver");
 	std::map<int, ListenSocket*>::iterator it_s;
 	std::map<int, Client*>::iterator it_c;
 
-	for(it_s = _sockets.begin(); it_s != _sockets.end(); ++it_s)
-	{
+	while (!_sockets.empty()) {
+		auto it_s = _sockets.begin();
 		if (it_s->second) {
-			if (int fd = it_s->second->getFd() != -1) {
-				close(fd);
-			}
+			int old_fd = it_s->second->getFd();	
 			delete (it_s->second);
+			_sockets.erase(old_fd);
 		}
 	}
-	for(it_c = _clients.begin(); it_c != _clients.end(); ++it_c)
-	{
+	while (!_clients.empty()) {
+		auto it_c = _clients.begin();
 		if (it_c->second)
 			_closeClientConnection(it_c->second);
 	}
 	_poll.clear();
-	_clients.clear();
-	_sockets.clear();
 }
 
 /*-------------ACCESSORS------------------------------------------------------*/
 
-std::vector<struct pollfd>	&MultiServer::getPoll(void)
-{
-	return (_poll);
-}
-
-std::map<int, Client*>	&MultiServer::getClients(void)
+const std::map<int, Client*>	&MultiServer::getClients(void) const
 {
 	return (_clients);
 }
@@ -72,15 +65,10 @@ void	MultiServer::run()
 			break;
 		}
 
-		// std::cout << "POLL data " << _poll.data() << std::endl;
-		// std::cout << "POLL revents " << _poll.size() << std::endl;
-
 		for (int i = _poll.size() - 1; i >= 0; i--) {
 			int fd = _poll[i].fd;
-	
-			// std::cout << "POLL revents[" << i << "]: " << _poll[i].fd << std::endl;
 			if (_poll[i].revents & POLLIN) { //ready for reading / receiving
-				if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listenint socket case
+				if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listening socket case
 					LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
 					_acceptNewConnection(it_s->second);
 				}
@@ -104,7 +92,6 @@ void	MultiServer::run()
 				_handlePollErr(fd, i);
 		}
 		_checkTimeouts();
-		// _checkCgi(); //ADD THIS FUNCTION TO MONITOR PERIODICALLY CGI STATE (Waitpid)
 		_handleConnections();
 	}
 	return ;

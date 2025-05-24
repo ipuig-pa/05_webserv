@@ -6,13 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:38 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/11 09:46:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 19:07:17 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Header.hpp"
 
 Header::Header()
+	: _fields()
 {
 }
 
@@ -44,13 +45,13 @@ bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string&
 }
 
 //Add or replace a header field
-void Header::set(const std::string name, const std::string value)
+void Header::set(const std::string &name, const std::string &value)
 {
 	_fields[name] = value;
 }
 
 // Get a field value (returns empty string if not found)
-std::string Header::getVal(const std::string& name) const
+std::string Header::getVal(const std::string &name) const
 {
 	std::map<std::string, std::string, CaseInsensitiveCompare>::const_iterator it = _fields.find(name);
 	if (it != _fields.end())

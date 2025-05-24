@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 10:30:48 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:57:19 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 CgiProcess::CgiProcess(Client *client)
-	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(42), _cgiBuffer(), _cgiActive(false), _headers_sent(false), _envp(nullptr)
+	:_client(client), _pipFromCgi(-1), _pipToCgi(-1), _cgiPid(-1), _cgiBuffer(), _cgiActive(false), _state(UNINITIALIZED), _headers_sent(false), _envp(nullptr)
 {
 	_script_path = client->getRequest().getPath();
 }
@@ -32,7 +32,20 @@ void	CgiProcess::setActive(bool active)
 	_cgiActive = active;
 }
 
+void	CgiProcess::setState(cgiState state)
+{
+	if (_state != state) {
+		_state = state;
+		LOG_INFO("Cgi process linked with client at socket " + std::to_string(_client->getSocket()) + " change state to " + getStateString(state));
+	}
+}
+
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
+
+Client	*CgiProcess::getClient()
+{
+	return (_client);
+}
 
 int	CgiProcess::getFromCgi()
 {
@@ -44,22 +57,31 @@ int	CgiProcess::getToCgi()
 	return _pipToCgi;
 }
 
-bool	CgiProcess::isActive()
-{
-	return (_cgiActive);
-}
-
 int	CgiProcess::getCgiPid()
 {
 	return (_cgiPid);
 }
 
-Client	*CgiProcess::getClient(void)
+bool	CgiProcess::isActive()
 {
-	return (_client);
+	return (_cgiActive);
 }
 
-bool	CgiProcess::getHeadersSent(void)
+cgiState	CgiProcess::getState()
+{
+	return (_state);
+}
+
+std::string	CgiProcess::getStateString(cgiState state) {
+	switch (state) {
+		case UNINITIALIZED: return "UNINITIALIZED";
+		case READING_CGI: return "READING_CGI";
+		case READ_CGI: return "READ_CGI";
+		case WRITING_CGI: return "WRITING_CGI";
+	}
+}
+
+bool	CgiProcess::getHeadersSent()
 {
 	return (_headers_sent);
 }
@@ -68,6 +90,7 @@ std::string	CgiProcess::getScriptPath()
 {
 	return (_script_path);
 }
+
 
 /*-------------METHODS--------------------------------------------------------*/
 
@@ -94,9 +117,16 @@ bool CgiProcess::initCgi()
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
 	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
-	av[0] = strdup(_getExtSysPath(_client).c_str()); //usr/bin/xxx
-	std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
-	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_filename: /05_webserv/www/cgi/simple.py
+	//av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
+	// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
+	// av[0] = strdup(cgiSysFromConf.c_str());
+	std::string	cgi_ext = _getExtSysPath();
+	if (cgi_ext.empty())
+		return false;
+	av[0] = strdup(cgi_ext.c_str());
+	// std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
+	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
+	// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 	av[2] = NULL;
 	_createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
@@ -166,10 +196,10 @@ bool CgiProcess::initCgi()
 			throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 		close(pipToCgi[0]);
 		_pipToCgi = pipToCgi[1];
-		_client->setState(WRITING_CGI);
+		this->setState(WRITING_CGI);
 	}
 	else
-		_client->setState(READING_CGI); //check later
+		this->setState(READING_CGI); //check later
 	return true;
 }
 
@@ -187,39 +217,16 @@ void	CgiProcess::_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 		_cleanEnvp();
 }
 
-// std::string	CgiProcess::_getExtSysPath(Client* client)
-// {
-// 	std::string	cgiExt = "";
-
-// 	size_t pos = client->getRequest().getUri().rfind('.');
-// 	if (pos == std::string::npos) { //in this case cgi_ext is not in request line, but since this staged is called indicates that the index is CGI_Script!
-// 		if (client->getLocationConf()->getIdxExt().empty() == false) {
-// 			cgiExt = client->getLocationConf()->getIdxExt();
-// 		}
-// 	} else if (pos != std::string::npos) {
-// 		cgiExt = client->getRequest().getUri().substr(pos); //eg: ".php"	
-// 	}
-// 	std::cout << "CGI EXT: " << cgiExt << std::endl;
-// 	std::map<std::string, std::string> pair = client->getLocationConf()->getPathExMap();
-// 	if (pair.empty())
-// 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
-// 	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
-// 	if (it != pair.end())
-// 		return (it->second);
-// 	else {
-// 		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
-// 		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
-// 	}
-// 	return cgiExt;
-// }
-
-std::string	CgiProcess::_getExtSysPath(Client* client)
+//scalable function
+//SHOULDNT WE GET THIS FROM CONFIG FILE?!?!?
+// std::string CgiProcess::_getExtSysPath(std::string	script_path)
+std::string	CgiProcess::_getExtSysPath()
 {
 	std::string	cgiExt = "";
 
-	size_t pos = client->getRequest().getUri().rfind('.');
+	size_t pos = _client->getRequest().getUri().rfind('.');
 	if (pos != std::string::npos) {
-		cgiExt = client->getRequest().getUri().substr(pos); //eg: ".php"	
+		cgiExt = _client->getRequest().getUri().substr(pos); //eg: ".php"	
 	}
 	// else if (client->getLocationConf()->getLocIndex().size() != 0) {
 	// 	std::vector<std::string> tmp = client->getLocationConf()->getLocIndex();
@@ -236,17 +243,21 @@ std::string	CgiProcess::_getExtSysPath(Client* client)
 	// 	}
 	// }
 	std::cout << "CGI EXT: " << cgiExt << std::endl;
-	std::map<std::string, std::string> pair = client->getLocationConf()->getPathExMap();
-	if (pair.empty())
-		// _client->sendErrorResponse(501, "CGI execution is not configured for this location");
-		client->sendErrorResponse(501, "CGI execution is not configured for this location");
+	//Get from config file!!! 
+	//should we restrict the cgi we are handling?!?!??
+	std::cout << _client->getLocationConf()->getLocPath() << std::endl;
+	std::map<std::string, std::string> pair = _client->getLocationConf()->getPathExMap();
+	if (pair.empty()) {
+		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		return "";
+	}
 	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
 	if (it != pair.end())
 		return (it->second);
 	else {
 		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
-		// _client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
-		client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		return "";
 	}
 	return cgiExt;
 }
@@ -276,33 +287,34 @@ void	CgiProcess::cleanCloseCgi(void)
 	_pipToCgi = -1;
 
 	//check child process
-	int status;
-	int result = waitpid(_cgiPid, &status, WNOHANG);
-	if (result == 0) {
-		LOG_WARN("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
-		kill(_cgiPid, SIGTERM); 
-		usleep(100000); // 100ms as grace period
-		if (waitpid(_cgiPid, &status, WNOHANG) == 0)
-			kill(_cgiPid, SIGKILL); 
-		waitpid(_cgiPid, &status, 0); //make sure it's really dead
-	}
-	else if (result > 0) {
-		if (WIFEXITED(status)) {
-			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with: \033[0m" + std::to_string(WEXITSTATUS(status)));
-		} else if (WIFSIGNALED(status)) {
-			LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal: \033[0m" + std::to_string(WTERMSIG(status)));
+	if (_cgiPid != -1) {
+		int status;
+		int result = waitpid(_cgiPid, &status, WNOHANG);
+		if (result == 0) {
+			LOG_WARN("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " did not terminate, sending SIGTERM / SIGKILL");
+			kill(_cgiPid, SIGTERM);
+			usleep(200000); // 200ms as grace period
+			if (waitpid(_cgiPid, &status, WNOHANG) == 0)
+				kill(_cgiPid, SIGKILL);
+			waitpid(_cgiPid, &status, 0); //make sure it's really dead
 		}
-		LOG_INFO("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " has terminated");
-		// _client->setState(SENDING_RESPONSE);
+		else if (result > 0) {
+			if (WIFEXITED(status)) {
+				LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit with: \033[0m" + std::to_string(WEXITSTATUS(status)));
+			} else if (WIFSIGNALED(status)) {
+				LOG_INFO("\033[31mCGI process " + std::to_string(result) + " exit by signal: \033[0m" + std::to_string(WTERMSIG(status)));
+			}
+			LOG_INFO("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " has terminated");
+			// _client->setState(SENDING_RESPONSE);
+		}
+		else if (result < 0) {
+			// Error occurred
+			LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
+			_client->sendErrorResponse(500, "");
+		}
+		_cgiActive = false;
+		_cgiPid = -1;
 	}
-	else if (result < 0) {
-		// Error occurred
-		LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
-		_client->sendErrorResponse(500, "");
-	}
-	_cgiActive = false;
-	_cgiPid = -1;
-
 	//clean env var pointer
 	_cleanEnvp();
 }

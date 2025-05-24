@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:51:27 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/19 19:51:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:18:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,20 @@
 
 /*-------------METHODS--------------------------------------------------------*/
 
-void	MultiServer::_eraseFromPoll(int fd)
-{
-	for (int i = getPoll().size() - 1; i > 0; i--) {
-		if (getPoll().data()[i].fd == fd) {
-			getPoll().erase(getPoll().begin() + i);
-			return ;
-		}
-	}
-}
-
 void	MultiServer::_newFdsToPoll(Client *client)
 {
-	//push file fds to poll
-	int	file_fd = (client)->getFileFd();
+	//push GET file fds to poll
+	int	file_fd = client->getFileFd();
 	if (file_fd != -1) {
-		LOG_INFO("File " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
-		if (client->getRequest().getMethod() == POST)
-			_poll.push_back((struct pollfd) {file_fd, POLLOUT, 0});
-		else
-			_poll.push_back((struct pollfd) {file_fd, POLLIN, 0});
+		LOG_INFO("Input file " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
+		_poll.push_back((struct pollfd) {file_fd, POLLIN, 0});
+	}
+
+	//push POST file fds to poll
+	for (auto it = client->getPostFdMap().begin(); it != client->getPostFdMap().end(); ++it) {
+		file_fd = it->first;
+		LOG_INFO("Output file " + std::to_string(file_fd) + " has been linked with client at socket " + std::to_string(client->getSocket()));
+		_poll.push_back((struct pollfd) {file_fd, POLLOUT, 0});
 	}
 
 	//push cgi_fds to _poll
@@ -52,6 +46,16 @@ void	MultiServer::_newFdsToPoll(Client *client)
 	}
 }
 
+void	MultiServer::_eraseFromPoll(int fd)
+{
+	for (int i = _poll.size() - 1; i > 0; i--) {
+		if (_poll.data()[i].fd == fd) {
+			_poll.erase(_poll.begin() + i);
+			return ;
+		}
+	}
+}
+
 void	MultiServer::_handlePollErr(int fd, int i)
 {
 	std::map<int, Client*>::iterator it_c;
@@ -60,9 +64,8 @@ void	MultiServer::_handlePollErr(int fd, int i)
 		for (it_c = _clients.begin(); it_c != _clients.end(); ++it_c) {
 			if (it_c->second->getCgiProcess() && it_c->second->getCgiProcess()->getFromCgi() == fd) {
 				LOG_DEBUG("CGI pipe end at " + std::to_string(fd) + " closed (POLLHUP)");
-				it_c->second->getCgiProcess()->readCgiOutput();
-				// it_c->second->getCgiProcess()->setActive(false);
-				// it_c->second->getResponse().setState(READ);
+				if (it_c->second->getCgiProcess()->getState() == READING_CGI)
+					it_c->second->getCgiProcess()->readCgiOutput();
 				if (it_c->second->getCgiProcess()->isActive() == false)
 					_eraseFromPoll(fd);
 				return ;

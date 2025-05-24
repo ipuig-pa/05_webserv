@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 12:35:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:00:13 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -521,9 +521,12 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 		}
 	}
 	match = 0;
-	for(size_t i = 0; i < _location.size(); ++i) {
-		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && uripath[_location[i].getLocPath().size() - 1] == '/') {
-			if (_location[i].getLocPath().size() > match) {
+	for(size_t i = 0; i < _location.size(); ++i)
+	{
+		if (!_location[i].getLocPath().empty() && uripath.find(_location[i].getLocPath()) == 0 && (_location[i].getLocPath()[_location[i].getLocPath().size() - 1] == '/' || uripath[_location[i].getLocPath().size()] == '/'))
+		{
+			if (_location[i].getLocPath().size() > match)
+			{
 				match = _location[i].getLocPath().size();
 				longest_match = &_location[i];
 				std::cout << "longest match for " + uripath + " is location num. " << i << std::endl;

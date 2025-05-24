@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:15:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 15:56:11 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include <cstdlib> //for setenv(), unsetenv()
 #include <climits>
 #include <iomanip> // for put_time
+#include <netdb.h> // For getaddrinfo(), freeaddrinfo(), gai_strerror()
+#include <netinet/in.h>   // For sockaddr_in, INADDR_ANY, INADDR_LOOPBACK, htons(), htonl()
 
 #include <sys/socket.h> //socket(), bind/listen/accept/send/recv()
 #include <sys/types.h> // For pid_t, etc.

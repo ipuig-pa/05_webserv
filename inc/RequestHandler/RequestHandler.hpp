@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:40:47 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:51:05 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,14 @@ private:
 	bool				_handleRedirection(Client& client);
 	bool				_checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
+	std::string			_getAbsoluteUrl(Client& client, std::string uri);
+	std::string			_getFilename(HttpRequest &request, size_t i);
 	bool				_deleteAttempt(Client &client, const std::string &path);
-	std::string			_getAbsoluteUrl(Client& client, const std::string &path);
 	std::string			_generateUniqueFilename();
-	std::string			_getPathFromUri(Client &client);
+	void				_handleMultipart(HttpRequest &request, Client &client);
+	void				_handleFileUpload(Client &client, Part &part, size_t i);
+	void				_handleRegularPost(Client &Client, const std::string& contentType, int i);
+
 	
 public:
 	RequestHandler();
@@ -50,7 +54,17 @@ public:
 	void				processRequest(Client &client);
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
-	bool				handleFileWrite(Client &client); //client or fd or what?
+	bool				handleFileWrite(Client &client, int file_fd, size_t i);
+
+	bool				validCgi(Client& client);
+	// bool 		_forkErr(int& pip1, int& pip2);
+
+	HttpResponse		_convertToResponse(std::string cgiOutBuff);
+	// void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
+	void				_cgiHeaderScope(const std::string& line, HttpResponse& response);
+	std::string			_getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
+	std::string			_extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
+	std::string			_getScriptDir(std::string &path);
 };
 
 #endif

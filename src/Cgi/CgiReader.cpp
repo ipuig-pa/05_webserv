@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 13:57:07 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:59:03 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 void	CgiProcess::readCgiOutput()
 {
 	std::vector<char> buffer(BUFF_SIZE);
-	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));
+	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));//check
+	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) << std::endl;
+	// std::string buffer_str(buffer.begin(), buffer.end());
+	// std::cout << "buffer is:\033[0m" << buffer_str << "STOP" << std::endl;
 	if (bytes_read > 0) {
 		buffer.resize(bytes_read);
 		// std::cout << "READ: " << buffer << std::endl;
@@ -25,6 +28,7 @@ void	CgiProcess::readCgiOutput()
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
 		std::cout << "reached EOF" << std::endl;
 		_cgiActive = false;
+		this->setState(READ_CGI);
 		_client->getResponse().setState(READ);
 		// cleanCloseCgi();
 	}
@@ -61,10 +65,15 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 	}
 	else
 		_client->getResponse().appendBodyBuffer(buffer, bytes, true);
+	// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
+	// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
 }
 
 void	CgiProcess::_cgiHeadersToResponse()
 {
+	// std::cout << "HEADERS ARE ALREDY RECEIVED!" << std::endl;
+	// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
+	// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
 	HttpResponse &response = _client->getResponse();
 	response.setStatusCode(200); //set default, will be used if CGI didnt provide one
 	bool HeaderScope = true;
@@ -86,8 +95,9 @@ void	CgiProcess::_cgiHeadersToResponse()
 		}
 		if (HeaderScope == true) {
 			_addHeaderToResponse(line, response);
-		} else { //not in header scope
-			content << line << "\n";
+		}
+		else { //not in header scope
+			content << line;
 		}
 	}
 	_cgiBuffer.clear();

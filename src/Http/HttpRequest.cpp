@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 14:45:20 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:01:36 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 HttpRequest::HttpRequest()
-	: _header(), _method(INVALID), _uri(""), _queryPart(""), _path(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false)
+	: _header(), _method(INVALID), _uri(""), _queryPart(""), _path(""), _version("HTTP1.1"), _upload_path(""), _body(), _postBytesWritten(0), _complete(false), _multipart(nullptr)
 {
 	_body.reserve(BUFF_SIZE);
 	_scriptname = "";
@@ -24,11 +24,13 @@ HttpRequest::HttpRequest()
 
 HttpRequest::~HttpRequest()
 {
+	if (_multipart)
+		delete (_multipart);
 }
 
 /*-------------ACCESSORS - SETTERS--------------------------------------------*/
 
-void HttpRequest::setHeaderField(const std::string name, const std::string value)
+void HttpRequest::setHeaderField(const std::string &name, const std::string &value)
 {
 	this->_header.set(name, value);
 }
@@ -105,6 +107,11 @@ void HttpRequest::setUpload(std::string upload_path)
 	_upload_path = upload_path;
 }
 
+void	HttpRequest::setMultipart(MultiPart *multipart)
+{
+	_multipart = multipart;
+}
+
 /*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
 std::string HttpRequest::getHeaderVal(const std::string& name) const
@@ -172,7 +179,7 @@ std::string HttpRequest::getVersion()
 	return _version;
 }
 
-std::vector<char> &HttpRequest::getBody()
+const std::vector<char> &HttpRequest::getBody() const
 {
 	return _body;
 }
@@ -190,6 +197,11 @@ std::string	HttpRequest::getUpload()
 bool HttpRequest::isComplete()
 {
 	return _complete;
+}
+
+MultiPart	*HttpRequest::getMultipart()
+{
+	return _multipart;
 }
 
 /*-------------METHODS--------------------------------------------------------*/
@@ -212,4 +224,7 @@ void HttpRequest::reset()
 	_body.clear();
 	_postBytesWritten = 0;
 	_complete = false;
+	if (_multipart)
+		delete _multipart;
+	_multipart = nullptr;
 }

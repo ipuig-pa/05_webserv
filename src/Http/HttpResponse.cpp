@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 14:47:29 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:01:43 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,11 @@ void	HttpResponse::checkMandatoryHeaders()
 	if (getHeader("Content-Length").empty() && !_chunked)
 		setHeaderField("Content-Length", std::to_string(_body_length));
 	// also include Connection: keep-alive or close?
+}
+
+void	HttpResponse::removeHeader(const std::string &name)
+{
+	_header.remove(name);
 }
 
 void	HttpResponse::reset()

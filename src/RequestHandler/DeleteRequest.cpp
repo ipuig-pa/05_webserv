@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:46:55 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:01:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,23 +15,29 @@
 //idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
 void	RequestHandler::_handleDeleteRequest(Client &client)
 {
+	std::string uploadpath = client.getRequest().getUpload();
 	std::string path = client.getRequest().getPath();
-	if (!_deleteAttempt(client, path)) {
-		std::string uploadpath = client.getRequest().getUpload();
+	if (uploadpath.empty())
+		uploadpath = path;
+	else {
 		if (uploadpath[uploadpath.size() - 1] != '/')
 			uploadpath += '/';
 		std::string filename;
 		size_t lastSlash = path.find_last_of('/');
 		if (lastSlash != std::string::npos && lastSlash != path.size() - 1) {
 			filename += path.substr(lastSlash + 1);
+			std::cout << "FILENAME: " << filename << "PATH: " << path << std::endl;
 			uploadpath += filename;
-			_deleteAttempt(client, uploadpath);
+			std::cout << "UPLOADPATH: " << uploadpath << std::endl;
 		}
 	}
+	std::cout << "UPLOADPATH: " << uploadpath << std::endl;
+	_deleteAttempt(client, uploadpath);
 }
 
 bool	RequestHandler::_deleteAttempt(Client &client, const std::string &path)
 {
+	std::cout << "UPLOAD PATH: " << path << std::endl;
 	if (access(path.c_str(), F_OK) != 0) {
 		client.sendErrorResponse(404, ""); //Not found
 		return false;
@@ -40,7 +46,7 @@ bool	RequestHandler::_deleteAttempt(Client &client, const std::string &path)
 	stat(path.c_str(), &file_stat);
 	if ((access(path.c_str(), W_OK) != 0) || S_ISDIR(file_stat.st_mode)) {
 		client.sendErrorResponse(403, ""); //Forbidden
-		return true;
+		return false;
 	}
 	try
 	{

@@ -38,6 +38,8 @@ SOURCES =	ReadConf.cpp \
 			InvalidRequest.cpp \
 			HttpReqParser.cpp \
 			HttpRequest.cpp \
+			MultiPart.cpp \
+			Part.cpp \
 			HttpResponse.cpp \
 			ErrorPageHandler.cpp \
 			Header.cpp \

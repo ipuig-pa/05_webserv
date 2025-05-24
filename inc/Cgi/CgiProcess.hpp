@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 13:33:05 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:35:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,14 @@
 
 class Client;
 
+enum cgiState
+{
+	UNINITIALIZED,
+	READING_CGI,
+	READ_CGI,
+	WRITING_CGI //POST
+};
+
 class CgiProcess
 {
 private:
@@ -27,6 +35,7 @@ private:
 	int					_cgiPid;
 	std::vector<char>	_cgiBuffer;
 	bool				_cgiActive;
+	cgiState			_state;
 	bool				_headers_sent;
 	std::string			_script_path;
 	char				**_envp;
@@ -56,14 +65,26 @@ private:
 	std::string			getScriptPath();
 	
 	//setters
-	void				setActive(bool active);
-	
+	void			setActive(bool active);
+	void			setState(cgiState state);
+
+	//getters
+	Client			*getClient();
+	int				getFromCgi();
+	int				getToCgi();
+	int				getCgiPid();
+	bool			isActive();
+	cgiState		getState();
+	std::string		getStateString(cgiState state);
+	bool			getHeadersSent();
+	std::string		getScriptPath();
+
+
 	//methods
-	bool				initCgi(void);
-	void				readCgiOutput(void);
-	bool				writeToCgi(void);
-	void				cleanCloseCgi(void);
-	Client				*getClient(void);
+	bool			initCgi();
+	void			readCgiOutput();
+	bool			writeToCgi();
+	void			cleanCloseCgi();
 };
 
 #endif

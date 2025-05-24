@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:17:44 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:27:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:49:22 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,10 @@ public:
 	Status	&operator=(const Status &other);
 	~Status();
 
-	void			setStatusCode(int code);
-	std::string		toString() const;
-	std::string&	getStatusMessage(void);
+	std::string toString() const;
+	void	setStatusCode(int code);
+	std::string	&getStatusMessage(void);
+	int		getStatusCode(void);
 };
 
 #endif

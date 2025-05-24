@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:20:32 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/04/30 14:22:47 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/22 10:35:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,11 @@ std::string Status::toString() const
 std::string	&Status::getStatusMessage(void)
 {
 	return _phrase;
+}
+
+int	Status::getStatusCode(void)
+{
+	return _statusCode;
 }
 
 //https://www.rfc-editor.org/rfc/rfc9110#section-15

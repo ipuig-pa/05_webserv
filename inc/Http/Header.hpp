@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:16:07 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:38:34 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,17 @@ public:
 	Header(const Header& other);
 	Header	&operator=(const Header &other);
 	~Header();
-	
-	void																set(const std::string name, const std::string value);
-	bool																check_exist(const std::string& name) const;
-	void																remove(const std::string& name);
-	std::string															getVal(const std::string& name) const;
-	std::string															toString() const;
-	const std::map<std::string, std::string, CaseInsensitiveCompare>&	getAll() const;
+
+	void set(const std::string &name, const std::string &value);
+	std::string getVal(const std::string &name) const;
+	const std::map<std::string, std::string, CaseInsensitiveCompare>& getAll() const;
+
+	bool check_exist(const std::string& name) const;
+	void remove(const std::string& name);
+
+	// Parse headers from a string (for request parsing)
+	// bool parse(const std::string& headerStr);
+	std::string toString() const;
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 14:44:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:00:20 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -308,8 +308,8 @@ void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
 
 void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 {
-	std::string _content_len = request.getHeaderVal("Content-Length"); // case sensitive or not?
-	if (_content_len.empty()) {
+	std::string content_len = request.getHeaderVal("Content-Length"); // case sensitive or not?
+	if (content_len.empty()) {
 		if (request.getHeaderVal("Transfer-Encoding") == "chunked") {
 			_chunked = true;
 			_stage = BODY;
@@ -328,7 +328,7 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 	}
 	else {
 		try {
-			_bodyLength = std::stoul(_content_len);
+			_bodyLength = std::stoul(content_len);
 			if (_bodyLength >= 0 && static_cast<size_t>(_bodyLength) <= client.getMaxBodySize()) { // also the case of hasbody == 0, need handle??
 					_stage = BODY;
 				if (_bodyLength == 0)
