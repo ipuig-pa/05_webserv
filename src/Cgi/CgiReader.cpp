@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiReader.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 09:19:06 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:10:56 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	CgiProcess::readCgiOutput()
 		buffer.resize(bytes_read);
 		// std::cout << "READ: " << buffer << std::endl;
 		_appendCgiOutputBuff(buffer, bytes_read);
-		// std::cout << "\033[31mCGI buff in bytes_read > 0 block: \033[0m\n" << buffer << std::endl;
 	}
 	else if (bytes_read == 0) { //reach EOF
 		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
@@ -31,7 +30,7 @@ void	CgiProcess::readCgiOutput()
 		_cgiActive = false;
 		this->setState(READ_CGI);
 		_client->getResponse().setState(READ);
-		// cleanCloseCgi();//close and clean
+		// cleanCloseCgi();
 	}
 	else {
 		LOG_ERR("\033[31mError in reading CGI (pipe)\033[0m\n");
@@ -103,7 +102,6 @@ void	CgiProcess::_cgiHeadersToResponse()
 	}
 	_cgiBuffer.clear();
 	_checkChunkedTransfer(response);
-
 	std::string content_str = content.str();
 	std::vector<char> content_vector(content_str.begin(), content_str.end());
 	response.appendBodyBuffer(content_vector, content.str().length(), true);
@@ -119,9 +117,9 @@ void CgiProcess::_addHeaderToResponse(const std::string& line, HttpResponse& res
 	}
 	std::string name = line.substr(0, pos);
 	std::string val = line.substr(pos + 1);
-	FileUtils::_trimLeadBack(val);
+	FileUtils::trimLeadBack(val);
 	if (name == "Status") {
-		if (!ServerConf::_codeRange(val)) {
+		if (!ServerConf::codeRange(val)) {
 			LOG_ERR("invalid status code from cgi output.");
 			return ;
 		}
@@ -140,3 +138,9 @@ void	CgiProcess::_checkChunkedTransfer(HttpResponse &response)
 		response.setChunked(true);
 	}
 }
+
+// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
+// std::cout << "buffer is: \033[0m" << buffer << std::endl;
+// std::cout << "\033[31mCGI buff in bytes_read > 0 block: \033[0m\n" << buffer << std::endl;
+// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
+

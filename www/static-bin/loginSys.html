@@ -1,0 +1,147 @@
+<!-- ai generated html just to see how it can be like -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webserv Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 0 1rem;
+        }
+
+        section {
+            padding: 1.5rem 0;
+        }
+
+        h1, h2 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style: disc;
+            padding-left: 2rem;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Form Styling */
+        form {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+
+        button[type="submit"] {
+            background-color: #5cb85c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #449d44;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to My Webserv Test Page</h1>
+    </header>
+
+    <div class="container">
+        <section id="about">
+            <h2>About This Page</h2>
+            <p>This is a simple HTML page to test my <code>webserv</code>. It includes basic HTML elements, CSS styling, and a form to test POST requests.</p>
+        </section>
+
+        <section id="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Basic HTML structure</li>
+                <li>CSS styling for better presentation</li>
+                <li>A form to submit data via POST</li>
+                <li>Links to external resources</li>
+            </ul>
+        </section>
+
+        <section id="contact">
+            <h2>Contact Us</h2>
+            <form id="contactForm" action="/submit" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+
+                <button type="submit">Submit</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // Simple JavaScript to prevent form submission and display a message
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent actual form submission
+            alert('Form submission prevented.  Check your webserv to see if the POST request was received.');
+        });
+    </script>
+
+</body>
+</html>

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 11:05:41 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:09:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,15 @@
 class RequestHandler
 {
 private:
-	void				handleGetRequest(Client &client);
-	void				handlePostRequest(Client &client);
-	void				handleDeleteRequest(Client &client);
-	void				handleInvalidRequest(Client &client);
-	void				handleDirectoryRequest(Client &client);
-	void				handleDirectoryListing(Client &client);
+	void				_handleGetRequest(Client &client);
+	void				_handlePostRequest(Client &client);
+	void				_handleDeleteRequest(Client &client);
+	void				_handleInvalidRequest(Client &client);
+	void				_handleDirectoryRequest(Client &client);
+	void				_handleDirectoryListing(Client &client);
 	void				_handleCgiRequest(Client &client);
 	bool				_handleRedirection(Client& client);
-	std::string			getPathFromUri(Client &client);
-	bool				checkAllowedMethod(Client &client);
+	bool				_checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
 	std::string			_getAbsoluteUrl(Client& client, std::string uri);
 	std::string			_getFilename(HttpRequest &request, size_t i);
@@ -69,3 +68,11 @@ public:
 };
 
 #endif
+
+//all following removed to cgi process
+// bool				validCgi(Client& client);
+// void				cgiHeaderScope(const std::string& line, HttpResponse& response);
+// HttpResponse		convertToResponse(std::string cgiOutBuff);
+// std::string			getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
+// std::string			extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
+// std::string			getScriptDir(std::string &path);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 09:30:09 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:10:27 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ bool CgiProcess::initCgi()
 	
 	LocationConf* locConf = _client->getLocationConf();
 	if (!locConf) {
-		//std::cerr << "Location{} block is NULL!\n";
 		LOG_ERR("\033[31mLocation{} block is NULL!\033[0m");
 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
 		return false;
@@ -111,8 +110,8 @@ bool CgiProcess::initCgi()
 	else if (!CgiChecker::validCgiScript(_client)) //Check CGI removed, as it is already checked in wrapLocChecker (in ServerConf creation at parsing)
 		return false;
 	if (pipe(pipFromCgi) < 0 || (_client->getRequest().getMethod() == POST && pipe(pipToCgi) < 0)) {
-		LOG_ERR("\033[32mDEBUG message in pipe_CGI in requesthandler\033[0m"); //CHANGE MESSAGE!
-		cleanupCgiPipe(pipFromCgi, pipToCgi);
+		LOG_ERR("\033[32mFailed to create pipe for CGI process\033[0m");
+		_cleanupCgiPipe(pipFromCgi, pipToCgi);
 		return false;
 	}
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
@@ -129,16 +128,15 @@ bool CgiProcess::initCgi()
 	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py  or whole path??? It works with whole path!!!!
 	// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
-	// av[1] = strdup(_client->getRequest().getPath().c_str());
 	av[2] = NULL;
-	createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
+	_createEnv(_client->getRequest(), _client->getRequest().getUri()); //store this envp somehow to be able to free it later
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 
 	// std::cout << "about to INIT CGI" << std::endl;
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
-		LOG_ERR("\033[32mDEBUG messaga in fork_CGI in requesthandler\033[0m"); //runtime error or LOG_ERR?!?!?
-		cleanupCgiPipe(pipFromCgi, pipToCgi);
+		throw std::runtime_error("\033[32mError: failed in forking!\033[0m");
+		_cleanupCgiPipe(pipFromCgi, pipToCgi);
 		return false;
 	}
 	if (cgiPid == 0) {
@@ -153,13 +151,6 @@ bool CgiProcess::initCgi()
 			close(pipToCgi[0]);
 			close(pipToCgi[1]);
 		}
-		// else {//debug point for php case, just try this
-		// 	int devNull = open("/dev/null", O_RDONLY);
-        //     if (devNull >= 0) {
-        //         dup2(devNull, STDIN_FILENO);
-        //         close(devNull);
-        //     }
-		// }
 		// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
 		// // LOG_DEBUG("printing envp");
 		// for (size_t i = 0; i < envp.size(); ++i) {
@@ -212,7 +203,7 @@ bool CgiProcess::initCgi()
 	return true;
 }
 
-void	CgiProcess::cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
+void	CgiProcess::_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 {
 	if (pipFromCgi[0] != -1)
 		close(pipFromCgi[0]);
@@ -237,6 +228,20 @@ std::string	CgiProcess::_getExtSysPath()
 	if (pos != std::string::npos) {
 		cgiExt = _client->getRequest().getUri().substr(pos); //eg: ".php"	
 	}
+	// else if (client->getLocationConf()->getLocIndex().size() != 0) {
+	// 	std::vector<std::string> tmp = client->getLocationConf()->getLocIndex();
+	// 	for (size_t i = 0; i < tmp.size(); ++i) {
+	// 		if (FileUtils::isIndexCgi(tmp[i]) == true) {
+	// 			size_t extDot = tmp[i].rfind('.');
+	// 			if (extDot != std::string::npos)
+	// 				cgiExt = tmp[i].substr(extDot);
+	// 			break ;
+	// 		}
+	// 	}
+	// 	if (cgiExt.empty() == true) {
+	// 		cgiExt = client->getLocationConf()->getIdxExt();
+	// 	}
+	// }
 	std::cout << "CGI EXT: " << cgiExt << std::endl;
 	//Get from config file!!! 
 	//should we restrict the cgi we are handling?!?!??

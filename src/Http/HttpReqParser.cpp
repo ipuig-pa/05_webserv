@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:22:23 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:35:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ HttpReqParser::HttpReqParser(HttpRequest &request)
 {
 	_buffer.reserve(BUFF_SIZE);
 }
+
 HttpReqParser::~HttpReqParser() {}
 
 bool HttpReqParser::httpParse(Client &client)
@@ -35,8 +36,6 @@ bool HttpReqParser::httpParse(Client &client)
 	return _stage == FINISH;
 }
 
-//TODO in LocConf and ServerConf Parsing!!! (upload_store)
-//idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
 std::string	HttpReqParser::_mapUploadPath(Client &client)
 {
 	std::string	uripath = client.getRequest().getUri();
@@ -134,7 +133,7 @@ bool	HttpReqParser::_isPathSafe(std::string normalizedUri, const std::string &do
 
 std::string	HttpReqParser::_mapSysPathFromUri(Client &client)
 {
-	//idea: getUri() either ends at cgi script name or normal static request! never contains extra info(path_info or query)
+	//getUri() either ends at cgi script name or normal static request! never contains extra info(path_info or query)
 	std::string normalizedUri = _normalizeUriPath(client.getRequest().getUri());
 	client.getRequest().setUri(normalizedUri);
 
@@ -202,18 +201,6 @@ size_t	HttpReqParser::_countCgiEnd(const std::string& uri)
 			return cgi_end;
 		}
 	}
-	// if (tmp.find(".py") != std::string::npos) {
-	// 	size_t cgi_end = tmp.find(".py") + 3;
-	// 	return cgi_end;
-	// }
-	// else if (tmp.find(".sh") != std::string::npos) {
-	// 	size_t cgi_end = tmp.find(".sh") + 3;
-	// 	return cgi_end;
-	// }
-	// else if (tmp.find(".php") != std::string::npos) {
-	// 	size_t cgi_end = tmp.find(".php") + 4;
-	// 	return cgi_end;
-	// }
 	return std::string::npos;
 }
 
@@ -240,7 +227,7 @@ void HttpReqParser::_parseReqLine(HttpRequest &request)
 	size_t pos = _countCgiEnd(uri);//if is CGI, uri==scriptname, use 2 setters
 	if (pos != std::string::npos) { //the pos of cgi_ext end returned
 		if (pos == uri.length()) {//uri ends at script name!
-			request.setUri(uri);//in this case. make uri==script name
+			request.setUri(uri);//in this case: uri==script name
 			request.setScriptName(uri);
 			request.setPathInfo("");
 			request.setQueryPart("");
@@ -362,7 +349,6 @@ void	HttpReqParser::_prepareBodyParsing(HttpRequest &request, Client &client)
 		}
 	}
 }
-
 
 bool	HttpReqParser::_parseChunkSize(Client &client)
 {

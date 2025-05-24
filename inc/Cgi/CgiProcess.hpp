@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 09:28:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:06:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ class CgiProcess
 {
 private:
 	Client				*_client;
-	int					_pipFromCgi;//read from cgi stdout
-	int					_pipToCgi; //for POST body -> stdin
+	int					_pipFromCgi;
+	int					_pipToCgi;
 	int					_cgiPid;
 	std::vector<char>	_cgiBuffer;
 	bool				_cgiActive;
@@ -40,33 +40,44 @@ private:
 	std::string			_script_path;
 	char				**_envp;
 
-	void				createEnv(HttpRequest& httpReq, const std::string &req_url);
-	// bool				_noPathInfo(const std::string& req_url);
-	// std::string			_splitPathInfo(const std::string& req_url);
+	void				_createEnv(HttpRequest& httpReq, const std::string &req_url);
 	void				_convertToEnvp(std::vector<std::string>& envStr);
 	void				_cleanEnvp(void);
-	// std::string			_getExtSysPath(std::string script_path);
-	std::string			_getExtSysPath(void);
-	std::string			_getScriptDir(std::string path);
-	void				cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
+	void				_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
 	void				_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes);
 	void				_cgiHeadersToResponse();
 	void				_addHeaderToResponse(const std::string& line, HttpResponse& response);
 	void				_checkChunkedTransfer(HttpResponse &response);
 	bool				_checkHeaderCompletion();
-
-public:
+	std::string			_getExtSysPath(Client *client);
+	std::string			_getScriptDir(std::string path);
+	
+	public:
 	CgiProcess(Client *client);
 	~CgiProcess();
-
+	
+	//getters
+	bool				isActive();
+	int					getCgiPid();
+	int					getFromCgi();
+	int					getToCgi();
+	bool				getHeadersSent();
+	std::string			getScriptPath();
+	
 	//setters
 	void			setActive(bool active);
+	void			setState(cgiState state);
 	void			setState(cgiState state);
 
 	//getters
 	Client			*getClient();
+	Client			*getClient();
 	int				getFromCgi();
 	int				getToCgi();
+	int				getCgiPid();
+	bool			isActive();
+	cgiState		getState();
+	std::string		getStateString(cgiState state);
 	int				getCgiPid();
 	bool			isActive();
 	cgiState		getState();
@@ -83,3 +94,7 @@ public:
 };
 
 #endif
+
+// bool				_noPathInfo(const std::string& req_url);
+// std::string			_splitPathInfo(const std::string& req_url);
+// std::string			_getExtSysPath(std::string script_path);

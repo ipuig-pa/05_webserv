@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 18:23:54 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 14:51:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,12 @@ std::atomic<bool> runServer = true;
 void signalHandler(const int signum) {
 	if (!runServer)
 		LOG_INFO("Server is already stopping...");
-	std::string s(sys_signame[signum]); //in Mac
+	// std::string s(sys_signame[signum]); //in Mac
+	std::string s(strsignal(signum));//for valgrind
 	for (size_t i = 0; i < s.length(); i++)
 		s[i] = toupper(s[i]);
-	LOG_FATAL("Server interrupted by SIG" + s + ". Stopping server...");
-	// LOG_FATAL("Server interrupted by SIG" + std::to_string(signum) + ". Stopping server..."); // Linux
+	// LOG_FATAL("\033[31mServer interrupted by SIG" + s + ". Stopping server...\033[0m");
+	LOG_FATAL("Server interrupted by SIG" + std::to_string(signum) + ". Stopping server..."); // Linux
 	runServer = false;
 }
 
@@ -39,12 +40,12 @@ int main(int ac, char **av)
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
 
-	LOG_INFO("Setting configuration file...");
+	LOG_INFO("\033[32;1mSetting configuration file...\033[0m");
 	std::string	configPath;
 	if (ac == 2)
 		configPath = av[1];
 	else {
-		LOG_WARN("No config file is provided. \"" + std::string(DEFAULT_CONF) + "\" will be used");
+		LOG_WARN("\033[31mNo config file is provided. \"" + std::string(DEFAULT_CONF) + "\" will be used\033[0m");
 		configPath = DEFAULT_CONF; 
 	}
 
@@ -64,8 +65,8 @@ int main(int ac, char **av)
 		ConfParser parser;
 		std::vector<std::string> tokens;
 		createTokens(configFile, tokens);
-		parser._split(tokens);
-		parser._createServBlock();
+		parser.split(tokens);
+		parser.createServBlock();
 		std::vector<std::string> tmp = parser.getSrvBlock();
 		servs_vector = parser.getServers();
 	}

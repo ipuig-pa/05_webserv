@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   AutoindexRequest.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/18 10:01:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 12:47:19 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-void	RequestHandler::handleDirectoryListing(Client &client)
+void	RequestHandler::_handleDirectoryListing(Client &client)
 {
 	std::string path = client.getRequest().getPath();
 	std::string uri = client.getRequest().getUri();

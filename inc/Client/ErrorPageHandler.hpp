@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorPageHandler.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 10:36:22 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:42:00 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/21 11:13:07 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ class Client;
 class ErrorPageHandler
 {
 private:
-	Client *_client;
+	Client		*_client;
 
 public:
 	ErrorPageHandler(Client *client);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Header.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:30:50 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 19:07:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:07:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,13 @@
 # include <map>
 
 struct CaseInsensitiveCompare {
-	bool operator()(const std::string& a, const std::string& b) const;
+	bool 																operator()(const std::string& a, const std::string& b) const;
 };
 
 class Header
 {
 private:
-	//implement correctly in cpp file instead!?!
-	// struct CaseInsensitiveCompare {
-	// 	bool operator()(const std::string& a, const std::string& b) const;
-	// };
-	std::map<std::string, std::string, CaseInsensitiveCompare> _fields;
+	std::map<std::string, std::string, CaseInsensitiveCompare>			_fields;
 
 public:
 	Header();
@@ -48,3 +44,10 @@ public:
 };
 
 #endif
+
+//implement correctly in cpp file instead!?!
+// struct CaseInsensitiveCompare {
+// 	bool operator()(const std::string& a, const std::string& b) const;
+// };
+// Parse headers from a string (for request parsing)
+// bool parse(const std::string& headerStr);

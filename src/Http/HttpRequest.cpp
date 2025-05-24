@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 19:15:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:11:54 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,10 +158,12 @@ std::string HttpRequest::getScriptName(void) const
 {
 	return _scriptname;
 }
+
 std::string HttpRequest::getPathInfo(void) const
 {
 	return _pathinfo;	
 }
+
 std::string HttpRequest::getQueryPart() const
 {
 	return _queryPart;

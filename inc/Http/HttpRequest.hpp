@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 19:05:29 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:08:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,13 @@ public:
 	std::string			getHeaderVal(const std::string& name) const; //needed?!!? -yes, this will check is there has a body or not
 	// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????
 	int					getMethod(void) const;
-	std::string			getMethodStr() const; //to get the string, not int from enum
+	size_t				getPostBytesWritten(void);
 	std::string			getUri(void);
+	std::string			getPath(void);
+	std::string			getVersion(void);
+	std::string			getUpload(void);
+	std::vector<char>	&getBody(void);
+	std::string			getMethodStr(void) const;
 	std::string			getScriptName(void) const;
 	std::string			getPathInfo(void) const;
 	std::string			getPath(void);
@@ -86,3 +91,4 @@ public:
 };
 
 #endif
+// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 10:40:38 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:09:22 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,42 +27,42 @@ enum responseState
 class HttpResponse
 {
 private:
-	Status			_status;
-	Header			_header;
-	size_t			_body_length;
-	std::vector<char>		_body_buffer;
-	responseState	_state;
-	size_t			_bytes_read;
-	size_t			_bytes_sent;
-	bool			_chunked;
+	Status				_status;
+	Header				_header;
+	size_t				_body_length;
+	std::vector<char>	_body_buffer;
+	responseState		_state;
+	size_t				_bytes_read;
+	size_t				_bytes_sent;
+	bool				_chunked;
 
 public:
 	HttpResponse();
 	HttpResponse(const HttpResponse &other);
-	HttpResponse	&operator=(const HttpResponse &other);
+	HttpResponse		&operator=(const HttpResponse &other);
 	~HttpResponse();
 
 	//setters
-	void		setStatus(Status &status);
-	void		setStatusCode(int code);
-	void		setHeaderField(const std::string name, const std::string value);
-	void		setBodyLength(size_t body_length);
-	void		setBodyBuffer(const std::vector<char> &buffer);
-	void		clearBodyBuffer();
-	void		setState(responseState state);
-	void		setBytesRead(size_t bytes_read);
-	void		addBytesSent(size_t bytes_sent);
-	void		setChunked(bool chunked);
+	void				setStatus(Status &status);
+	void				setStatusCode(int code);
+	void				setHeaderField(const std::string name, const std::string value);
+	void				setBodyLength(size_t body_length);
+	void				setBodyBuffer(const std::vector<char> &buffer);
+	void				clearBodyBuffer();
+	void				setState(responseState state);
+	void				setBytesRead(size_t bytes_read);
+	void				addBytesSent(size_t bytes_sent);
+	void				setChunked(bool chunked);
 
 	//getters
-	std::string	getHeader(const std::string &name);
-	responseState	getState(void) const;
-	size_t		getBodyLength(void) const;
-	size_t		getBytesRead(void);
-	size_t		getBytesSent(void);
+	bool				isChunked(void);
+	size_t				getBodyLength(void) const;
+	size_t				getBytesRead(void);
+	size_t				getBytesSent(void);
+	Status				&getStatus(void);
+	std::string			getHeader(const std::string& name);
+	responseState		getState(void) const;
 	std::vector<char>	&getBodyBuffer(void);
-	Status		&getStatus(void);
-	bool		isChunked(void);
 
 	//methods
 	void		appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length);
@@ -73,6 +73,6 @@ public:
 	void		reset();
 };
 
-std::string		getMediaType(const std::string path);
+std::string				getMediaType(const std::string path);
 
 #endif

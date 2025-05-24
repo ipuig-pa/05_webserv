@@ -3,30 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   CgiEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 12:44:55 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:10:19 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
 
-void CgiProcess::createEnv(HttpRequest& httpReq, const std::string &req_url) //url here is WITHOUT query part
+void CgiProcess::_createEnv(HttpRequest& httpReq, const std::string &req_url) //url here is WITHOUT query part
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMethodStr()));
 	env.push_back("SCRIPT_NAME=" + std::string(req_url));
-	// env.push_back("SCRIPT_NAME=" + std::string(httpReq.getScriptName())); //addr of executable (MAKE SURE WE NEED THIS NAME AND NOT THE LAST PART AFTER LAST /)
 	if (httpReq.getPathInfo().empty() == false) {
 		env.push_back("PATH_INFO=" + std::string(httpReq.getPathInfo()));
 	}
 	if (!httpReq.getQueryPart().empty()) {
 		env.push_back("QUERY_STRING=" + std::string(httpReq.getQueryPart()));
 	}
-	env.push_back("SERVER_PROTOCOL=" + std::string(httpReq.getVersion())); //HTTP/1.1
-	env.push_back("SCRIPT_FILENAME=" + std::string(httpReq.getPath())); //_cgiPath ??? difference with script name??? it is printing the same??? (MAKE SUE WE NEED THIS AND NOT JUST UNTIL THE SCRIPT NAME!?!?)
+	env.push_back("SERVER_PROTOCOL=" + std::string(httpReq.getVersion()));
+	env.push_back("SCRIPT_FILENAME=" + std::string(httpReq.getPath())); //full path to script
 	env.push_back("CONTENT_TYPE=" + std::string(httpReq.getHeaderVal("Content-Type")));
 	env.push_back("CONTENT_LENGTH=" + std::string(httpReq.getHeaderVal("Content-Length")));
 	env.push_back("SERVER_NAME=webserv");
@@ -52,6 +51,31 @@ void CgiProcess::createEnv(HttpRequest& httpReq, const std::string &req_url) //u
 	// }
 	_convertToEnvp(env);
 }
+
+void	CgiProcess::_convertToEnvp(std::vector<std::string>& envStr)
+{
+	_envp = new char*[envStr.size() + 1];
+
+	for (size_t i = 0; i < envStr.size(); ++i) {
+		size_t len = envStr[i].size();
+		_envp[i] = new char[len + 1]; //null-term each directive
+		std::strncpy(_envp[i], envStr[i].c_str(), len);
+		_envp[i][len] = '\0';
+		// std::cout << "envp[" << i <<"] = " << _envp[i] << std::endl;
+	}
+	_envp[envStr.size()] = nullptr;
+}
+
+void CgiProcess::_cleanEnvp(void)
+{
+	if (_envp) {
+		for (size_t i = 0; _envp[i] != nullptr; ++i) {
+			delete[] _envp[i];
+		}
+		delete[] _envp;
+	}
+}
+
 
 // bool	CgiProcess::_noPathInfo(const std::string& req_url)
 // {

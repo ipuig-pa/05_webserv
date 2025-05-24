@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 18:57:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:12:01 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	MultiServer::run()
 	if (runServer)
 		LOG_INFO("Server is now available");
 	while (runServer) {
-		LOG_DEBUG("Server running...");
+		LOG_DEBUG("\033[35mServer running...\033[0m");
 
 		if (poll(_poll.data(), _poll.size(), 30000) < 0 && runServer) { // 30 s timeout
 			LOG_ERR("Poll error: " + std::string(strerror(errno)));

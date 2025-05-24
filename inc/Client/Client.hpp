@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 09:09:05 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:06:53 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,6 @@
 class ErrorPageHandler;
 class CgiProcess;
 
-/**
- * accept (new) client connection,
- * read from and write to clients,
- * keep non-blocking
-*/
-
 enum clientState
 {
 	NEW_CONNECTION,
@@ -47,7 +41,7 @@ enum clientState
 	BOUNCED //when!?!?!?
 };
 
-class Client //or struct?
+class Client
 {
 private:
 	HttpRequest			_request;
@@ -60,7 +54,7 @@ private:
 	int					_file_fd; //should be an array / vector / etc??? Or just one file_fd possible at a time?
 	std::map<int, int>	_post_fd; //map each post_fd to the position (i) of the corresponding part in the multipart request
 	ListenSocket		*_listenSocket;
-	ServerConf			*_currentServerConf; //idea: maybe create a upper class
+	ServerConf			*_currentServerConf;
 	LocationConf		*_currentLocConf;
 	CgiProcess			*_cgi;
 	ConnectionTracker	_tracker;
@@ -85,8 +79,8 @@ public:
 	LocationConf	*getLocationConf(void);
 	HttpReqParser	&getParser(void);
 	ConnectionTracker	&getTracker(void);
-	CgiProcess		*getCgiProcess(void);
-	size_t			getMaxBodySize(void);
+	CgiProcess			*getCgiProcess(void);
+	size_t				getMaxBodySize(void);
 	
 	void			setState(clientState state);
 	void			setFileFd(int file_fd);
@@ -105,3 +99,10 @@ public:
 };
 
 #endif
+
+/**
+ * accept (new) client connection,
+ * read from and write to clients,
+ * keep non-blocking
+ * 
+*/
