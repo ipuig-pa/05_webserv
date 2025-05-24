@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpReqParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:11:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:35:24 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ bool HttpReqParser::httpParse(Client &client)
 	if (_stage == BODY)
 		_parseBody(_httpReq, client);
 	if (_stage == PARSE_ERROR && client.getState() != SENDING_RESPONSE)
-		client.sendErrorResponse(400, "Error parsing request"); //Bad request
+		client.sendErrorResponse(400, "The server cannot process the request due to malformed syntax"); //Bad request
 	LOG_DEBUG("STAGE AFTER PARSING: " + std::to_string(_stage));
 	return _stage == FINISH;
 }
@@ -218,7 +218,7 @@ void HttpReqParser::_parseReqLine(HttpRequest &request)
 	std::istringstream tmp(cur_line);
 	tmp >> method >> uri >> ver;
 	if (method.empty() || uri.empty() || ver.empty()) {
-		std::cerr << "PARSE_Error: invalid request line. should be Method Uri Version";
+		LOG_ERR("PARSE_Error: invalid request line. should be Method Uri Version");
 		_stage = PARSE_ERROR;
 		return ;
 	}
@@ -250,7 +250,7 @@ void HttpReqParser::_parseReqLine(HttpRequest &request)
 	}
 	std::string tmp_v = "HTTP/1.1";
 	if (tmp_v.compare(ver) != 0) {
-		std::cerr << "PARSE_Error: invalid HTTP version";
+		LOG_ERR("PARSE_Error: invalid HTTP version");
 		_stage = PARSE_ERROR;
 		return ;
 	}

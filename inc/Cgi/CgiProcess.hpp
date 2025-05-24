@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:20:16 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:30:37 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,36 +49,34 @@ private:
 	void				_addHeaderToResponse(const std::string& line, HttpResponse& response);
 	void				_checkChunkedTransfer(HttpResponse &response);
 	bool				_checkHeaderCompletion();
-	std::string			_getExtSysPath(Client *client);
+	std::string			_getExtSysPath();
 	std::string			_getScriptDir(std::string path);
 	
 	public:
 	CgiProcess(Client *client);
 	~CgiProcess();
-	
-	//getters
-	bool				isActive();
-	int					getCgiPid();
-	int					getFromCgi();
-	int					getToCgi();
-	bool				getHeadersSent();
-	std::string			getScriptPath();
-	
+
 	//setters
-	void			setActive(bool active);
-	void			setState(cgiState state);
+	void				setActive(bool active);
+	void				setState(cgiState state);
 
 	//getters
-	Client			*getClient();
-	std::string		getStateString(cgiState state);
-	cgiState		getState();
+	Client				*getClient();
+	int					getFromCgi();
+	int					getToCgi();
+	int					getCgiPid();
+	bool				isActive();
+	cgiState			getState();
+	std::string			getStateString(cgiState state);
+	bool				getHeadersSent();
+	std::string			getScriptPath();
 
 
 	//methods
-	bool			initCgi();
-	void			readCgiOutput();
-	bool			writeToCgi();
-	void			cleanCloseCgi();
+	bool				initCgi();
+	void				readCgiOutput();
+	bool				writeToCgi();
+	void				cleanCloseCgi();
 };
 
 #endif

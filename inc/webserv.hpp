@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 11:15:08 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 15:56:11 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 14:00:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,5 +50,7 @@
 #define DEFAULT_CONF "config/default.conf"
 #define BUFF_SIZE 4096
 #define DEFAULT_MAX_CLIENT_BODY 1000000
+#define MAX_CLIENTS 1000
+#define MAX_ERROR_PAGE_SIZE 64 * 1024 //64 KB
 
 #endif

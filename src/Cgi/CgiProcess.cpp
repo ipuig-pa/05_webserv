@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 15:23:04 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:32:17 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,7 +170,7 @@ bool CgiProcess::initCgi()
 		// }
 		// char* av[] = { (char*)_client->getRequest().getPath().c_str(), NULL };
 		if (chdir(scriptDir.c_str()) != 0) {
-			std::cerr << "Failed to change to directory: " << scriptDir << " - " << strerror(errno) << std::endl;
+			LOG_ERR("Failed to change to directory: " + scriptDir + " - " + strerror(errno));
 			exit(1); //allowed?!?!?
 		}
 		// LOG_DEBUG(std::string(av[1]));
