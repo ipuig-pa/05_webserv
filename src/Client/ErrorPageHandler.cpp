@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorPageHandler.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/17 11:41:21 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:30:25 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,16 +40,18 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code, std::string mes
 	// 		return (body);
 	// 	}
 	// }
-	body = _client->getServerConf()->getErrPageCode(status_code);
-	if (!body.empty()) {
-		_client->getResponse().setBodyLength(body.length()); // or should read from there?
-		_client->getResponse().setBytesRead(body.length());
-		_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
-		_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
-		return (body);
+	if (_client->getServerConf())
+	{
+		body = _client->getServerConf()->getErrPageCode(status_code);
+		if (!body.empty()) {
+			_client->getResponse().setBodyLength(body.length()); // or should read from there?
+			_client->getResponse().setBytesRead(body.length());
+			_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
+			_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
+			return (body);
+		}
 	}
-	// if (status_code == 204 || status_code == 304)
-	if (status_code == 204 || (status_code >= 300 && status_code <= 400))
+	if (status_code == 204 || (status_code >= 300 && status_code < 400))
 	{
 		_client->getResponse().setBodyLength(0);
 		_client->getResponse().setBytesRead(0);

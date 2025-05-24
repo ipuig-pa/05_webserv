@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 19:50:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:30:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConf.hpp"
 
 ServerConf::ServerConf()
-	: _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _srv_autoindex(false), _upload("")
+	: _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _error_page(), _srv_autoindex(false), _upload(""), _location()
 {
 }
 // ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}
@@ -542,9 +542,12 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 
 std::string	ServerConf::getErrPageCode(int status_code)
 {
-	std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
-	if (it != _error_page.end())
-		return it->second;
+	if (_error_page.size() != 0) {
+		std::map<int, std::string>::const_iterator it = _error_page.find(status_code);
+		if (it != _error_page.end()) {
+			return it->second;
+		}
+	}
 	return "";
 }
 
