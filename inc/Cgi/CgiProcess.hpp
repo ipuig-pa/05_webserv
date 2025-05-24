@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:06:42 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:46:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,48 +49,34 @@ private:
 	void				_addHeaderToResponse(const std::string& line, HttpResponse& response);
 	void				_checkChunkedTransfer(HttpResponse &response);
 	bool				_checkHeaderCompletion();
-	std::string			_getExtSysPath(Client *client);
+	std::string			_getExtSysPath();
 	std::string			_getScriptDir(std::string path);
 	
 	public:
 	CgiProcess(Client *client);
 	~CgiProcess();
-	
-	//getters
-	bool				isActive();
-	int					getCgiPid();
-	int					getFromCgi();
-	int					getToCgi();
-	bool				getHeadersSent();
-	std::string			getScriptPath();
-	
+
 	//setters
-	void			setActive(bool active);
-	void			setState(cgiState state);
-	void			setState(cgiState state);
+	void				setActive(bool active);
+	void				setState(cgiState state);
 
 	//getters
-	Client			*getClient();
-	Client			*getClient();
-	int				getFromCgi();
-	int				getToCgi();
-	int				getCgiPid();
-	bool			isActive();
-	cgiState		getState();
-	std::string		getStateString(cgiState state);
-	int				getCgiPid();
-	bool			isActive();
-	cgiState		getState();
-	std::string		getStateString(cgiState state);
-	bool			getHeadersSent();
-	std::string		getScriptPath();
+	Client				*getClient();
+	int					getFromCgi();
+	int					getToCgi();
+	int					getCgiPid();
+	bool				isActive();
+	cgiState			getState();
+	std::string			getStateString(cgiState state);
+	bool				getHeadersSent();
+	std::string			getScriptPath();
 
 
 	//methods
-	bool			initCgi();
-	void			readCgiOutput();
-	bool			writeToCgi();
-	void			cleanCloseCgi();
+	bool				initCgi();
+	void				readCgiOutput();
+	bool				writeToCgi();
+	void				cleanCloseCgi();
 };
 
 #endif

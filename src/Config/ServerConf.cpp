@@ -6,14 +6,14 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:35:08 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 11:38:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerConf.hpp"
 
 ServerConf::ServerConf()
-	: _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _index(""), _error_page(), _srv_autoindex(false), _upload(""), _location()
+	: _srv_autoindex(false), _port (0), _max_body_size (0), _server_name(""), _root_dir(""), _host(""), _upload(""), _index(), _error_page(), _location()
 {
 }
 // ServerConf::ServerConf(int _port, const std::string& _servname, const std::string& _root) {}

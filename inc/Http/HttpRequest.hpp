@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:08:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:43:16 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,16 +68,11 @@ public:
 	std::string			getHeaderVal(const std::string& name) const; //needed?!!? -yes, this will check is there has a body or not
 	// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????
 	int					getMethod(void) const;
-	size_t				getPostBytesWritten(void);
 	std::string			getUri(void);
 	std::string			getPath(void);
-	std::string			getVersion(void);
-	std::string			getUpload(void);
-	std::vector<char>	&getBody(void);
 	std::string			getMethodStr(void) const;
 	std::string			getScriptName(void) const;
 	std::string			getPathInfo(void) const;
-	std::string			getPath(void);
 	std::string			getQueryPart() const;
 	std::string			getVersion();
 	const std::vector<char>	&getBody() const;
