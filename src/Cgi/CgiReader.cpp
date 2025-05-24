@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/16 12:04:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 09:00:33 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@ void	CgiProcess::readCgiOutput()
 {
 	std::vector<char> buffer(BUFF_SIZE);
 	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));//check
-	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
-	// std::cout << "buffer is: \033[0m" << buffer << std::endl;
+	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) << std::endl;
+	// std::string buffer_str(buffer.begin(), buffer.end());
+	// std::cout << "buffer is:\033[0m" << buffer_str << "STOP" << std::endl;
 	if (bytes_read > 0) {
 		buffer.resize(bytes_read);
 		// std::cout << "READ: " << buffer << std::endl;
@@ -64,11 +65,15 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 	}
 	else
 		_client->getResponse().appendBodyBuffer(buffer, bytes, true);
-	// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
+	// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
+	// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
 }
 
 void	CgiProcess::_cgiHeadersToResponse()
 {
+	// std::cout << "HEADERS ARE ALREDY RECEIVED!" << std::endl;
+	// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
+	// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
 	HttpResponse &response = _client->getResponse();
 	response.setStatusCode(200); //set default, will be used if CGI didnt provide one
 	bool HeaderScope = true;
@@ -92,7 +97,7 @@ void	CgiProcess::_cgiHeadersToResponse()
 			_addHeaderToResponse(line, response);
 		}
 		else { //not in header scope
-			content << line << "\n";
+			content << line;
 		}
 	}
 	_cgiBuffer.clear();
