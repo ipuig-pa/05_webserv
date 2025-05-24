@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectionHandler.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:13:14 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 13:53:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,8 @@ void	MultiServer::_acceptNewConnection(ListenSocket *listen_socket)
 		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 	struct pollfd cli_sock_fd = {cli_socket, POLLIN, 0};
 	_poll.push_back(cli_sock_fd);
+	if (_clients.size() > MAX_CLIENTS)
+		client->sendErrorResponse(503, ""); //Service Unavailable
 }
 
 void	MultiServer::_handleConnections(void)

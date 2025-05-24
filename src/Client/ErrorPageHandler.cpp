@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 13:05:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 14:04:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,17 @@ std::string	ErrorPageHandler::_readErrorPage(const std::string& path)
 			root.append("/");
 		full_path = root + path;
 	}
-	if (FileUtils::pathType(full_path) == 2 && FileUtils::pathValid(full_path, F_OK | R_OK) == 0) {
-		std::ifstream file(full_path);
-		if (file.is_open()) {
-			std::string content((std::istreambuf_iterator<char>(file)),
-							std::istreambuf_iterator<char>());
-			file.close();
-			return content;
+	if (FileUtils::pathValid(full_path, F_OK | R_OK) == 0) {
+		struct stat file_stat;
+		stat(path.c_str(), &file_stat);
+		if (S_ISREG(file_stat.st_mode) != 0 && file_stat.st_size <= MAX_ERROR_PAGE_SIZE) {
+			std::ifstream file(full_path);
+			if (file.is_open()) {
+				std::string content((std::istreambuf_iterator<char>(file)),
+								std::istreambuf_iterator<char>());
+				file.close();
+				return content;
+			}
 		}
 	}
 	return "";

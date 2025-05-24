@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:15 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:06:53 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 13:44:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,7 @@ enum clientState
 	PROCESSING,
 	SENDING_RESPONSE,
 	SENDING_CONTINUE,
-	CONNECTION_CLOSED,
-	BOUNCED //when!?!?!?
+	CONNECTION_CLOSED
 };
 
 class Client

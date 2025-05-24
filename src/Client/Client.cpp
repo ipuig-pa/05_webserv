@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 12:07:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 14:05:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ std::string	Client::getStateString(clientState state) {
 		case SENDING_RESPONSE: return "SENDING_RESPONSE";
 		case SENDING_CONTINUE: return "SENDING_CONTINUE";
 		case CONNECTION_CLOSED: return "CONNECTION_CLOSED";
-		case BOUNCED: return "BOUNCED";
 		default: return "UNKNOWN_STATE";
 	}
 }

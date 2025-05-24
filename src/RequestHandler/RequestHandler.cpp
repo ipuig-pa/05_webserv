@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 16:14:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 14:05:04 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,18 @@ void	RequestHandler::handleClientWrite(Client &client)
 	
 	if (client.getState() == SENDING_RESPONSE)
 	{
-		if (!client.sendResponseChunk()) //error handling??
-			std::cerr << "Error sending chunk" << std::endl; // change to proper behaviour
+		if (!client.sendResponseChunk()) {
+			LOG_ERR("Error sending response chunk to client at socket " + std::to_string(client.getSocket()) + ". Connection will be closed");
+			client.setState(CONNECTION_CLOSED);
+		}
 	}
 	if (client.getState() == SENDING_CONTINUE)
 	{
-		if (!client.sendContinue()) //error handling??
-			std::cerr << "Error sending continue" << std::endl; // change to proper behaviour
-		client.setState(CONTINUE_REQUEST);
+		if (!client.sendContinue()){
+			LOG_ERR("Error sending response chunk to client at socket " + std::to_string(client.getSocket()) + ". Connection will be closed");
+			client.setState(CONNECTION_CLOSED);
+		} else
+			client.setState(CONTINUE_REQUEST);
 		return ;
 	}
 	if (client.getResponse().getState() == READ && (client.getResponse().getBytesSent() == (client.getResponse().statusToString().length() + client.getResponse().headersToString().length() + client.getResponse().getBytesRead())))
