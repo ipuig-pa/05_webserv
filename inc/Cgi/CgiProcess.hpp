@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 10:35:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:06:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,17 @@ private:
 	//setters
 	void			setActive(bool active);
 	void			setState(cgiState state);
+	void			setState(cgiState state);
 
 	//getters
 	Client			*getClient();
+	Client			*getClient();
 	int				getFromCgi();
 	int				getToCgi();
+	int				getCgiPid();
+	bool			isActive();
+	cgiState		getState();
+	std::string		getStateString(cgiState state);
 	int				getCgiPid();
 	bool			isActive();
 	cgiState		getState();

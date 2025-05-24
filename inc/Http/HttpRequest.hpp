@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 10:46:09 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 11:08:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ public:
 	void	setMultipart(MultiPart *multipart);
 	
 	//getters
-	bool				isComplete(void);
 	std::string			getHeaderVal(const std::string& name) const; //needed?!!? -yes, this will check is there has a body or not
 	// std::map<std::string, std::string, CaseInsensitiveCompare> getHeader() const; //needed????
 	int					getMethod(void) const;
