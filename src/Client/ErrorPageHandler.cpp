@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:30:25 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 13:05:19 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,28 +27,19 @@ ErrorPageHandler::~ErrorPageHandler()
 
 std::string	ErrorPageHandler::generateErrorBody(int status_code, std::string message)
 {
-	std::string	body;
-
-	//Handle here the status specific headers???
-
-	//INCLUDE GET ERR PAGE IN LOCATION CONF, SO IT CAN BE CHECKED HERE!!!!!!!
-	// if (_client->getLocationConf())
-	// {
-	// 	body = _client->getLocationConf()->getErrPageCode(status_code);
-	// 	if (!body.empty())
-	// 	{
-	// 		return (body);
-	// 	}
-	// }
 	if (_client->getServerConf())
 	{
-		body = _client->getServerConf()->getErrPageCode(status_code);
-		if (!body.empty()) {
-			_client->getResponse().setBodyLength(body.length()); // or should read from there?
-			_client->getResponse().setBytesRead(body.length());
-			_client->getResponse().setHeaderField("Content-Type", getMediaType(body)); //get the corresponding mediatype!?!!
-			_client->getResponse().setHeaderField("Content-Length", std::to_string(body.length()));
-			return (body);
+		std::string	err_page_path;
+		err_page_path = _client->getServerConf()->getErrPageCode(status_code);
+		if (!err_page_path.empty()) {
+			std::string	body = _readErrorPage(err_page_path);
+			if (!body.empty()) {
+				_client->getResponse().setBodyLength(body.size()); // or should read from there?
+				_client->getResponse().setBytesRead(body.size());
+				_client->getResponse().setHeaderField("Content-Type", getMediaType(err_page_path)); //get the corresponding mediatype!?!!
+				_client->getResponse().setHeaderField("Content-Length", std::to_string(body.size()));
+				return (body);
+			}
 		}
 	}
 	if (status_code == 204 || (status_code >= 300 && status_code < 400))
@@ -58,10 +49,31 @@ std::string	ErrorPageHandler::generateErrorBody(int status_code, std::string mes
 		return ("");
 	}	
 	else
-		return ErrorPageHandler::getDefaultErrorPage(status_code, message);
+		return ErrorPageHandler::_getDefaultErrorPage(status_code, message);
 }
 
-std::string ErrorPageHandler::getDefaultErrorPage(int status_code, std::string message)
+std::string	ErrorPageHandler::_readErrorPage(const std::string& path)
+{
+	std::string	full_path = path;
+	if (full_path[0] != '/' && _client->getServerConf()) {
+		std::string root = _client->getServerConf()->getRoot();
+		if (root[root.size() - 1] != '/')
+			root.append("/");
+		full_path = root + path;
+	}
+	if (FileUtils::pathType(full_path) == 2 && FileUtils::pathValid(full_path, F_OK | R_OK) == 0) {
+		std::ifstream file(full_path);
+		if (file.is_open()) {
+			std::string content((std::istreambuf_iterator<char>(file)),
+							std::istreambuf_iterator<char>());
+			file.close();
+			return content;
+		}
+	}
+	return "";
+}
+
+std::string ErrorPageHandler::_getDefaultErrorPage(int status_code, std::string message)
 {
 	std::string	explanation = "The server encountered an error processing your request: " + message;
 	std::string status_message = _client->getResponse().getStatus().getStatusMessage();
