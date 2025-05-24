@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 14:48:50 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:17:44 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,53 @@ FileUtils::~FileUtils() {}
 /**
  * int stat(const char *restrict pathname, struct stat *restrict statbuf);
  * returns info about the file PTR-ed by 'pathname'
- */
+*/
+
+//may improved for more robost check later (make sure is exact ends with ".php" etc)
+bool FileUtils::isIndexCgi(const std::string indexPath)
+{
+	// std::vector<std::string> exts = {".php", ".sh", ".py"};
+	if (indexPath.find(".php") != std::string::npos \
+		|| indexPath.find(".sh") != std::string::npos \
+		|| indexPath.find(".py") != std::string::npos) {
+			return true;
+		}
+	return false;
+}
+// bool CgiChecker::_validCgiIndex(const LocationConf& loc)
+
+//bool FileUtils::validIndex(const std::string idx, std::string rt, std::string locpath)
+std::string FileUtils::validIndex(const std::string idx, std::string path)
+{
+	if (path[path.length() - 1] != '/') {
+		path += "/";
+	}
+	std::string full_path = path + idx;
+	//if index is full path and works case
+	if (access(idx.c_str(), F_OK | R_OK) == 0 && pathType(idx) == 2) {
+		std::cout << "NON VALID" << std::endl;
+		return idx;
+	}
+	//if root+path+index is full path and works case
+	if (access(full_path.c_str(), F_OK | R_OK) == 0 && pathType(full_path) == 2) {
+		std::cout << "VALID: " << full_path << std::endl;
+		return full_path;
+	}
+	LOG_ERR("No valid index provided!");
+	// //if non above work, use getcwd() to get CWD, and cate with path+index
+	// char* tmpCwd = getcwd(NULL, 0);
+	// if (!tmpCwd) {
+	// 	return "";
+	// }
+	// std::string cwd_path = std::string(tmpCwd) + path + idx;
+	// // std::string cwd_path = std::string(tmpCwd) + "/" + idx; //no path??
+	// free(tmpCwd);
+	// if (access(cwd_path.c_str(), F_OK | R_OK) == 0 && pathType(cwd_path) == 2) {
+	// 	return cwd_path;
+	// }
+	return "";
+}
+
 int FileUtils::pathType(const std::string _filePath)
 {
 	struct stat _info;

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 15:26:44 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/22 16:07:02 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ LocationConf::LocationConf()
 	_locCMBS = 1024*2;
 	_locAuto = false;
 	_autoflag = false;
-	// _locIndex = "";
 	_hasReturn = false;
+	_idxExt = "";
 }
 
 LocationConf::~LocationConf() {}
@@ -151,6 +151,11 @@ void LocationConf::setLocIndex(std::vector<std::string> s)
 	this->_locIndex = s;
 }
 
+void LocationConf::setIdxExt(std::string s)
+{
+	this->_idxExt = s;
+}
+
 bool LocationConf::autoSet() const
 {
 	return _autoflag;
@@ -233,6 +238,11 @@ int LocationConf::getLocCMBS() const
 const std::vector<std::string>& LocationConf::getLocIndex() const
 {
 	return this->_locIndex;
+}
+
+const std::string LocationConf::getIdxExt() const
+{
+	return this->_idxExt;
 }
 
 bool LocationConf::getLocAuto() const

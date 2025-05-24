@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 13:53:59 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 10:30:48 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ bool CgiProcess::initCgi()
 	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
 	av[0] = strdup(_getExtSysPath(_client).c_str()); //usr/bin/xxx
-	// std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
+	std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
 	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_filename: /05_webserv/www/cgi/simple.py
 	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 	av[2] = NULL;
@@ -187,6 +187,32 @@ void	CgiProcess::_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 		_cleanEnvp();
 }
 
+// std::string	CgiProcess::_getExtSysPath(Client* client)
+// {
+// 	std::string	cgiExt = "";
+
+// 	size_t pos = client->getRequest().getUri().rfind('.');
+// 	if (pos == std::string::npos) { //in this case cgi_ext is not in request line, but since this staged is called indicates that the index is CGI_Script!
+// 		if (client->getLocationConf()->getIdxExt().empty() == false) {
+// 			cgiExt = client->getLocationConf()->getIdxExt();
+// 		}
+// 	} else if (pos != std::string::npos) {
+// 		cgiExt = client->getRequest().getUri().substr(pos); //eg: ".php"	
+// 	}
+// 	std::cout << "CGI EXT: " << cgiExt << std::endl;
+// 	std::map<std::string, std::string> pair = client->getLocationConf()->getPathExMap();
+// 	if (pair.empty())
+// 		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+// 	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
+// 	if (it != pair.end())
+// 		return (it->second);
+// 	else {
+// 		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
+// 		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+// 	}
+// 	return cgiExt;
+// }
+
 std::string	CgiProcess::_getExtSysPath(Client* client)
 {
 	std::string	cgiExt = "";
@@ -195,16 +221,32 @@ std::string	CgiProcess::_getExtSysPath(Client* client)
 	if (pos != std::string::npos) {
 		cgiExt = client->getRequest().getUri().substr(pos); //eg: ".php"	
 	}
+	// else if (client->getLocationConf()->getLocIndex().size() != 0) {
+	// 	std::vector<std::string> tmp = client->getLocationConf()->getLocIndex();
+	// 	for (size_t i = 0; i < tmp.size(); ++i) {
+	// 		if (FileUtils::isIndexCgi(tmp[i]) == true) {
+	// 			size_t extDot = tmp[i].rfind('.');
+	// 			if (extDot != std::string::npos)
+	// 				cgiExt = tmp[i].substr(extDot);
+	// 			break ;
+	// 		}
+	// 	}
+	// 	if (cgiExt.empty() == true) {
+	// 		cgiExt = client->getLocationConf()->getIdxExt();
+	// 	}
+	// }
 	std::cout << "CGI EXT: " << cgiExt << std::endl;
 	std::map<std::string, std::string> pair = client->getLocationConf()->getPathExMap();
 	if (pair.empty())
-		_client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		// _client->sendErrorResponse(501, "CGI execution is not configured for this location");
+		client->sendErrorResponse(501, "CGI execution is not configured for this location");
 	std::map<std::string, std::string>::iterator it = pair.find(cgiExt);
 	if (it != pair.end())
 		return (it->second);
 	else {
 		LOG_ERR("\033[31mCannot find corresponding excutable path for the extension passed.\033[0m");
-		_client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		// _client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
+		client->sendErrorResponse(501, "CGI execution for" + cgiExt + "is not configured for this location");
 	}
 	return cgiExt;
 }
