@@ -1,0 +1,2 @@
+This is to test POST
+This txt will be uploaded to /uploads dir

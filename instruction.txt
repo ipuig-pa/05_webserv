@@ -1,19 +1,71 @@
 
 Here is request line command that used to test our webserv project
 
-curl:
+**curl**:
+GET:
+	- static:
+		curl -v http://127.0.0.1:8080/www/static-bin/index.html
+	- autoinde on:
+		curl -v http://127.0.0.1:8080/www/
+	- non-exist:
+		curl -v http://127.0.0.1:8080/www/static-bin/bad.html
 
-- static:
-	POST:
-	GET:
-	DELETE:
-	[...]
+POST: 
+	- from data:
+		curl -v -X POST -d "POST content evalutor want to test" http://127.0.0.1:8080/form
+	- file upload:
+		curl -v -F "file=@upload_source/Hello.txt" http://localhost:8080/uploads/
 
-- cgi:
-	PATH_INFO:
-	QUERY_PART:
-	POST:
-	GET:
-	DELETE:
+DELETE:
+	- curl -v -X DELETE http://localhost:8080/upload/ups/content.txt
+	- curl -v -X DELETE http://localhost:8080/upload/ups/non_exist.txt
+CGI:
+	GCI_get:
+		- QUERY_PART:
+			curl "http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK"
+		- PATH_INFO:
+			curl -v http://localhost:8080/www/cgi/pathinfo.py/tryMe.txt
+		- normal:
+			curl -v http://localhost:8080/www/cgi/env.py
+			curl -v http://localhost:8080/www/cgi/print.php
+			curl -v http://localhost:8080/www/cgi/some.sh
+	
+	CGI_post:
+		- curl -X POST -d "POST content evalutor wants to test" http://127.0.0.1:8080/www/cgi/post.py
 
-telnet: [...]
+	CGI_delete: //check later
+		- curl -v -X DELETE http://localhost:8080/www/cgi/todelete.py
+METHOD:
+	culr -v -X NONVALIDMETHOD http://127.0.0.1:8080/www/static-bin/bad.html
+
+**telnet**:
+GET:
+	- connect to sever: 
+		- telnet localhost 8080
+	- passing raw request:
+		- GET / HTTP/1.1
+		- Host: localhost
+	Malformed telnet request:
+		- GET /nonexist HTTP/1.1
+		- BAD / HTTP/1.1
+POST:
+	- POST /www/cgi/todelete.py HTTP/1.1
+	- Host: localhost
+	- Content-Length: 11
+	- Content-Type: application/x-www-form-urlencoded
+	- name=webserv
+DELETE:
+	- DELETE /uploads/ups/content.txt HTTP/1.1
+	- Host: localhost
+
+**browser**
+	- static:
+		- http://localhost:8080/www/static-bin/index.html
+	- autoindex:
+		- http://127.0.0.1:8080/www/static-bin
+	- cgi:
+		- http://localhost:8080/www/cgi/env.py
+	- cgi with query
+		- http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK
+	- non_exist: (404 case)
+		http://localhost:8080/www/static-bin/bad.html

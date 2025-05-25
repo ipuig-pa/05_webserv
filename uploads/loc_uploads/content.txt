@@ -1,4 +1,0 @@
-This is to test POST
-This txt will be uploaded to /uploads dir
-
-cmd: curl -v -F "file=@uploads/loc_uploads/content.txt" http://localhost:8080/uploads/
