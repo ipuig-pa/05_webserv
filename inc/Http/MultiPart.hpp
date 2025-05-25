@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 09:58:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 17:24:01 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 11:08:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ enum partStage {
 class MultiPart
 {
 private:
-	std::vector<Part>	_parts;
-	std::string			_boundary;
-	partStage			_stage;
-	std::vector<char>	_data;
+	std::vector<Part>					_parts;
+	std::string							_boundary;
+	partStage							_stage;
+	std::vector<char>					_data;
 
 	void								_parsePartHeaders(size_t i);
 	bool								_singleHeaderLine(size_t i, const std::string& curLine);

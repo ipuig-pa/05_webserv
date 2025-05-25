@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 12:53:13 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 12:34:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 17:40:32 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class ServerConf
 {
 private:
 	bool								_srv_autoindex;
+	bool								_isSrvAutoSet;
 	unsigned int						_port;
 	unsigned int						_max_body_size;
 	std::string							_server_name;
@@ -36,22 +37,21 @@ private:
 	
 public:
 	ServerConf();
-	ServerConf(int _port, const std::string& _servname, const std::string& _root);
+	// ServerConf(int _port, const std::string& _servname, const std::string& _root);
 	~ServerConf();
 	
 	//checker
-	// int									cgiValid();
-	// static int							validPath();
 	bool								locReturnCheck(LocationConf& loc);
+	bool								getIsSrvAutoSet();
 	void								wrapLocChecker(LocationConf& loc);
 	static bool							allDigit(const std::string& s);
 	static bool 						hasSemicolon(const std::string& s);
 	static bool							codeRange(const std::string& errtoken);
 	static std::string					rmvSemicolon(const std::string& token);
-
+	
 	//clean
 	void								cleanLocTk(std::string& tk);
-
+	
 	//setter
 	void								setPort(std::string s);
 	void								setHost(std::string s);
@@ -77,7 +77,7 @@ public:
 	std::string							getErrPageCode(int status_code);
 	const std::map<int, std::string>&	getErrPage() const;
 	const std::vector<LocationConf>&	getLocation() const;
-
+	
 	//paser
 	void								parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
 	void								parseMethod(LocationConf& loc, std::vector<std::string>& loc_tks, size_t& i);
@@ -95,6 +95,8 @@ public:
 #endif
 
 /**
+ * int									cgiValid();
+ * static int							validPath();
  * Response Codes:
 	2xx: Success (200 OK, 201 Created)
 	4xx: Client errors (400 Bad Request, 401 Unauthorized, 403 Forbidden)

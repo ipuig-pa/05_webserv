@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 17:26:59 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 11:08:52 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,12 @@ public:
 	std::vector<char>	&getBodyBuffer(void);
 
 	//methods
+	void				appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length);
+	std::string			statusToString() const;
+	std::string			headersToString() const;
+	void				checkMandatoryHeaders();
+	void				removeHeader(const std::string &name);
+	void				reset();
 	void				appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length);
 	std::string			statusToString() const;
 	std::string			headersToString() const;

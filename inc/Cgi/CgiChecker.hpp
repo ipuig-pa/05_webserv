@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 09:17:23 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 13:49:59 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:46:30 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,4 +33,3 @@ private:
 };
 
 #endif
-// static bool _validCgiIndex(const LocationConf& loc);

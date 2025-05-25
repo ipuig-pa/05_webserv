@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 14:25:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/22 16:02:25 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 10:27:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,6 @@ public:
 	~LocationConf();
 	
 	//setters
-	bool										autoSet() const;
-	bool										isCmbsSet() const;
-	bool										isMethodSet() const;
 	void										setLocAuto(bool _flag);
 	void										setLocPath(std::string s);
 	void										setLocRoot(std::string s);
@@ -69,6 +66,9 @@ public:
 	void										setCgiExtenion(std::vector<std::string> s);
 	
 	//getters
+	bool										isautoSet() const;
+	bool										isCmbsSet() const;
+	bool										isMethodSet() const;
 	int											getLocCMBS() const;
 	int											getRetCode() const;
 	bool										getMethod(int method);
@@ -91,7 +91,6 @@ public:
 #endif
 
 //idea tmp.getlocation()
-
 //like a sub-config, define behaviour for specific URL
 //not all attribute required, just list all for compiling with more .conf file
 /**
@@ -106,7 +105,4 @@ public:
 //4 methods supported : GET, HEAD, POST, DELETE
 //for serve files
 //for uplaod limit
-// void							setReturn(std::map<int, std::string> returnPair);
-// std::map<int, std::string>	getReturn() const;
-//clean
-//void							cleanLocTk(std::string& tk);
+

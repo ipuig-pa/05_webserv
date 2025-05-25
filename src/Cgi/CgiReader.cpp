@@ -6,28 +6,26 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:10:56 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 16:43:08 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
 
+
+/*-------------METHODS--------------------------------------------------------*/
+
 void	CgiProcess::readCgiOutput()
 {
 	std::vector<char> buffer(BUFF_SIZE);
-	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));//check
-	// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) << std::endl;
-	// std::string buffer_str(buffer.begin(), buffer.end());
-	// std::cout << "buffer is:\033[0m" << buffer_str << "STOP" << std::endl;
-	if (bytes_read > 0) {
+	ssize_t bytes_read = read(_pipFromCgi, buffer.data(), sizeof(buffer));
+	if (bytes_read > 0) { //read output and append to CGI_buffer
 		buffer.resize(bytes_read);
-		// std::cout << "READ: " << buffer << std::endl;
 		_appendCgiOutputBuff(buffer, bytes_read);
 	}
 	else if (bytes_read == 0) { //reach EOF
-		// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
 		std::cout << "reached EOF" << std::endl;
-		_cgiActive = false;
+		_cgiActive = false;//CGI finished, flag off
 		this->setState(READ_CGI);
 		_client->getResponse().setState(READ);
 		// cleanCloseCgi();
@@ -43,15 +41,15 @@ bool	CgiProcess::_checkHeaderCompletion()
 {
 	static const std::vector<char> pattern1 = {'\r', '\n', '\r', '\n'};
 	static const std::vector<char> pattern2 = {'\n', '\n'};
-
+	
 	auto it1 = std::search(_cgiBuffer.begin(), _cgiBuffer.end(), 
-						  pattern1.begin(), pattern1.end());
-
+	pattern1.begin(), pattern1.end());
+	
 	auto it2 = std::search(_cgiBuffer.begin(), _cgiBuffer.end(), 
-						  pattern2.begin(), pattern2.end());
+	pattern2.begin(), pattern2.end());
 	
 	if (it1 != _cgiBuffer.end() || it2 != _cgiBuffer.end())
-		return true;
+	return true;
 	return false;
 }
 
@@ -61,19 +59,14 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 		_cgiBuffer.reserve(_cgiBuffer.size() + bytes);
 		_cgiBuffer.insert(_cgiBuffer.end(), buffer.begin(), buffer.begin() + bytes);
 		if (_checkHeaderCompletion())
-			_cgiHeadersToResponse();
+		_cgiHeadersToResponse();
 	}
 	else
-		_client->getResponse().appendBodyBuffer(buffer, bytes, true);
-	// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
-	// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
+	_client->getResponse().appendBodyBuffer(buffer, bytes, true);
 }
 
 void	CgiProcess::_cgiHeadersToResponse()
 {
-	// std::cout << "HEADERS ARE ALREDY RECEIVED!" << std::endl;
-	// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
-	// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
 	HttpResponse &response = _client->getResponse();
 	response.setStatusCode(200); //set default, will be used if CGI didnt provide one
 	bool HeaderScope = true;
@@ -95,8 +88,7 @@ void	CgiProcess::_cgiHeadersToResponse()
 		}
 		if (HeaderScope == true) {
 			_addHeaderToResponse(line, response);
-		}
-		else { //not in header scope
+		} else { //not in header scope
 			content << line;
 		}
 	}
@@ -106,7 +98,6 @@ void	CgiProcess::_cgiHeadersToResponse()
 	std::vector<char> content_vector(content_str.begin(), content_str.end());
 	response.appendBodyBuffer(content_vector, content.str().length(), true);
 	response.setBodyLength(content.str().length());
-	// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;
 }
 
 void CgiProcess::_addHeaderToResponse(const std::string& line, HttpResponse& response)
@@ -139,8 +130,16 @@ void	CgiProcess::_checkChunkedTransfer(HttpResponse &response)
 	}
 }
 
+// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
 // std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
 // std::cout << "buffer is: \033[0m" << buffer << std::endl;
 // std::cout << "\033[31mCGI buff in bytes_read > 0 block: \033[0m\n" << buffer << std::endl;
 // std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
-
+/*-----
+// std::cout << "HEADERS ARE ALREDY RECEIVED!" << std::endl;
+// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
+// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
+// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
+// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
+// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;
+*/

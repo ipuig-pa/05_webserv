@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 10:36:10 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 11:05:56 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ void	RequestHandler::_processRequest(Client &client)
 	} else {
 		(this->*handleMethod[4])(client); // invalid request
 	}
-	client.setState(SENDING_RESPONSE);
+	if (!_isCgiRequest(client))
+		client.setState(SENDING_RESPONSE);
 }
 
 bool	RequestHandler::_checkAllowedMethod(Client &client)
