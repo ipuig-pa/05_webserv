@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationConf.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 16:48:57 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 10:26:28 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 11:45:07 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,15 +114,15 @@ void LocationConf::setPathExMap(const std::vector<std::string>& _ext, const std:
 		{
 			if ((ext == ".php" || ext == "*.php") && (cgiSys[j].find("php") != std::string::npos)) {
 				_path_extend[".php"] = cgiSys[j];
-				LOG_INFO("Add PHP mapping: .php -> " + cgiSys[j]);
+				LOG_DEBUG("Add PHP mapping: .php -> " + cgiSys[j] + " in location \"" + _locPath + "\"");
 			}
 			else if ((ext == ".py" || ext == "*.py") && (cgiSys[j].find("py") != std::string::npos)) {
 				_path_extend[".py"] = cgiSys[j];
-				LOG_INFO("Add Python mapping: .py -> " + cgiSys[j]);
+				LOG_DEBUG("Add Python mapping: .py -> " + cgiSys[j] + " in location \"" + _locPath + "\"");
 			}
 			else if ((ext == ".sh" || ext == "*.sh") && (cgiSys[j].find("bash") != std::string::npos)) {
 				_path_extend[".sh"] = cgiSys[j];
-				LOG_INFO("Add bash mapping: .sh -> " + cgiSys[j]);
+				LOG_DEBUG("Add bash mapping: .sh -> " + cgiSys[j] + " in location \"" + _locPath + "\"");
 			}
 		}
 	}

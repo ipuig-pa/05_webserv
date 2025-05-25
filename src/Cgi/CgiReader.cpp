@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiReader.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 16:43:08 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 11:20:04 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,14 @@ void	CgiProcess::readCgiOutput()
 		_appendCgiOutputBuff(buffer, bytes_read);
 	}
 	else if (bytes_read == 0) { //reach EOF
-		std::cout << "reached EOF" << std::endl;
-		_cgiActive = false;//CGI finished, flag off
+		_cgiActive = false;
 		this->setState(READ_CGI);
 		_client->getResponse().setState(READ);
-		// cleanCloseCgi();
 	}
 	else {
 		LOG_ERR("\033[31mError in reading CGI (pipe)\033[0m\n");
 		_client->sendErrorResponse(500, "");
-		cleanCloseCgi();//close and clean
+		cleanCloseCgi();
 	}
 }
 
@@ -68,7 +66,7 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 void	CgiProcess::_cgiHeadersToResponse()
 {
 	HttpResponse &response = _client->getResponse();
-	response.setStatusCode(200); //set default, will be used if CGI didnt provide one
+	response.setStatusCode(200);
 	bool HeaderScope = true;
 	std::string buffer_str(_cgiBuffer.begin(), _cgiBuffer.end());
 	std::istringstream tmp(buffer_str);
@@ -77,10 +75,10 @@ void	CgiProcess::_cgiHeadersToResponse()
 	while (std::getline(tmp, line)) {
 		if (!line.empty()) {
 			if (line[line.length() - 1] == '\r') {
-				line.erase(line.length() - 1); //to unify format, Windows use '\r\n'; Mac&Linux '\n' (really??)
+				line.erase(line.length() - 1); //to unify format, Windows use '\r\n'; Mac&Linux '\n'
 			}
 		}
-		if (line.empty() && HeaderScope == true) { //in the '\n', delim of HEADER & BODY
+		if (line.empty() && HeaderScope == true) {
 			HeaderScope = false;
 			_headers_sent = true;
 			_client->setState(SENDING_RESPONSE);
@@ -88,7 +86,7 @@ void	CgiProcess::_cgiHeadersToResponse()
 		}
 		if (HeaderScope == true) {
 			_addHeaderToResponse(line, response);
-		} else { //not in header scope
+		} else {
 			content << line;
 		}
 	}
@@ -129,17 +127,3 @@ void	CgiProcess::_checkChunkedTransfer(HttpResponse &response)
 		response.setChunked(true);
 	}
 }
-
-// _appendCgiOutputBuff("0\r\n\r\n", 5); //not appending but sending the signal
-// std::cout << "\033[32mbytes_read read from Cgi (before bytes_read check) " + std::to_string(bytes_read) + "\033[0m" << std::endl;
-// std::cout << "buffer is: \033[0m" << buffer << std::endl;
-// std::cout << "\033[31mCGI buff in bytes_read > 0 block: \033[0m\n" << buffer << std::endl;
-// std::cout << "CGI BUFFER: " << _cgiBuffer << std::endl;
-/*-----
-// std::cout << "HEADERS ARE ALREDY RECEIVED!" << std::endl;
-// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
-// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
-// std::string	cgi_str(_cgiBuffer.begin(), _cgiBuffer.end());
-// std::cout << "CGI BUFFER:" << cgi_str << "STOP" << std::endl;
-// std::cout << "CONTENT-LENGTH: " << content.str().length() << std::endl;
-*/

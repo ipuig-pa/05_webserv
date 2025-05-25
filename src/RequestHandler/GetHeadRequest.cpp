@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   GetHeadRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 15:26:35 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 11:31:26 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+/*-------------METHODS--------------------------------------------------------*/
 
 void	RequestHandler::_handleGetRequest(Client &client)
 {
@@ -31,7 +33,6 @@ void	RequestHandler::_handleGetRequest(Client &client)
 	if (S_ISDIR(file_stat.st_mode))
 	{
 		_handleDirectoryRequest(client);
-		//std::cout << "\033[31;1mIS the handle directory request called?\n\033[0m";
 		return ;
 	}
 	int file_fd = open(path.c_str(), O_RDONLY);
@@ -76,43 +77,24 @@ void	RequestHandler::_handleDirectoryRequest(Client &client)
 	LOG_DEBUG("Handling directory request");
 	std::vector<std::string> indexFile;
 	std::string path;
-	if (client.getLocationConf())
-	{
-		//LOG_DEBUG("LocConf is still found in " + client.getLocationConf()->getLocPath());
+	if (client.getLocationConf()) {
 		indexFile = client.getLocationConf()->getLocIndex();
-		//LOG_DEBUG(std::to_string(indexFile.size()));
 		path = client.getLocationConf()->getLocRoot() + client.getLocationConf()->getLocPath();
-		for (size_t i =0; i != indexFile.size(); ++i) {
-			LOG_DEBUG("index file (location conf) at " + path + " is: " + indexFile[i]);
-		}
 	}
-	if (indexFile.empty()) //case of no-index in cur_location conf
-	{
+	if (indexFile.empty()) {// case of no-index in cur_location conf
 		indexFile = client.getServerConf()->getIndex();
 		path = client.getServerConf()->getRoot();
-		for (size_t i = 0; i < indexFile.size(); ++i) {
-			std::cout << "index file (server conf) at " << path << " is: " << indexFile[i] << std::endl;
-		}
 	}
-	if (!indexFile.empty()) //have index either in loc or serv level
-	{
-		std::cout << "entering index exec" << std::endl;
+	if (!indexFile.empty()) { // have index either in loc or serv level
 		for (size_t i = 0; i < indexFile.size(); ++i) {
 			std::string tmpIndex = FileUtils::validIndex(indexFile[i], path);
-			//LOG_DEBUG("INDEX FULL PATH is: " + tmpIndex);
+			LOG_DEBUG("Index full path is: " + tmpIndex);
 			if (tmpIndex.empty() == false)
 			{
-				// client.getRequest().setUri(tmpIndex);
-				// client.getRequest().setPath(client.getParser().mapSysPathFromUri(client));
 				client.getRequest().setPath(tmpIndex);
-				if (FileUtils::isIndexCgi(tmpIndex) == true)
-				{
-					// client.getRequest().setUri(tmpIndex);
-			
+				if (FileUtils::isIndexCgi(tmpIndex) == true) {
 					std::string idxext = tmpIndex.substr(tmpIndex.rfind("."));
-					std::cout <<"The idxext is: " << idxext << "\n";
 					client.getLocationConf()->setIdxExt(idxext);
-
 					_handleCgiRequest(client);
 					return ;
 				} else { //not CGI case
@@ -124,85 +106,17 @@ void	RequestHandler::_handleDirectoryRequest(Client &client)
 	}
 	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf()->getAutoIndex()))
 		_handleDirectoryListing(client);
-	else {
-		// Directory listing is disabled and no index file exists
-		client.sendErrorResponse(403, "tesing the fall logic in index"); // Forbidden
+	else { // Directory listing is disabled and no index file exists
+		client.sendErrorResponse(403, "No index or autoindex available to serve"); // Forbidden
 	}
 }
-
-//We have to use either serverConf or locationConf, and be able to get index from where needed (maybe pass it as a pointer that we can change inside getPathFromUri to point to LocationConf??)
-// void	RequestHandler::_handleDirectoryRequest(Client &client)
-// {
-// 	LOG_DEBUG("Handling directory request");
-
-// 	// std::vector<std::string> indexFile;
-
-// 	std::string indexFile;
-// 	std::string path;
-// 	//Check for index files first
-// 	if (client.getLocationConf())
-// 	{
-// 		indexFile = client.getLocationConf()->getLocIndex();
-// 		path = client.getLocationConf()->getLocRoot() + client.getLocationConf()->getLocPath();
-// 		std::cout << "index file (location conf) at " << path << " is: " << indexFile << std::endl;
-// 	}
-// 	if (indexFile.empty())
-// 	{
-// 		indexFile = client.getServerConf()->getIndex();
-// 		path = client.getServerConf()->getRoot();
-// 		std::cout << "index file (server conf) at " << path << " is: " << indexFile << std::endl;
-// 	}
-// 	if (!indexFile.empty())
-// 	{
-// 		// If path doesn't end with '/', add it
-// 		if (path[path.length() - 1] != '/') {
-// 			path += "/";
-// 		}
-// 		std::string fullPath = path + indexFile;
-
-// 		// Check if the index file exists and is readable
-// 		LOG_INFO("Checking access to directory " + fullPath);
-// 		if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
-// 			// Found an index file, modify the request path and process as a file request:
-// 			// Update the request path to include the index file ???
-// 			client.getRequest().setPath(fullPath); // ???
-// 			// Process as a normal file GET request
-// 			_handleGetRequest(client);
-// 			return;
-// 		}
-// 	}
-// 	//IN THE CASE THAT MULTIPLE INDEX FILES CAN EXIST FOR THE SAME LOCATION!?!?
-// 	// for (size_t i = 0; i < indexFiles.size(); i++) {
-// 	// 	std::string fullPath = path + "/" + indexFiles[i];
-// 	// 	// Check if the index file exists and is readable
-// 	// 	if (access(fullPath.c_str(), F_OK | R_OK) == 0) {
-// 	// 		// Found an index file, modify the request path and process as a file request:
-// 	// 		// If path doesn't end with '/', add it
-// 	// 		if (path[path.length() - 1] != '/') {
-// 	// 			path += "/";
-// 	// 		}
-// 	// 		// Update the request path to include the index file
-// 	// 		client.getRequest().setPath(path + indexFiles[i]);
-// 	// 		// Process as a normal file GET request
-// 	// 		_(client, client.getResponse(), client.getServerConf());
-// 	// 		return;
-// 	// 	}
-// 	// }
-// 	// No index file found, check if directory listing is enabled
-// 	if ((client.getLocationConf() && client.getLocationConf()->getLocAuto()) || (!client.getLocationConf() && client.getServerConf()->getAutoIndex()))
-// 		_handleDirectoryListing(client);
-// 	else {
-// 		// Directory listing is disabled and no index file exists
-// 		client.sendErrorResponse(403, ""); // Forbidden
-// 	}
-// }
 
 bool	RequestHandler::handleFileRead(Client &client)
 {
 	LOG_DEBUG("Reading file " + std::to_string(client.getFileFd()) + " ...");
 	if (client.getResponse().getState() == READING)
 	{
-		std::vector<char> buffer(BUFF_SIZE); //Adjust buffer size
+		std::vector<char> buffer(BUFF_SIZE);
 		size_t bytesRead = read(client.getFileFd(), buffer.data(), sizeof(buffer));
 		if (bytesRead > 0) {
 			buffer.resize(bytesRead);
@@ -221,5 +135,5 @@ bool	RequestHandler::handleFileRead(Client &client)
 			}
 		}
 	}
-	return(false);//check that we really want to keep it (return false) in this case
+	return(false);
 }

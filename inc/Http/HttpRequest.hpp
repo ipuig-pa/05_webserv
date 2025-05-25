@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 11:09:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 11:13:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,31 +50,17 @@ public:
 
 	//setters
 	void					setHeaderField(const std::string &name, const std::string &value);
-	void					setMethod(std::string s); //set as methodType type
+	void					setMethod(std::string s);
 	void					setUri(const std::string uri);
 	void					setScriptName(const std::string cgiScript);
 	void					setPathInfo(const std::string pathinfo);
 	void					setPath(const std::string path);
 	void					setQueryPart(const std::string s);
-	void					setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
+	void					setVersion(const std::string s);
 	void					setBody(const std::vector<char> &body);
 	void					appendBody(const std::vector<char> &chunk, size_t length);
 	void					addPostBytesWritten(size_t bytesWritten);
-	void					setComplete(bool flag); //flag for finsihing parsing or not
-	void					setUpload(std::string upload_path);
-	void					setMultipart(MultiPart *multipart);
-	void					setHeaderField(const std::string &name, const std::string &value);
-	void					setMethod(std::string s); //set as methodType type
-	void					setUri(const std::string uri);
-	void					setScriptName(const std::string cgiScript);
-	void					setPathInfo(const std::string pathinfo);
-	void					setPath(const std::string path);
-	void					setQueryPart(const std::string s);
-	void					setVersion(const std::string s); //return version like '/1.1', str1.compare(str2) == 0
-	void					setBody(const std::vector<char> &body);
-	void					appendBody(const std::vector<char> &chunk, size_t length);
-	void					addPostBytesWritten(size_t bytesWritten);
-	void					setComplete(bool flag); //flag for finsihing parsing or not
+	void					setComplete(bool flag);
 	void					setUpload(std::string upload_path);
 	void					setMultipart(MultiPart *multipart);
 	

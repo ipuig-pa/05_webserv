@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiProcess.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 10:55:06 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 11:18:35 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,6 @@ bool CgiProcess::initCgi()
 		return false;
 	}
 	std::string scriptDir = _getScriptDir(_client->getRequest().getPath());
-	std::cout << "SCRIPT DIR: "<< scriptDir << std::endl;
 	char* av[3];
 	std::string	cgi_ext = _getExtSysPath(_client);
 
@@ -122,7 +121,7 @@ bool CgiProcess::initCgi()
 	av[0] = strdup(cgi_ext.c_str());
 	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py 
 	av[2] = NULL;
-	_createEnv(_client->getRequest()); //store this envp somehow to be able to free it later
+	_createEnv(_client->getRequest());
 
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
@@ -134,7 +133,7 @@ bool CgiProcess::initCgi()
 		dup2(pipFromCgi[1], STDOUT_FILENO);
 		close(pipFromCgi[0]);
 		close(pipFromCgi[1]);
-		if (_client->getRequest().getMethod() == POST) { //proper access from child??!?
+		if (_client->getRequest().getMethod() == POST) {
 			dup2(pipToCgi[0], STDIN_FILENO);
 			close(pipToCgi[0]);
 			close(pipToCgi[1]);
@@ -144,7 +143,7 @@ bool CgiProcess::initCgi()
 			exit(1);
 		}
 		if (execve(av[0], av, _envp) == -1) {
-			LOG_ERR("\033[31mfail in execve\033[0m"); //this will be written in the child output, not in the normal terminal!!!!
+			LOG_ERR("\033[31mfail in execve\033[0m");
 			close(STDOUT_FILENO);
 			if (_client->getRequest().getMethod() == POST)
 			close(STDIN_FILENO);
@@ -153,13 +152,11 @@ bool CgiProcess::initCgi()
 			exit(1); //exit on error
 		}
 	}
-	//parent
 	free(av[0]);
 	free(av[1]);
 	_cgiPid = cgiPid;
 	_cgiActive = true;
 	_client->getTracker().setCgiStart();
-	// set non-blocking and close-on-exec mode for read-end in parent
 	if (fcntl(pipFromCgi[0], F_SETFL, O_NONBLOCK) == -1) {
 		throw std::runtime_error("Failed to set non-blocking mode: " + std::string(strerror(errno)));
 	}
@@ -196,7 +193,6 @@ void	CgiProcess::_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi)
 	_cleanEnvp();
 }
 
-//matching cgi extension with config to find corresponding executable path
 std::string	CgiProcess::_getExtSysPath(Client *client)
 {
 	std::string	cgiExt = "";
@@ -238,15 +234,14 @@ std::string	CgiProcess::_getExtSysPath(Client *client)
 
 std::string	CgiProcess::_getScriptDir(std::string path)
 {
-	std::cout << "PATH TO FIND SCRIPT DIR: " << path << std::endl;
 	size_t pos = path.find_last_of('/');
 	if (pos == std::string::npos) {
-		return "."; // No directory in path, use current directory
+		return ".";
 	}
 	return path.substr(0, pos);
 }
 
-void	CgiProcess::cleanCloseCgi(void) //called in destructor, to close pipe ends and set fd to -1
+void	CgiProcess::cleanCloseCgi(void)
 {
 	if (_pipFromCgi != -1) {
 		close(_pipFromCgi);
@@ -257,7 +252,7 @@ void	CgiProcess::cleanCloseCgi(void) //called in destructor, to close pipe ends 
 	_pipFromCgi = -1;
 	_pipToCgi = -1;
 	
-	if (_cgiPid != -1) { //checking child process
+	if (_cgiPid != -1) {
 		int status;
 		int result = waitpid(_cgiPid, &status, WNOHANG);
 		if (result == 0) {
@@ -266,7 +261,7 @@ void	CgiProcess::cleanCloseCgi(void) //called in destructor, to close pipe ends 
 			usleep(200000); // 200ms as grace period
 			if (waitpid(_cgiPid, &status, WNOHANG) == 0)
 			kill(_cgiPid, SIGKILL);
-			waitpid(_cgiPid, &status, 0); //make sure it's really dead
+			waitpid(_cgiPid, &status, 0);
 		}
 		else if (result > 0) {
 			if (WIFEXITED(status)) {
@@ -277,33 +272,11 @@ void	CgiProcess::cleanCloseCgi(void) //called in destructor, to close pipe ends 
 			LOG_INFO("CGI process " + std::to_string(_cgiPid)+ " linked to client " + std::to_string(_client->getSocket()) + " has terminated");
 		}
 		else if (result < 0) {
-			// Error occurred
 			LOG_ERR("Error waiting for CGI process " + std::string(strerror(errno)));
 			_client->sendErrorResponse(500, "");
 		}
 		_cgiActive = false;
 		_cgiPid = -1;
 	}
-	_cleanEnvp(); //clean env var pointer
+	_cleanEnvp();
 }
-
-// LOG_DEBUG(std::string(av[1]));
-// write(STDERR_FILENO, "Child av[1]: ", 13);
-// write(STDERR_FILENO, av[1], strlen(av[1]));
-// write(STDERR_FILENO, "\n", 1);
-// int fd_trial = open("/Users/ipuig-pa/Documents/05/05_Webserv_PERSONAL/www/cgi/test2.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-// dup2(fd_trial, STDOUT_FILENO);
-// close (fd_trial);
-// LOG_DEBUG("Calling CGI at " + sysPath + " with " + std::string(av[1]));
-// // LOG_DEBUG("printing envp");
-// for (size_t i = 0; i < envp.size(); ++i) {
-// 	// LOG_DEBUG("printing envp" + std::string(envp[0]));
-// 	std::cout << "printing envp..." << envp[i] << std::endl;
-// }
-// char* av[] = { (char*)_client->getRequest().getPath().c_str(), NULL };
-//av[0] = const_cast<char*>(_getExtSysPath(_client->getRequest().getPath()).c_str()); //usr/local/python3
-// av[0] = const_cast<char*>(cgiSysFromConf.c_str());
-// av[0] = strdup(cgiSysFromConf.c_str());
-// std::cout << "\033[31mav[0] for execve() is: " << av[0] << std::endl;
-// av[1] = const_cast<char*>(_client->getRequest().getUri().c_str());
-// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;

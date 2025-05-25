@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:12:34 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 15:22:14 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 11:44:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int main(int ac, char **av)
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
 
-	LOG_INFO("\033[32;1mSetting configuration file...\033[0m");
+	LOG_INFO("Setting configuration file...");
 	std::string	configPath;
 	if (ac == 2)
 		configPath = av[1];

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 10:57:11 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 11:24:42 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@
 
 void	RequestHandler::_handleCgiRequest(Client &client)
 {
-	LOG_INFO("\033[32;1mCGI Request recived\033[0m");
+	LOG_INFO("CGI Request recived");
 	
 	client.setCgiProcess(new CgiProcess(&client));
 	if (!client.getCgiProcess()->initCgi() && client.getState() != SENDING_RESPONSE) {
-		LOG_DEBUG("\033[31mCGI init fail\033[0m");
+		LOG_ERR("CGI init fail");
 		client.sendErrorResponse(500, "");
 	}
 }
@@ -28,11 +28,11 @@ void	RequestHandler::_handleCgiRequest(Client &client)
 bool RequestHandler::_isCgiRequest(Client& client)
 {
 	std::string tmp = client.getRequest().getPath();
-	std::cout << "\033[31mResolved script path: \033[0m" << tmp << std::endl;
+	LOG_DEBUG("Resolved script path for Cgi request is: " + tmp);
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos || tmp.find(".sh") != std::string::npos) {
-		LOG_DEBUG("\033[32mCGI request called!\033[0m");
+		LOG_DEBUG("CGI request called");
 		return true;
 	}
-	LOG_DEBUG("\033[32mNot CGI request or Unsupported CGI extension passed!\nSupproted extension is: .php, .py, .sh\033[0m");
+	LOG_ERR("Not CGI request or Unsupported CGI extension passed. Supproted extension is: .php, .py, .sh");
 	return false;
 }

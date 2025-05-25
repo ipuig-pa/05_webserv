@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConf.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 10:30:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 11:44:49 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,14 +80,9 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 {
 	LocationConf	*longest_match = nullptr;
 	size_t			match;
-	std::cout << "finding " << uripath << " location" << std::endl;
-	std::cout << _location.size() << std::endl;
 	for(size_t i = 0; i < _location.size(); ++i) {
-		std::cout << _location[i].getLocPath() << std::endl;
-		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().compare(uripath) == 0) {
-			std::cout << i << std::endl;
+		if (!_location[i].getLocPath().empty() && _location[i].getLocPath().compare(uripath) == 0)
 			return (&_location[i]);
-		}
 	}
 	match = 0;
 	for(size_t i = 0; i < _location.size(); ++i) {
@@ -95,13 +90,13 @@ LocationConf	*ServerConf::getMatchingLocation(std::string uripath)
 			if (_location[i].getLocPath().size() > match) {
 				match = _location[i].getLocPath().size();
 				longest_match = &_location[i];
-				std::cout << "longest match for " + uripath + " is location num. " << i << std::endl;
 			}
 		}
 	}
-	if (longest_match)
+	if (longest_match) {
+		LOG_DEBUG("Found: " + uripath + " in location " + longest_match->getLocPath());
 		return (longest_match);
-	std::cout << "\033[31mFound: " << uripath << " in location" << longest_match << "\033[0m";
+	}
 	return (nullptr);
 }
 
@@ -286,7 +281,7 @@ void ServerConf::wrapLocChecker(LocationConf& loc)
 			throw std::runtime_error("Error: Location: upload value is not a dir: " + s);
 		}
 		loc.setLocUpload(s);
-		std::cout << "loction upload full path is: " << loc.getLocUpload() << "\n";
+		LOG_DEBUG("location upload full path for loc \"" + loc.getLocPath() + "\" is: " + loc.getLocUpload());
 	}
 	if (!loc.getLocCMBS()) {
 		loc.setLocCMBS(this->_max_body_size);
