@@ -1,0 +1,19 @@
+
+Here is request line command that used to test our webserv project
+
+curl:
+
+- static:
+	POST:
+	GET:
+	DELETE:
+	[...]
+
+- cgi:
+	PATH_INFO:
+	QUERY_PART:
+	POST:
+	GET:
+	DELETE:
+
+telnet: [...]

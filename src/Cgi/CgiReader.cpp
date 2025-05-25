@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CgiReader.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:48:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 11:20:04 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 14:52:28 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,11 @@ void	CgiProcess::readCgiOutput()
 		_appendCgiOutputBuff(buffer, bytes_read);
 	}
 	else if (bytes_read == 0) { //reach EOF
+		if (_cgiBuffer.empty() && _client->getResponse().getBodyBuffer().empty() && _client->getResponse().getBytesSent() == 0) { //empty script and error cgi
+			_client->sendErrorResponse(500, "Malformed CGI or Missing CGI response ");
+			cleanCloseCgi();
+			return ;
+		}
 		_cgiActive = false;
 		this->setState(READ_CGI);
 		_client->getResponse().setState(READ);
@@ -60,7 +65,7 @@ void	CgiProcess::_appendCgiOutputBuff(std::vector<char> &buffer, size_t bytes)
 		_cgiHeadersToResponse();
 	}
 	else
-	_client->getResponse().appendBodyBuffer(buffer, bytes, true);
+		_client->getResponse().appendBodyBuffer(buffer, bytes, true);
 }
 
 void	CgiProcess::_cgiHeadersToResponse()

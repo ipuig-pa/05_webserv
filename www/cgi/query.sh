@@ -14,3 +14,5 @@ for param in "${PARAMS[@]}"; do
 	value="$(printf '%b' "${value//%/\\x}")"
 	echo "$key = $value"
 done
+
+# cmd: curl "http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK"

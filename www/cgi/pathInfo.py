@@ -16,3 +16,5 @@ else:
             print(f.read())
     except Exception as e:
         print(f"\033[32;1m{e}!\033[0m\n")
+
+# cmd: curl -v http://localhost:8080/www/cgi/pathinfo.py/tryMe.txt

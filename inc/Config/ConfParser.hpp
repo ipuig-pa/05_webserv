@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:27:59 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 13:35:30 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 13:57:57 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,23 +56,3 @@ public:
 };
 
 #endif
-
-// the case of MULTI serves!!
-// extrac and populate data to serverConf
-// include getters of all 'var' (root/port/location [...])
-// nested block also need handle
-
-// ServerConf parseToServ(const std::vector<std::string>& tokens);
-// void parseToServ(std::string& serv_block, ServerConf& servConf);
-// std::vector<std::string> tokToParse(std::string& clean_lines);
-// void _split(std::string& lines);
-// size_t leftBracket(std::string& lines, size_t pos);
-// size_t rightBracket(std::string& lines, size_t pos);
-// tokenized, vector of config for ONE sever
-// vector of servers, has mutil 'server{}' with all para
-//'CategoryHandler' is the name for a PTR to a member funcion of this class
-//  bool _insideBlock;
-// std::map that stores the mapping: from STR ("listen", "root") to functions
-// std::string rmvSemicolon(const std::string& token);
-// std::vector<std::string> errTokens(const std::vector<std::string>& tokens, size_t& i);
-// mapping with str to sub-functions
