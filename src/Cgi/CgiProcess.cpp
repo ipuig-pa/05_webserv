@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 16:58:46 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 10:55:06 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ std::string	CgiProcess::getScriptPath()
 
 /*-------------METHODS--------------------------------------------------------*/
 
-//split function
 bool CgiProcess::initCgi()
 {
 	int pipFromCgi[2] = {-1, -1};
@@ -122,9 +121,8 @@ bool CgiProcess::initCgi()
 		return false;
 	av[0] = strdup(cgi_ext.c_str());
 	av[1] = strdup(_client->getRequest().getPath().c_str()); //script_name: www/cgi/simple.py 
-	// std::cout << "av[1] for execve() is: \033[0m" << av[1] << std::endl;
 	av[2] = NULL;
-	_createEnv(_client->getRequest(), _client->getRequest().getPath()); //store this envp somehow to be able to free it later
+	_createEnv(_client->getRequest()); //store this envp somehow to be able to free it later
 
 	pid_t cgiPid = fork();
 	if (cgiPid < 0) {
@@ -179,7 +177,7 @@ bool CgiProcess::initCgi()
 		_pipToCgi = pipToCgi[1];
 		this->setState(WRITING_CGI);
 	} else {
-		this->setState(READING_CGI); //check later
+		this->setState(READING_CGI);
 	}
 	return true;
 }
@@ -246,7 +244,6 @@ std::string	CgiProcess::_getScriptDir(std::string path)
 		return "."; // No directory in path, use current directory
 	}
 	return path.substr(0, pos);
-	//check if it is valid!?
 }
 
 void	CgiProcess::cleanCloseCgi(void) //called in destructor, to close pipe ends and set fd to -1

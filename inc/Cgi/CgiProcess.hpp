@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 16:20:03 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 10:55:31 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ private:
 	std::string			_script_path;
 	char				**_envp;
 
-	void				_createEnv(HttpRequest& httpReq, const std::string &full_path);
+	void				_createEnv(HttpRequest& httpReq);
 	void				_convertToEnvp(std::vector<std::string>& envStr);
 	void				_cleanEnvp(void);
 	void				_cleanupCgiPipe(int *pipFromCgi, int *pipToCgi);
