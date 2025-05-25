@@ -1,0 +1,40 @@
+Installation:
+-------------------
+cd /goinfre/$USER
+git clone https://github.com/Homebrew/brew homebrew
+echo 'export PATH="/goinfre/$USER/homebrew/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+brew install telnet
+brew install siege
+
+
+Availability test:
+-------------------
+# Moderate load
+siege -c 10 -t 60s http://127.0.0.1:8080/www/empty.html
+# Benchmark mode (no delays)
+siege -b -c 10 -t 10s http://127.0.0.1:8080/
+siege -b -c 10 -t 60s http://127.0.0.1:8080/www/empty.html
+
+Good results:
+Availability > 95%
+Response time < 1 second
+No failed transactions (or very few)
+Consistent performance
+
+
+Memory:
+-------------------
+top -stats pid,command,cpu,mem,vprvt -pid $(pgrep webserv)
+top -pid $(pgrep webserv) -s 5
+open -a "Activity Monitor"
+
+
+Connections:
+-------------------
+lsof -i :8080 | grep webserv
+lsof -i :8080 | grep webserv | wc -l
+
+lsof -p $(pgrep webserv) | wc -l
+
+(constant connections. Listen or established. No permenent Close_wait states)
