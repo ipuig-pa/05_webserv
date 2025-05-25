@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 10:43:11 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 11:24:42 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:43:23 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,18 @@ void	RequestHandler::_handleCgiRequest(Client &client)
 	}
 }
 
-bool RequestHandler::_isCgiRequest(Client& client)
+bool RequestHandler::_isCgiRequest(Client& client, bool log)
 {
+	if (log)
+		LOG_DEBUG("Checking Cgi request...");
 	std::string tmp = client.getRequest().getPath();
-	LOG_DEBUG("Resolved script path for Cgi request is: " + tmp);
+	if (log)
+		LOG_DEBUG("Resolved script path for Cgi request is: " + tmp);
 	if (tmp.find(".py") != std::string::npos || tmp.find(".php") != std::string::npos || tmp.find(".sh") != std::string::npos) {
 		LOG_DEBUG("CGI request called");
 		return true;
 	}
-	LOG_ERR("Not CGI request or Unsupported CGI extension passed. Supproted extension is: .php, .py, .sh");
+	if (log)
+		LOG_ERR("Not CGI request or Unsupported CGI extension passed. Supproted extension is: .php, .py, .sh");
 	return false;
 }

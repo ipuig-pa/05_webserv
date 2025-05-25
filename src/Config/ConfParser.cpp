@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfParser.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:35:50 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 10:20:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 15:41:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ ServerConf ConfParser::addCategory(const std::vector<std::string>& tokens)
 				_insideBlock = false;
 			}
 		} else if (_cate != "{" && _cate != "}") {
-			throw std::runtime_error("Error: is problem happens here ? misplaced category: " + _cate);
+			throw std::runtime_error("Error: misplaced category: " + _cate);
 		}
 	}
 	if (servConf.getSrvUpload().empty() == false) {
@@ -291,7 +291,7 @@ size_t ConfParser::parseAutoIndex(const std::vector<std::string>& tokens, size_t
 	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'autoindex'.");
 	}
-	if (servConf.getIsSrvAutoSet() == true) {//_isSrvAutoSet is on once setAuto is called (no matther set as ON/OFF)
+	if (servConf.getIsSrvAutoSet() == true) {
 		throw std::runtime_error("Error: 'autoindex' already set.");
 	}
 	if (!ServerConf::hasSemicolon(tokens[i + 1])) {
@@ -317,11 +317,11 @@ size_t ConfParser::parseErrPage(const std::vector<std::string>& tokens, size_t i
 {
 	std::vector<std::string> err_tks;
 	while (++i < tokens.size()) {
-		std::string tmp_tk = tokens[i]; //should be at the pos of 1st error-code
+		std::string tmp_tk = tokens[i];
 		err_tks.push_back(tmp_tk);
 		if (ServerConf::hasSemicolon(tmp_tk)) {
 			err_tks.back() = ServerConf::rmvSemicolon(tmp_tk); 
-			break ;	//reach end of this category
+			break ;
 		}
 		if (i + 1 >= tokens.size()) {
 			throw std::runtime_error("Error: invalid format of error page parsed.");
@@ -336,62 +336,10 @@ size_t ConfParser::parseLocation(const std::vector<std::string>& tokens, size_t 
 	if (i + 1 >= tokens.size()) {
 		throw std::runtime_error("Error: no parameter after 'location'.");
 	}
-	i++; //move the the '/path'
+	i++;
 	std::string _path = tokens[i];
 	size_t _locEnd = blockEnd(tokens, i);
-	std::vector<std::string> loc_tokens(tokens.begin() + i + 2, tokens.begin() + _locEnd);//pos i+2: the 1st element after '{'
-	servConf.addLocation(_path, loc_tokens);//addloc is another big ptr->func map (may simply use if-else if, not sure yet)
+	std::vector<std::string> loc_tokens(tokens.begin() + i + 2, tokens.begin() + _locEnd);
+	servConf.addLocation(_path, loc_tokens);
 	return _locEnd;
 }
-
-
-// size_t ConfParser::leftBracket(std::string& lines, size_t pos)
-// {
-	// 	size_t i = pos;
-	// 	while (i < lines.length() && std::isspace(lines[i]))
-	// 		i++;
-	// 	if (lines.compare(i, 6, "server") != 0) //int compare (size_t pos, size_t len, const char* s) const, >> 0==equal
-	// 		throw std::runtime_error("Error: cannot find server.");
-	// 	i = i + 6; //skip 'server'
-	// 	while (i < lines.length() && std::isspace(lines[i]))
-	// 		i++;
-// 	if (i >= lines.length() || (lines[i] != '{'))
-// 		throw std::runtime_error("Error: invalid bracket block");
-// 	return i;
-// }
-// size_t ConfParser::rightBracket(std::string& lines, size_t pos)
-// {
-// 	size_t i = pos;
-// 	int incident_level = 0;
-	
-// 	while (i < lines.length())
-// 	{
-// 		if (lines[i] == '{') //the pos passed is the index of '{'m returned by findleft() ft
-// 			incident_level++;
-// 		else if (lines[i] == '}')
-// 		{
-// 			incident_level--;
-// 			if (incident_level == 0) //properly pair "{}"
-// 				return i;	
-// 		}
-// 		i++; //return index of closing '}', and hence put this into one 'server{}' block
-// 	}
-// 	return pos;
-// }
-
-/*logic flow for any reference*/
-
-//read file-> tokenize-> split 'svr{}' block, push to vector<string> _single_server (big str)
-// -> create serverBlock and actual instance of serverConf
-// #include "ReadConf.hpp"
-// int ConfParser::testMain(const std::string& fileName)
-// {
-// 	//add path check logic here for server block
-// 	std::vector<std::string> tokens;
-// 	std::string lines = read_conf(fileName);
-// 	createTokens(lines, tokens);
-// 	_split(tokens);
-// 	_createServBlock();
-// 	//inside location{}, path_valid check needed
-// 	return (0);
-// }

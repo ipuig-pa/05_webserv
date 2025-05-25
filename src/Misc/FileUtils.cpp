@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FileUtils.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 10:53:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 15:42:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 /*-------------METHODS--------------------------------------------------------*/
 
-//may improved for more robost check later (make sure is exact ends with ".php" etc)
 bool FileUtils::isIndexCgi(const std::string indexPath)
 {
 	if (indexPath.find(".php") != std::string::npos \
@@ -97,12 +96,7 @@ std::string FileUtils::resolvePath(const std::string& _filePath)
 	if (!tmp) {
 		throw std::runtime_error("Error: cannot resolve valid path of config file.");
 	}
-	std::string absPath(tmp); //convert c-style(char*) string to cpp std::string
+	std::string absPath(tmp);
 	free(tmp);
 	return absPath;
 }
-
-/**
- * int stat(const char *restrict pathname, struct stat *restrict statbuf);
- * returns info about the file PTR-ed by 'pathname'
-*/

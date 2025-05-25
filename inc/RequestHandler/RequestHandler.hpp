@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 11:33:34 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:42:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ class RequestHandler
 private:
 	void				_processRequest(Client &client);
 	bool				_checkAllowedMethod(Client &client);
+	std::string			_getMethodString(methodType method);
 
 	//get request
 	void				_handleGetRequest(Client &client);
@@ -34,7 +35,7 @@ private:
 	void				_handleDirectoryListing(Client &client);
 	void				_handleCgiRequest(Client &client);
 	bool				_handleRedirection(Client& client);
-	bool				_isCgiRequest(Client& client);
+	bool				_isCgiRequest(Client& client, bool log);
 
 	//post request
 	void				_handlePostRequest(Client &client);

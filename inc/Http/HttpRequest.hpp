@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:10:20 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 11:13:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:46:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ public:
 	
 	//getters
 	std::string				getHeaderVal(const std::string& name) const;
-	int						getMethod(void) const;
+	methodType				getMethod(void) const;
 	std::string				getUri(void);
 	std::string				getPath(void);
 	std::string				getMethodStr(void) const;

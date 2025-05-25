@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 12:32:46 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 14:51:50 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	RequestHandler::_processRequest(Client &client)
 		&RequestHandler::_handleDeleteRequest, 
 		&RequestHandler::_handleInvalidRequest};
 
-	LOG_DEBUG("Processing client request, with method: " + std::to_string(client.getRequest().getMethod()));
+	LOG_DEBUG("Processing client request, with " + _getMethodString(client.getRequest().getMethod()) + " method");
 
 	if (_handleRedirection(client) == true) {
 		client.setState(SENDING_RESPONSE);
@@ -31,7 +31,7 @@ void	RequestHandler::_processRequest(Client &client)
 	}
 	bool method_allowed = _checkAllowedMethod(client);
 	if (method_allowed) {
-		if (_isCgiRequest(client) == true) {
+		if (_isCgiRequest(client, true) == true) {
 			_handleCgiRequest(client);
 			return ;
 		} else {
@@ -41,7 +41,7 @@ void	RequestHandler::_processRequest(Client &client)
 	} else {
 		(this->*handleMethod[4])(client); // invalid request
 	}
-	if (!_isCgiRequest(client))
+	if (!_isCgiRequest(client, false))
 		client.setState(SENDING_RESPONSE);
 }
 
@@ -49,7 +49,6 @@ bool	RequestHandler::_checkAllowedMethod(Client &client)
 {
 	bool	method_allowed = false;
 
-	// std::cout << "checking allowed method " << client.getRequest().getMethod();
 	if (client.getLocationConf()) {
 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
 			method_allowed = true;
@@ -60,4 +59,14 @@ bool	RequestHandler::_checkAllowedMethod(Client &client)
 		}
 	}
 	return (method_allowed);
+}
+
+std::string	RequestHandler::_getMethodString(methodType method) {
+	switch (method) {
+		case GET: return "GET";
+		case HEAD: return "HEAD";
+		case POST: return "POST";
+		case INVALID: return "INVALID";
+		default: return "INVALID";
+	}
 }
