@@ -3,19 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 14:05:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:08:42 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-// Client::Client()
-// {
-// 	//create a new socket?!?!
-// }
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 Client::Client(int socket, ListenSocket *listenSocket)
 	:_request(), _req_parser(_request), _max_body_size(-1), _response(), _socket(socket), _state(NEW_CONNECTION), _file_fd(-1), _listenSocket(listenSocket), _currentServerConf(listenSocket->getDefaultConf()), _currentLocConf(nullptr), _cgi(nullptr), _tracker()
@@ -44,6 +41,8 @@ Client::~Client()
 		_cgi = nullptr;
 	}
 }
+
+/*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
 HttpRequest	&Client::getRequest(void)
 {
@@ -122,6 +121,43 @@ ConnectionTracker	&Client::getTracker(void)
 	return (_tracker);
 }
 
+size_t	Client::getMaxBodySize(void)
+{
+	return (_max_body_size);
+}
+
+CgiProcess	*Client::getCgiProcess(void)
+{
+	return (_cgi);
+}
+
+static std::vector<char>	getChunk(const std::vector<char> &buffer)
+{
+	std::stringstream ss;
+	ss << std::hex << buffer.size();
+	std::string sizeHex = ss.str();
+	
+	std::vector<char> chunk;
+	chunk.reserve(sizeHex.length() + 2 + buffer.size() + 2);
+	chunk.insert(chunk.begin(), sizeHex.begin(), sizeHex.end());
+	chunk.push_back('\r');
+	chunk.push_back('\n');
+	chunk.insert(chunk.end(), buffer.begin(), buffer.end());
+	chunk.push_back('\r');
+	chunk.push_back('\n');
+	return chunk;
+}
+
+void	Client::setServerConf(ServerConf *conf)
+{
+	_currentServerConf = conf;
+}
+
+void	Client::setLocationConf(LocationConf *conf)
+{
+	_currentLocConf = conf;
+}
+
 void	Client::setState(clientState state)
 {
 	if (_state != state) {
@@ -129,16 +165,11 @@ void	Client::setState(clientState state)
 		LOG_INFO("Client at socket " + std::to_string(_socket) + " change state to " + Client::getStateString(state));
 	}
 	if (state == SENDING_RESPONSE)
-		this->_tracker.setResponseStart();
+	this->_tracker.setResponseStart();
 	else if (state == NEW_REQUEST) {
 		this->_reset();
 		this->getTracker().setLastActivity();
 	}
-}
-
-size_t	Client::getMaxBodySize(void)
-{
-	return (_max_body_size);
 }
 
 void	Client::setFileFd(int file_fd)
@@ -155,28 +186,13 @@ void	Client::setCgiProcess(CgiProcess *cgi)
 {
 	_cgi = cgi;
 }
-static std::vector<char>	getChunk(const std::vector<char> &buffer)
-{
-	std::stringstream ss;
-	ss << std::hex << buffer.size();
-	std::string sizeHex = ss.str();
 
-	std::vector<char> chunk;
-	chunk.reserve(sizeHex.length() + 2 + buffer.size() + 2);
-	chunk.insert(chunk.begin(), sizeHex.begin(), sizeHex.end());
-	chunk.push_back('\r');
-	chunk.push_back('\n');
-	chunk.insert(chunk.end(), buffer.begin(), buffer.end());
-	chunk.push_back('\r');
-	chunk.push_back('\n');
-	
-	return chunk;
-}
+/*-------------METHODS--------------------------------------------------------*/
+
 bool	Client::sendResponseChunk(void)
 {
-	if (_response.getBytesSent() == 0)
-	{
-		_response.checkMandatoryHeaders(); //check all mandatory headers needed: include header date and server! (and content-tyep and length)
+	if (_response.getBytesSent() == 0) {
+		_response.checkMandatoryHeaders(); //checking mandatory headers needed: include header date and server! (and content-tyep and length)
 		std::string	status = _response.statusToString();
 		std::string	headers = _response.headersToString();
 		
@@ -190,9 +206,8 @@ bool	Client::sendResponseChunk(void)
 		_response.addBytesSent(sent);
 		return true; //return true to indicate correctly sent or that everything has been sent!??
 	}
-	if (!_response.isChunked() && _response.getBodyLength() != 0)
-	{
-		// std::cout << "IT'S NOT CHUNKED: " << _response.getBodyBuffer() << std::endl;
+	
+	if (!_response.isChunked() && _response.getBodyLength() != 0) {
 		if (_response.getBodyBuffer().size() != 0)
 		{
 			ssize_t sent = send(_socket, _response.getBodyBuffer().data(), _response.getBodyBuffer().size(), 0);
@@ -201,26 +216,20 @@ bool	Client::sendResponseChunk(void)
 			_response.clearBodyBuffer();
 			_response.addBytesSent(sent);
 			return true;
-		}
-		else if (_file_fd == -1 && _response.getState() == READ) //or handle the case where there was a fd and is already sent!
-		{
+		} else if (_file_fd == -1 && _response.getState() == READ) { //or handle the case where there was a fd and is already sent!
 			this->setState(NEW_REQUEST);
 			return true;
 		}
-		// else
-		// 	//error handling1??
 	}
+	
 	if (_response.isChunked()){
-		// std::cout << "IT'S CHUNKED: " << _response.getBodyBuffer() << std::endl;
 		if (_response.getBodyBuffer().size() != 0){
-			// LOG_DEBUG("buffer is not empty");
 			std::vector<char>	chunk = getChunk(_response.getBodyBuffer());
 			ssize_t sent = send(_socket, chunk.data(), chunk.size(), 0);
 			if (sent < 0)
 				return false;
 			_response.addBytesSent(_response.getBodyBuffer().size());
 			_response.clearBodyBuffer();
-			// std::cout << chunk << std::endl;
 		}
 		if (_response.getState() == READ && _response.getBytesSent() == (_response.statusToString().length() + _response.headersToString().length() + _response.getBytesRead())){
 			ssize_t sent = send(_socket, "0\r\n\r\n", 5, 0);
@@ -228,10 +237,8 @@ bool	Client::sendResponseChunk(void)
 				return false;
 			return true;
 		}
-		//error handling??
 	}
-	return true; //!?!?!?
-	//else set it as already sent
+	return true;
 }
 
 bool	Client::sendContinue(void)
@@ -241,17 +248,6 @@ bool	Client::sendContinue(void)
 	if (sent < 0)
 		return false;
 	return true;
-}
-
-
-void	Client::setServerConf(ServerConf *conf)
-{
-	_currentServerConf = conf;
-}
-
-void	Client::setLocationConf(LocationConf *conf)
-{
-	_currentLocConf = conf;
 }
 
 void	Client::sendErrorResponse(int code, std::string message)
@@ -265,18 +261,9 @@ void	Client::sendErrorResponse(int code, std::string message)
 	this->setState(SENDING_RESPONSE);
 }
 
-CgiProcess	*Client::getCgiProcess(void)
-{
-	return (_cgi);
-}
-
 void	Client::defineMaxBodySize(void)
 {
-	// TO IMPLEMENT!!!!! GET MAX BODY SIZE IN LOCATION CONF!!!
-	// if (_currentLocConf && !(_currentLocConf->getMaxBodySize() != -1))
-	// 	_max_body_size = _currentLocConf->getMaxBodySize();
-	// else 
-	if (_currentServerConf->getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
+	if (_currentServerConf->getMaxBodySize() > 0)
 		_max_body_size = _currentServerConf->getMaxBodySize();
 	else
 		_max_body_size = DEFAULT_MAX_CLIENT_BODY;

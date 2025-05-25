@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 15:42:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 15:24:00 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 09:41:25 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ int FileUtils::isExec(const std::string _filePath)
 
 int FileUtils::blockPathValid(std::string _path, std::string _index)
 {
-	if (!_index.empty() && _index[0] != '/' && _path.back() != '/') {
+	if (!_index.empty() && _index[0] != '/' && _path[_path.length() - 1] != '/') {
 		_index = "/" + _index;
 	}
 	std::string _fullPath = _path + _index;

@@ -6,18 +6,22 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/10 10:01:29 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 15:32:02 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 16:40:08 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiProcess.hpp"
 
-void CgiProcess::_createEnv(HttpRequest& httpReq, const std::string &req_url) //url here is WITHOUT query part
+
+/*-------------METHODS--------------------------------------------------------*/
+
+void CgiProcess::_createEnv(HttpRequest& httpReq, const std::string &full_path) //url here is WITHOUT query part
 {
 	std::vector<std::string> env;
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env.push_back("REQUEST_METHOD=" + std::string(httpReq.getMethodStr()));
-	env.push_back("SCRIPT_NAME=" + std::string(req_url));
+	// env.push_back("SCRIPT_NAME=" + std::string(httpReq.getUri()));
+	env.push_back("SCRIPT_NAME=" + std::string(full_path));
 	if (httpReq.getPathInfo().empty() == false) {
 		env.push_back("PATH_INFO=" + std::string(httpReq.getPathInfo()));
 	}
@@ -76,37 +80,4 @@ void CgiProcess::_cleanEnvp(void)
 		_envp = nullptr;
 	}
 }
-
-// bool	CgiProcess::_noPathInfo(const std::string& req_url)
-// {
-// 	std::string tmp = std::string(req_url);
-// 	size_t pos = tmp.rfind(".");
-// 	std::string check = tmp.substr(pos);//should be ".**"
-// 	if (check == (".py") || check == (".php") || check == (".sh")) { //nothing after cgi.ext, no PATH_INFO
-// 		return true;
-// 	}
-// 	return false;
-// }
-
-// std::string	CgiProcess::_splitPathInfo(const std::string& req_url)
-// {
-// 	std::string tmp = std::string(req_url);
-// 	if (tmp.find(".py")) {
-// 		std::string pathinfo = tmp.substr(tmp.find(".py") + 3);
-// 		std::cout << "checking extracted pathinf: " << pathinfo << '\n';
-// 		return pathinfo;
-// 	}
-// 	else if (tmp.find(".sh")) {
-// 		std::string pathinfo = tmp.substr(tmp.find(".sh") + 3);
-// 		std::cout << "checking extracted pathinf: " << pathinfo << '\n';
-// 		return pathinfo;
-// 	}
-// 	// else if (tmp.find(".php")) {
-// 	else {
-// 		std::string pathinfo = tmp.substr(tmp.find(".php") + 4);
-// 		std::cout << "checking extracted pathinf: " << pathinfo << '\n';
-// 		return pathinfo;
-// 	}
-// 	throw std::runtime_error("Error: invalid cgi uri passed!\n");
-// }
 

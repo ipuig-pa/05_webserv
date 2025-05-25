@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Multipart.hpp                                      :+:      :+:    :+:   */
+/*   MultiPart.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 09:58:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 16:37:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 15:58:35 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ enum partStage {
 class MultiPart
 {
 private:
-	std::vector<Part>	_parts;
-	std::string			_boundary;
-	partStage			_stage;
-	std::vector<char>	_data;
+	std::vector<Part>					_parts;
+	std::string							_boundary;
+	partStage							_stage;
+	std::vector<char>					_data;
 
 	void								_parsePartHeaders(size_t i);
 	bool								_singleHeaderLine(size_t i, const std::string& curLine);
@@ -43,9 +43,8 @@ public:
 	MultiPart(const std::string &boundary, const std::vector<char> &data);
 	~MultiPart();
 
-	const std::vector<Part>	&getParts();
-
-	void	parseMultipart(Client &client);
+	const std::vector<Part>				&getParts();
+	void								parseMultipart(Client &client);
 };
 
 

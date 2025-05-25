@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ConnectionTracker.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
+/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/06 12:00:01 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/10 16:53:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:11:12 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ConnectionTracker.hpp"
+
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
 
 ConnectionTracker::ConnectionTracker()
 	: _connection_start(time(NULL)), _last_activity(0), _response_start(0)
@@ -20,6 +22,8 @@ ConnectionTracker::ConnectionTracker()
 ConnectionTracker::~ConnectionTracker()
 {
 }
+
+/*-------------ACCESSORS - GETTERS--------------------------------------------*/
 
 time_t	ConnectionTracker::getConnectionStart(void)
 {

@@ -6,7 +6,7 @@
 /*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:21:58 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:09:22 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:57:14 by ewu              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,12 @@ public:
 	std::vector<char>	&getBodyBuffer(void);
 
 	//methods
-	void		appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length);
-	std::string	statusToString() const;
-	std::string	headersToString() const;
-	void		checkMandatoryHeaders();
-	void		removeHeader(const std::string &name);
-	void		reset();
+	void				appendBodyBuffer(const std::vector<char> &buffer, size_t bytes_read, bool contribute_length);
+	std::string			statusToString() const;
+	std::string			headersToString() const;
+	void				checkMandatoryHeaders();
+	void				removeHeader(const std::string &name);
+	void				reset();
 };
 
 std::string				getMediaType(const std::string path);
