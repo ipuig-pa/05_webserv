@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 17:29:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:46:35 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ std::string HttpRequest::getHeaderVal(const std::string& name) const
 	return _header.getVal(name);
 }
 
-int	HttpRequest::getMethod(void) const
+methodType	HttpRequest::getMethod(void) const
 {
 	return (_method);
 }

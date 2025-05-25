@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 10:08:02 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 13:13:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,10 @@ void	HttpReqParser::_setRequestConf(HttpRequest &request, Client &client)
 {
 	client.setServerConf(client.getListenSocket()->getConf(request.getHeaderVal("Host")));
 	client.setLocationConf(client.getServerConf()->getMatchingLocation(client.getRequest().getUri()));
+	if (client.getLocationConf())
+		LOG_DEBUG("Request is directed to server " + client.getServerConf()->getSrvName() + ", at location " + client.getLocationConf()->getLocPath());
+	else
+		LOG_DEBUG("Request is directed to server " + client.getServerConf()->getSrvName());
 	request.setPath(_mapSysPathFromUri(client));
 	if (request.getMethod() == POST || request.getMethod() == DELETE)
 		request.setUpload(_mapUploadPath(client));

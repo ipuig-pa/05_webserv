@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 12:19:44 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 11:44:49 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 15:41:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,8 @@ void ServerConf::setRoot(std::string s)
 		throw std::runtime_error("Error: missing ';' at Root value passed.");
 	}
 	s = rmvSemicolon(s);
-	this->_root_dir = s;
+	std::string	root = FileUtils::resolvePath(s);
+	this->_root_dir = root;
 }
 
 void ServerConf::setIndex(std::vector<std::string> s)
@@ -352,11 +353,12 @@ void ServerConf::parseLocRoot(LocationConf& loc, std::vector<std::string>& loc_t
 		throw std::runtime_error("Error: location: missing ';' at root passed.");
 	}
 	loc_tks[i] = rmvSemicolon(loc_tks[i]);
-	if (FileUtils::pathType(loc_tks[i]) == 3) {
-		loc.setLocRoot(loc_tks[i]);
+	std::string	root = FileUtils::resolvePath(loc_tks[i]);
+	if (FileUtils::pathType(root) == 3) {
+		loc.setLocRoot(root);
 	}
 	else {
-		loc.setLocRoot(this->_root_dir + loc_tks[i]);
+		loc.setLocRoot(this->_root_dir + root);
 	}
 }
 
@@ -528,20 +530,3 @@ void ServerConf::parseReturn(LocationConf& loc, std::vector<std::string>& loc_tk
 	}
 	loc.setRetUrl(rmvSemicolon(loc_tks[i]));
 }
-
-
-/** TASKS:
- * 1. check CGI parameters: CGI path/extension/index.html //done
- * 	 - FileUtils class is called for path checking!
- * 2. compare CGI_path and Cgi extension(.php, .py, .sh [...]) //done
- * 3. normal path check: 
- * 	- root: start with '/', or root var is empty //done
-*/
-/**
-valid range : 100-599
-100-199: Informational responses
-200-299: Successful responses
-300-399: Redirection messages
-400-499: Client error responses
-500-599: Server error responses
-*/

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 15:34:57 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 15:21:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,18 @@ void	RequestHandler::_handleInvalidRequest(Client &client)
 	{
 		methods.push_back("GET");
 		methods.push_back("HEAD");
+		methods.push_back("POST");
 	}
 	std::stringstream	str;
 	size_t i = 0;
-	while (i <= methods.size() - 1)
+	while (i < methods.size() - 1)
 	{
 		str << methods[i] << ", ";
 		i++;
 	}
-	str << methods[i];
-	client.getResponse().setHeaderField("Allow", str.str());
+	if (methods.size() > 0) {
+		str << methods[i];
+		client.getResponse().setHeaderField("Allow", str.str());
+	}
 	client.sendErrorResponse(405, "Request method is not allowed in this location");
 }

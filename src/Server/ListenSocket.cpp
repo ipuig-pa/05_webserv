@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 16:47:31 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 13:15:51 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,10 @@ ServerConf	*ListenSocket::getDefaultConf()
 
 ServerConf	*ListenSocket::getConf(std::string name)
 {
+	size_t colonPos = name.find(':');
+	if (colonPos != std::string::npos) {
+		name = name.substr(0, colonPos);
+	}
 	for(size_t i=0; i < _conf.size(); i++)
 	{
 		if ((_conf[i].getSrvName()).compare(name) == 0) {
