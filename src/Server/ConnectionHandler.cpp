@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 16:55:26 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 13:53:48 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:29:30 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	MultiServer::_acceptNewConnection(ListenSocket *listen_socket)
 
 	LOG_INFO("Accepting new client connection on listening socket " + std::to_string(listen_socket->getFd()) + ":" + std::to_string(listen_socket->getPort()) + "...");
 	int cli_socket = accept(listen_socket->getFd(), reinterpret_cast<sockaddr*>(&client_addr), &addr_len);
+	LOG_INFO("Client reaching socket " + std::to_string(listen_socket->getFd()) + ", connect to socket " + std::to_string(cli_socket));
 	if (cli_socket == -1) {
 		LOG_ERR("Failed to accept client on socket " + std::to_string(listen_socket->getFd()));
 		throw std::runtime_error("Invalid socket file descriptor");
@@ -58,8 +59,10 @@ void	MultiServer::_acceptNewConnection(ListenSocket *listen_socket)
 		throw std::runtime_error("Failed to set close-on-exec mode: " + std::string(strerror(errno)));
 	struct pollfd cli_sock_fd = {cli_socket, POLLIN, 0};
 	_poll.push_back(cli_sock_fd);
-	if (_clients.size() > MAX_CLIENTS)
+	if (_clients.size() > MAX_CLIENTS) {
+		LOG_ERR("Client will be bounced as max client number has been reached");
 		client->sendErrorResponse(503, ""); //Service Unavailable
+	}
 }
 
 void	MultiServer::_handleConnections(void)

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 11:05:56 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:32:46 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,13 @@ bool	RequestHandler::_checkAllowedMethod(Client &client)
 {
 	bool	method_allowed = false;
 
+	// std::cout << "checking allowed method " << client.getRequest().getMethod();
 	if (client.getLocationConf()) {
 		if(client.getLocationConf()->getMethod(client.getRequest().getMethod()))
 			method_allowed = true;
 	}
 	else {
-		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD) {
+		if (client.getRequest().getMethod() == GET || client.getRequest().getMethod() == HEAD || client.getRequest().getMethod() == POST) {
 			method_allowed = true;
 		}
 	}

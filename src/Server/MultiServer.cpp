@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MultiServer.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:26:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:12:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 12:30:06 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	MultiServer::run()
 			int fd = _poll[i].fd;
 			if (_poll[i].revents & POLLIN) { //ready for reading / receiving
 				if (std::map<int, ListenSocket*>::iterator it_s = _sockets.find(fd); it_s != _sockets.end()) { //listening socket case
-					LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready");
+					LOG_DEBUG("Listening socket " + std::to_string(fd) + " is ready to accept an incoming client");
 					_acceptNewConnection(it_s->second);
 				}
 				else if(std::map<int, Client*>::iterator it_c = _clients.find(fd); it_c != _clients.end()) { //client socket case
