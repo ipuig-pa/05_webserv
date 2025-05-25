@@ -1,6 +1,6 @@
 
 This is a TXT file
-to TEST PATH_INFO
+to TEST 'PATH_INFO'
 
 This should be printed
 if CGI and pathInfo.py works!
