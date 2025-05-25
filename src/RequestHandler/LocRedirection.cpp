@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   LocRedirection.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 13:37:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/17 16:06:18 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:34:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+/*-------------METHODS--------------------------------------------------------*/
 
 bool RequestHandler::_handleRedirection(Client& client)
 {

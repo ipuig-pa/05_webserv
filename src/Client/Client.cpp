@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 12:51:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 14:05:27 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:07:53 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ void	Client::defineMaxBodySize(void)
 	// if (_currentLocConf && !(_currentLocConf->getMaxBodySize() != -1))
 	// 	_max_body_size = _currentLocConf->getMaxBodySize();
 	// else 
-	if (_currentServerConf->getMaxBodySize() != 0) //how can I check if there is a value or if it is really set at 0!?!?
+	if (_currentServerConf->getMaxBodySize() > 0) //how can I check if there is a value or if it is really set at 0!?!?
 		_max_body_size = _currentServerConf->getMaxBodySize();
 	else
 		_max_body_size = DEFAULT_MAX_CLIENT_BODY;

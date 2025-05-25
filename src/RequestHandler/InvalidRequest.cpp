@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   InvalidRequest.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:47:31 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:34:57 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+/*-------------METHODS--------------------------------------------------------*/
 
 void	RequestHandler::_handleInvalidRequest(Client &client)
 {

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 10:07:20 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 10:25:40 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:25:18 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void	MultiPart::parseMultipart(Client &client)
 			_stage = PART_PARSE_ERROR;
 			break;
 		}
-		_data.erase(_data.begin(), it + _boundary.size() + 2); // /r/n also deleted after boundary
+		_data.erase(_data.begin(), it + _boundary.size() + 2);
 		if (_data.empty()) {
 			_stage = PART_PARSE_ERROR;
 			break ;
@@ -64,7 +64,7 @@ void	MultiPart::parseMultipart(Client &client)
 		if (_stage != PART_PARSE_ERROR) {
 			it = std::search(_data.begin(), _data.end(), boundary_vec.begin(), boundary_vec.end());
 			if (it != _data.end()) {
-				_parts[i].setBody(_data, it - _data.begin() - 2); //delete /r/n after body
+				_parts[i].setBody(_data, it - _data.begin() - 2);
 				_data.erase(_data.begin(), it);
 			}
 			i++;
@@ -78,7 +78,6 @@ void	MultiPart::_parsePartHeaders(size_t i)
 {
 	while (_stage == PART_HEADERS) {
 		std::string cur_line = _takeLine();
-		LOG_DEBUG("CURLINE: " + cur_line + ", size: " + std::to_string(cur_line.size())); //DELETE
 		if (_stage == PART_PARSE_ERROR)
 			return ;
 		if (!cur_line.empty()) {
@@ -91,7 +90,7 @@ void	MultiPart::_parsePartHeaders(size_t i)
 				size_t	name_pos = content_disp.find("name=\"");
 				if (name_pos != std::string::npos) {
 					std::string name = content_disp.substr(name_pos + 6, content_disp.find("\"", name_pos + 6) - (name_pos + 6));
-					_parts[i].setName(name); //parse name here or inside part?!?!
+					_parts[i].setName(name);
 				}
 				size_t	filename_pos = content_disp.find("filename=\"");
 				if (filename_pos != std::string::npos) {
@@ -100,7 +99,7 @@ void	MultiPart::_parsePartHeaders(size_t i)
 					size_t lastSlash = filename.find_last_of("/\\");
 					if (lastSlash != std::string::npos)
 						filename = filename.substr(lastSlash + 1);
-					_parts[i].setFilename(filename); //parse name here or inside part?!?!
+					_parts[i].setFilename(filename);
 				}
 			}
 			_stage = PART_BODY;
@@ -111,7 +110,6 @@ void	MultiPart::_parsePartHeaders(size_t i)
 bool	MultiPart::_singleHeaderLine(size_t i, const std::string& curLine)
 {
 	size_t pos = curLine.find(':');
-	LOG_DEBUG("find : in pos " + std::to_string(pos)); // DELETE
 	if (pos == std::string::npos) {
 		LOG_ERR("Request header parsing found no colon after field name");
 		return false;
@@ -123,7 +121,6 @@ bool	MultiPart::_singleHeaderLine(size_t i, const std::string& curLine)
 	size_t end = val.find_last_not_of(" \t");
 	val.erase(end + 1);
 	_parts[i].setHeaderField(name, val);
-	std::cout << name << " AND " << val << std::endl; //DELTE! (TESTING ONLY)
 	return true;
 }
 
@@ -145,10 +142,8 @@ std::string	MultiPart::_takeLine()
 		_stage = PART_PARSE_ERROR;
 		return "";
 	}
-	LOG_DEBUG("\\r\\n found in position " + std::to_string(end_it - _data.begin()));
 	size_t line_length = std::distance(_data.cbegin(), end_it);
 	std::string cur_line((_data.begin()), (_data.begin() + line_length));
 	_data.erase(_data.begin(), end_it + 2);
-	LOG_DEBUG("CURLINE: " + cur_line); //DELETE
 	return (cur_line);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 14:53:12 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:09:53 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 15:31:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,37 +27,41 @@
 class RequestHandler
 {
 private:
+	void				_processRequest(Client &client);
+	bool				_checkAllowedMethod(Client &client);
+
+	//get request
 	void				_handleGetRequest(Client &client);
-	void				_handlePostRequest(Client &client);
-	void				_handleDeleteRequest(Client &client);
-	void				_handleInvalidRequest(Client &client);
 	void				_handleDirectoryRequest(Client &client);
 	void				_handleDirectoryListing(Client &client);
 	void				_handleCgiRequest(Client &client);
 	bool				_handleRedirection(Client& client);
-	bool				_checkAllowedMethod(Client &client);
 	bool				_isCgiRequest(Client& client);
-	std::string			_getAbsoluteUrl(Client& client, std::string uri);
-	std::string			_getFilename(HttpRequest &request, size_t i);
-	bool				_deleteAttempt(Client &client, const std::string &path);
-	std::string			_generateUniqueFilename();
+
+	//post request
+	void				_handlePostRequest(Client &client);
 	void				_handleMultipart(HttpRequest &request, Client &client);
 	void				_handleFileUpload(Client &client, Part &part, size_t i);
 	void				_handleRegularPost(Client &Client, const std::string& contentType, int i);
+	std::string			_getAbsoluteUrl(Client& client, std::string uri);
+	std::string			_getFilename(HttpRequest &request, size_t i);
+	std::string			_generateUniqueFilename();
 
-	
+	//delete request
+	void				_handleDeleteRequest(Client &client);
+	bool				_deleteAttempt(Client &client, const std::string &path);
+
+	//non supported method
+	void				_handleInvalidRequest(Client &client);
+
 public:
 	RequestHandler();
 	~RequestHandler();
 	
 	void				handleClientRead(Client &client);
-	void				processRequest(Client &client);
 	void				handleClientWrite(Client &client);
 	bool				handleFileRead(Client &client); //client or fd or what?
 	bool				handleFileWrite(Client &client, int file_fd, size_t i);
-
-	bool				validCgi(Client& client);
-	// bool 		_forkErr(int& pip1, int& pip2);
 
 	HttpResponse		_convertToResponse(std::string cgiOutBuff);
 	// void				_convertFormat(std::map<std::string, std::string, CaseInsensitiveCompare>& reqHeader); //convert header format to CGI-Stytle
@@ -68,11 +72,3 @@ public:
 };
 
 #endif
-
-//all following removed to cgi process
-// bool				validCgi(Client& client);
-// void				cgiHeaderScope(const std::string& line, HttpResponse& response);
-// HttpResponse		convertToResponse(std::string cgiOutBuff);
-// std::string			getCgiExtension(std::string& script_path); //may not necessary?? since now just .php used for now
-// std::string			extSysPath(std::string& cgiExt); //read extension accordingly (from getExt()), for now just try .php
-// std::string			getScriptDir(std::string &path);

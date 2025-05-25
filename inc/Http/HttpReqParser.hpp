@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpReqParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:32:41 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/21 13:37:42 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 10:06:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,33 +37,40 @@ private:
 	size_t								_chunk_size;
 	HttpRequest							&_httpReq;
 
-	bool								_isPathSafe(std::string normalizedUri, const std::string &docRoot);
-	bool								_singleHeaderLine(HttpRequest& request, const std::string& curLine);
-	bool								_parseChunkSize(Client &client);
+	//parse request line
 	void								_parseReqLine(HttpRequest& request);
+	size_t								_countCgiEnd(const std::string& uri);
+
+	//parse header
 	void								_parseHeader(HttpRequest& request, Client &client);
-	void								_parseBody(HttpRequest& request, Client &client);
-	void								_parseChunk(HttpRequest &request);
-	void								_checkHeaderCompletion();
-	void								_checkChunkCompletion();
+	bool								_singleHeaderLine(HttpRequest& request, const std::string& curLine);
 	void								_setRequestConf(HttpRequest &request, Client &client);
 	void								_prepareBodyParsing(HttpRequest &request, Client &client);
-	size_t								_countCgiEnd(const std::string& uri);
-	std::string							_takeLine();
-	std::string							_mapSysPathFromUri(Client &client);
+
+	//parse body
+	void								_parseBody(HttpRequest& request, Client &client);
+	bool								_parseChunkSize(Client &client);
+	void								_parseChunk(HttpRequest &request);
+
+	//config utils
 	std::string							_normalizeUriPath(std::string rawUri);
+	std::string							_mapSysPathFromUri(Client &client);
 	std::string							_mapUploadPath(Client &client);
+	bool								_isPathSafe(std::string normalizedUri, const std::string &docRoot);
+
+	//parsing utils
+	std::string							_takeLine();
 	std::vector<char>::const_iterator	_findEndOfLine();
+	void								_checkHeaderCompletion();
+	void								_checkChunkCompletion();
 
 public:
 	HttpReqParser(HttpRequest &request);
 	~HttpReqParser();
 	
-	void								reset();
-	bool								checkFinish();
 	bool								httpParse(Client &client);
 	void								appendBuffer(const std::vector<char> &new_data);
-	HttpRequest							getHttpRequest() const;
+	void								reset();
 };
 
 #endif

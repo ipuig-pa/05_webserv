@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:30:26 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:12:06 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 17:26:39 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,12 @@ void	HttpResponse::setState(responseState state)
 
 void	HttpResponse::setBytesRead(size_t bytes_read)
 {
-	_bytes_read = bytes_read; //needed? Add or set?!!?
+	_bytes_read = bytes_read;
 }
 
 void	HttpResponse::addBytesSent(size_t bytes_sent)
 {
-	_bytes_sent += bytes_sent; //needed? Add or set?!!?
+	_bytes_sent += bytes_sent;
 }
 
 void	HttpResponse::setChunked(bool chunked)
@@ -178,7 +178,6 @@ void	HttpResponse::checkMandatoryHeaders()
 		LOG_ERR("No Content-Type header is found in HttpResponse");
 	if (getHeader("Content-Length").empty() && !_chunked)
 		setHeaderField("Content-Length", std::to_string(_body_length));
-	// also include Connection: keep-alive or close?
 }
 
 void	HttpResponse::removeHeader(const std::string &name)
@@ -197,10 +196,6 @@ void	HttpResponse::reset()
 	_bytes_sent = 0;
 }
 
-//https://www.rfc-editor.org/rfc/rfc9110#media.type
-//give somehow the path and not the body!?!?
-//use switch or something more elegant!?!?
-//where to include this function!!????
 std::string		getMediaType(const std::string path)
 {
 	std::string extension = path.substr(path.find_last_of('.') + 1);
@@ -221,7 +216,6 @@ std::string		getMediaType(const std::string path)
 		return "application/pdf";
 	else if (extension == "txt")
 		return "text/plain";
-	// Add more types if needed
 
 	return "application/octet-stream"; // Default binary type
 }

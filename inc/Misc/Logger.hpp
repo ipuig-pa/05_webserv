@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Logger.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:42 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:33:01 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 17:13:05 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,16 @@ enum LogLevel
 
 class Logger
 {
+private:
 	static LogLevel			_level;
 	static std::ofstream	_log_file;
 	static std::string		_file_path;
 	static bool				_console_output;
 	static bool				_append;
 
-	static std::string		getTimestamp();
-	static std::string		levelToString(LogLevel level);
-	static void				log(LogLevel level, const std::string& msg);
+	static std::string		_getTimestamp();
+	static std::string		_levelToString(LogLevel level);
+	static void				_log(LogLevel level, const std::string& msg);
 
 public:
 	~Logger();

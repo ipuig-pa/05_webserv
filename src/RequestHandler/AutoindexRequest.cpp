@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   AutoindexRequest.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 12:47:19 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 10:34:48 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+/*-------------METHODS--------------------------------------------------------*/
 
 void	RequestHandler::_handleDirectoryListing(Client &client)
 {
@@ -20,9 +22,6 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 		path += "/";
 	if (uri[uri.length() - 1] != '/')
 		uri += "/";
-	// std::string root = client.getServerConf()->getRoot();
-	// if (client.getServerConf() && !client.getLocationConf()->getLocRoot().empty())
-	// 	root = client.getLocationConf()->getLocRoot();
 	DIR	*dirp = opendir(path.c_str());
 
 	LOG_DEBUG("About to list " + uri);
@@ -30,13 +29,11 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 		client.sendErrorResponse(500, ""); //Internal Server error
 		return;
 	}
-	//Build HTML Content: check with telnet - nginx what exactly to build
 	struct dirent				*dirent;
 	struct stat					fileStat;
 	std::vector<std::string>	dirs;
 	std::vector<std::string>	files;
-	
-	//write the HTML content: d_name etc
+
 	std::stringstream html;
 
 	html << "<!DOCTYPE html>\n<html>\n<head>\n";
@@ -46,7 +43,7 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 	html << "</head>\n<body>\n";
 	html << "<h1>Index of " << uri << "</h1>\n";
 	html << "<table>\n<tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>\n";
-	// Add parent directory link unless we're at root
+
 	if (uri != "/")
 		html << "<tr><td><a href=\"../\">Parent Directory</a></td><td>-</td><td>-</td></tr>\n";
 	else
@@ -54,14 +51,11 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 
 	while ((dirent = readdir(dirp)))
 	{
-		std::cout << "dirent reading " << dirent->d_name << std::endl;
 		std::string name = dirent->d_name;
-		// Skip hidden files and . and ..
 		if (name[0] == '.') {
 			continue;
 		}
 		std::string	fullPath = path + name;
-		// skip if an error occur in stat
 		if(stat(fullPath.c_str(), &fileStat) < 0){
 			continue;
 		}
@@ -75,20 +69,16 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 	if (errno) // will catch errors from readdir
 	{
 		LOG_ERR("Readdir error: " + std::string(strerror(errno)));
-		//handle error
+		client.sendErrorResponse(500, "");
 	}
-	std::cout << "REDIR LIST DONE" << std::endl;
 	std::sort(dirs.begin(), dirs.end());
-	std::cout << "DIR SORT DONE" << std::endl;
 	std::sort(files.begin(), files.end());
-	std::cout << "FILES SORT DONE" << std::endl;
 
 	for (const std::string& name : dirs) {
 		std::string fullPath = path + name;
 		std::string fullUri = uri + name;
-		if (stat(fullPath.c_str(), &fileStat) < 0) continue;
-		
-		// Format time
+		if (stat(fullPath.c_str(), &fileStat) < 0)
+			continue;
 		char timeStr[80];
 		struct tm* timeinfo = localtime(&fileStat.st_mtime);
 		strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
@@ -98,18 +88,15 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 		html << "<td>-</td></tr>\n";
 	}
 
-	// Add files to HTML
 	for (const std::string& name : files) {
 		std::string fullPath = path + name;
 		std::string fullUri = uri + name;
-		if (stat(fullPath.c_str(), &fileStat) < 0) continue;
-		
-		// Format time
+		if (stat(fullPath.c_str(), &fileStat) < 0) 
+			continue;
 		char timeStr[80];
 		struct tm* timeinfo = localtime(&fileStat.st_mtime);
 		strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", timeinfo);
 		
-		// Format file size
 		std::string sizeStr;
 		if (fileStat.st_size < 1024)
 			sizeStr = std::to_string(fileStat.st_size) + " B";
@@ -128,7 +115,6 @@ void	RequestHandler::_handleDirectoryListing(Client &client)
 
 	std::string html_str = html.str();
 
-	// Send response to client
 	client.getResponse().setStatusCode(200);
 	client.getResponse().setHeaderField("Content-Type", "text/html");
 	client.getResponse().setHeaderField("Content-Length", std::to_string(html_str.size()));

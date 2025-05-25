@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 09:46:19 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 10:23:19 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:23:22 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,17 +29,19 @@ public:
 	Part();
 	~Part();
 	
-	void	setHeaderField(const std::string &name, const std::string &value);
-	void	setName(const std::string &name);
-	void	setFilename(const std::string &filename);
-	void	setBody(const std::vector<char> &body, size_t length);
-	void	setIsUpload(bool upload);
+	// setters
+	void					setHeaderField(const std::string &name, const std::string &value);
+	void					setName(const std::string &name);
+	void					setFilename(const std::string &filename);
+	void					setBody(const std::vector<char> &body, size_t length);
+	void					setIsUpload(bool upload);
 
-	std::string	getHeaderVal(std::string name) const;
+	//getters
+	std::string				getHeaderVal(std::string name) const;
 	const std::vector<char>	&getBody(void) const;
-	const std::string	&getName(void) const;
-	const std::string	&getFilename(void) const;
-	bool				isUpload();
+	const std::string		&getName(void) const;
+	const std::string		&getFilename(void) const;
+	bool					isUpload();
 };
 
 

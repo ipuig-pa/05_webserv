@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   DeleteRequest.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:12:13 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/25 10:35:28 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-//idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
+/*-------------METHODS--------------------------------------------------------*/
+
 void	RequestHandler::_handleDeleteRequest(Client &client)
 {
 	std::string uploadpath = client.getRequest().getUpload();
@@ -26,18 +27,14 @@ void	RequestHandler::_handleDeleteRequest(Client &client)
 		size_t lastSlash = path.find_last_of('/');
 		if (lastSlash != std::string::npos && lastSlash != path.size() - 1) {
 			filename += path.substr(lastSlash + 1);
-			std::cout << "FILENAME: " << filename << "PATH: " << path << std::endl;
 			uploadpath += filename;
-			std::cout << "UPLOADPATH: " << uploadpath << std::endl;
 		}
 	}
-	std::cout << "UPLOADPATH: " << uploadpath << std::endl;
 	_deleteAttempt(client, uploadpath);
 }
 
 bool	RequestHandler::_deleteAttempt(Client &client, const std::string &path)
 {
-	std::cout << "UPLOAD PATH: " << path << std::endl;
 	if (access(path.c_str(), F_OK) != 0) {
 		client.sendErrorResponse(404, ""); //Not found
 		return false;

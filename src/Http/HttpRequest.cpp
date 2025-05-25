@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:20:40 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/24 11:11:54 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 17:29:36 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void HttpRequest::setPath(const std::string path)
 	this->_path = path;
 }
 
-
 void HttpRequest::setVersion(const std::string s)
 {
 	this->_version = s;
@@ -118,12 +117,6 @@ std::string HttpRequest::getHeaderVal(const std::string& name) const
 {
 	return _header.getVal(name);
 }
-
-//Needed??
-// std::map<std::string, std::string, CaseInsensitiveCompare> HttpRequest::getHeader() const
-// {
-// 	return _header.getAll();
-// }
 
 int	HttpRequest::getMethod(void) const
 {
@@ -206,13 +199,9 @@ MultiPart	*HttpRequest::getMultipart()
 
 /*-------------METHODS--------------------------------------------------------*/
 
-/** IMPORTANT:
- * everytime a NEW Request comes, no need to do HttpRequest newRequest;
- * just _request.reset(), reuse the SAME OBJECT!!
- */
 void HttpRequest::reset()
 {
-	_header = Header(); //call default cons
+	_header = Header();
 	_method = INVALID;
 	_uri.clear();
 	_scriptname.clear();

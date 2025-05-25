@@ -6,16 +6,18 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:20:32 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/22 10:35:51 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:22:27 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Status.hpp"
 
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
+
 Status::Status()
 	:_protocolv("HTTP/1.1")
 {
-	setStatusCode(500);//which status code assign by default?!
+	setStatusCode(500);
 }
 
 Status::Status(int code)
@@ -44,29 +46,8 @@ Status::~Status()
 {
 }
 
-std::string Status::toString() const
-{
-	std::stringstream	ss;
+/*-------------ACCESSORS - SETTERS--------------------------------------------*/
 
-	ss << _protocolv << " " << _statusCode << " ";
-	if (!_phrase.empty()) //or if it is different than Unknown?!? check in RFC
-		ss << _phrase << "\r\n";
-	else
-		ss << "\r\n";
-	return ss.str();
-}
-
-std::string	&Status::getStatusMessage(void)
-{
-	return _phrase;
-}
-
-int	Status::getStatusCode(void)
-{
-	return _statusCode;
-}
-
-//https://www.rfc-editor.org/rfc/rfc9110#section-15
 void	Status::setStatusCode(int code)
 {
 	_statusCode = code;
@@ -115,4 +96,30 @@ void	Status::setStatusCode(int code)
 		case 505: _phrase = "HTTP Version Not Supported"; break;
 		default: _phrase = "Unknown"; break;
 	}
+}
+
+/*-------------ACCESSORS - GETTERS--------------------------------------------*/
+
+std::string	&Status::getStatusMessage(void)
+{
+	return _phrase;
+}
+
+int	Status::getStatusCode(void)
+{
+	return _statusCode;
+}
+
+/*-------------METHODS---------------------------------------------------------*/
+
+std::string Status::toString() const
+{
+	std::stringstream	ss;
+
+	ss << _protocolv << " " << _statusCode << " ";
+	if (!_phrase.empty()) //or if it is different than Unknown?!? check in RFC
+		ss << _phrase << "\r\n";
+	else
+		ss << "\r\n";
+	return ss.str();
 }

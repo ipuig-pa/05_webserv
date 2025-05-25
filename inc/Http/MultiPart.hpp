@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Multipart.hpp                                      :+:      :+:    :+:   */
+/*   MultiPart.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 09:58:40 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 16:37:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:24:01 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,11 @@ public:
 	MultiPart(const std::string &boundary, const std::vector<char> &data);
 	~MultiPart();
 
-	const std::vector<Part>	&getParts();
+	// getters
+	const std::vector<Part>				&getParts();
 
-	void	parseMultipart(Client &client);
+	// methods
+	void								parseMultipart(Client &client);
 };
 
 

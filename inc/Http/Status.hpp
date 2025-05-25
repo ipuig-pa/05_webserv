@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Status.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 15:17:44 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:09:45 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 17:21:02 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,18 @@ public:
 	Status();
 	Status(int code);
 	Status(const Status &other);
-	Status	&operator=(const Status &other);
+	Status			&operator=(const Status &other);
 	~Status();
 
-	std::string toString() const;
-	void	setStatusCode(int code);
-	std::string	&getStatusMessage(void);
-	int		getStatusCode(void);
+	//setters
+	void			setStatusCode(int code);
+
+	//getters
+	std::string		&getStatusMessage(void);
+	int				getStatusCode(void);
+
+	//methods
+	std::string		toString() const;
 };
 
 #endif

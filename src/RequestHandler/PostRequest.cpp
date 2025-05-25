@@ -6,15 +6,15 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 11:45:26 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/24 15:34:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 #include "Client.hpp"
 
-//todo: need change
-//idea: Sever level: getSrvUpload(), setSrvUpload(); Location level: getLocUpload(), setLocUpload()
+/*-------------METHODS--------------------------------------------------------*/
+
 void	RequestHandler::_handlePostRequest(Client &client)
 {
 	LOG_DEBUG("Handling POST request");
@@ -151,6 +151,32 @@ std::string RequestHandler::_getAbsoluteUrl(Client& client, std::string uri)
 	return scheme + host + uri;
 }
 
+std::string	RequestHandler::_getFilename(HttpRequest &request, size_t i)
+{
+	std::string filename = "";
+
+	if (request.getMultipart()) {
+		const Part &part = request.getMultipart()->getParts()[i];
+		filename = part.getFilename();
+	}
+	return filename;
+}
+
+std::string	RequestHandler::_generateUniqueFilename()
+{
+	static int id = 0;
+	std::string filename;
+
+	std::time_t now = std::time(nullptr);
+	std::tm* timeinfo = std::localtime(&now);
+	std::stringstream timestamp;
+	timestamp << std::put_time(timeinfo, "%Y%m%d_%H%M%S");
+	
+	filename = "upload_" + std::to_string(id) + "_" + timestamp.str();
+	id++;
+	return (filename);
+}
+
 
 bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 {
@@ -158,7 +184,6 @@ bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 
 	if (client.getRequest().getMultipart())
 		body = client.getRequest().getMultipart()->getParts()[i].getBody();
-	// std::cout << "HEADERS: " << client.getRequest().getHeaderVal("Content-Disposition") << "BODY: " << std::string(body.data(), body.size()) << std::endl;
 
 	if (client.getRequest().getPostBytesWritten() < body.size()) {
 		size_t bytesLeft = body.size() - client.getRequest().getPostBytesWritten();
@@ -190,30 +215,4 @@ bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 		return true;
 	}
 	return false;
-}
-
-std::string	RequestHandler::_getFilename(HttpRequest &request, size_t i)
-{
-	std::string filename = "";
-
-	if (request.getMultipart()) {
-		const Part &part = request.getMultipart()->getParts()[i];
-		filename = part.getFilename();
-	}
-	return filename;
-}
-
-std::string	RequestHandler::_generateUniqueFilename()
-{
-	static int id = 0;
-	std::string filename;
-
-	std::time_t now = std::time(nullptr);
-	std::tm* timeinfo = std::localtime(&now);
-	std::stringstream timestamp;
-	timestamp << std::put_time(timeinfo, "%Y%m%d_%H%M%S");
-	
-	filename = "upload_" + std::to_string(id) + "_" + timestamp.str();
-	id++;
-	return (filename);
 }

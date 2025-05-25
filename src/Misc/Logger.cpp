@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Logger.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ewu <ewu@student.42heilbronn.de>           +#+  +:+       +#+        */
+/*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 12:35:14 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/21 14:49:19 by ewu              ###   ########.fr       */
+/*   Updated: 2025/05/24 17:15:00 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,21 @@ std::ofstream Logger::_log_file;
 bool Logger::_console_output = true;
 std::string Logger::_file_path = "";
 bool Logger::_append = false;
+
+/*-------------CONSTRUCTORS / DESTRUCTORS-------------------------------------*/
+
+Logger::~Logger()
+{
+	Logger::cleanup();
+}
+
+/*-------------METHODS--------------------------------------------------------*/
+
+Logger& Logger::getInstance()
+{
+	static Logger instance;
+	return instance;
+}
 
 void	Logger::init(LogLevel level, const std::string& file_path, bool console_output, bool append)
 {
@@ -36,18 +51,38 @@ void	Logger::init(LogLevel level, const std::string& file_path, bool console_out
 	_console_output = console_output;
 }
 
-Logger::~Logger()
+void Logger::debug(const std::string &msg)
 {
-	Logger::cleanup();
+	_log(DEBUG, msg);
 }
 
-Logger& Logger::getInstance()
+void Logger::info(const std::string &msg)
 {
-	static Logger instance;
-	return instance;
+	_log(INFO, msg);
 }
 
-std::string Logger::getTimestamp()
+void Logger::warning(const std::string &msg)
+{
+	_log(WARNING, msg);
+}
+
+void Logger::error(const std::string &msg)
+{
+	_log(ERROR, msg);
+}
+
+void Logger::fatal(const std::string &msg)
+{
+	_log(FATAL, msg);
+}
+
+void Logger::cleanup()
+{
+	if (_log_file.is_open())
+		_log_file.close();
+}
+
+std::string Logger::_getTimestamp()
 {
 	auto now = std::time(nullptr);
 	std::tm* tm = std::localtime(&now);
@@ -56,7 +91,7 @@ std::string Logger::getTimestamp()
 	return ss.str();
 }
 
-std::string Logger::levelToString(LogLevel level)
+std::string Logger::_levelToString(LogLevel level)
 {
 	switch (level) {
 		case DEBUG:		return "\033[35;4mDEBUG\033[0m";
@@ -68,14 +103,14 @@ std::string Logger::levelToString(LogLevel level)
 	}
 }
 
-void Logger::log(LogLevel level, const std::string &msg)
+void Logger::_log(LogLevel level, const std::string &msg)
 {
 	if (level < _level)
 		return;
 		
 	std::stringstream log_message;
-	log_message << "\033[36m[" << getTimestamp() << "] "
-				<< "[" << levelToString(level) << "\033[36m]\033[0m "
+	log_message << "\033[36m[" << _getTimestamp() << "] "
+				<< "[" << _levelToString(level) << "\033[36m]\033[0m "
 				<< msg;
 				
 	if (_console_output)
@@ -83,35 +118,4 @@ void Logger::log(LogLevel level, const std::string &msg)
 		
 	if (_log_file.is_open())
 		_log_file << log_message.str() << std::endl;
-}
-
-void Logger::debug(const std::string &msg)
-{
-	log(DEBUG, msg);
-}
-
-void Logger::info(const std::string &msg)
-{
-	log(INFO, msg);
-}
-
-void Logger::warning(const std::string &msg)
-{
-	log(WARNING, msg);
-}
-
-void Logger::error(const std::string &msg)
-{
-	log(ERROR, msg);
-}
-
-void Logger::fatal(const std::string &msg)
-{
-	log(FATAL, msg);
-}
-
-void Logger::cleanup()
-{
-	if (_log_file.is_open())
-		_log_file.close();
 }
