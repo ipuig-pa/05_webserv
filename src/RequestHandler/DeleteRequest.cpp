@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 10:35:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:29:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 
 void	RequestHandler::_handleDeleteRequest(Client &client)
 {
+	LOG_DEBUG("Handling get request from client " + std::to_string(client.getSocket()) + " at target " + client.getRequest().getUri());
+
 	std::string uploadpath = client.getRequest().getUpload();
 	std::string path = client.getRequest().getPath();
 	if (uploadpath.empty())

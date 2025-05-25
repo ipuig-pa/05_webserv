@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/21 09:45:56 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 17:23:30 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:09:18 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ void	Part::setFilename(const std::string &filename)
 
 void	Part::setBody(const std::vector<char> &body, size_t length)
 {
-	LOG_DEBUG("LENGTH " + std::to_string(length));
 	if (_body.capacity() < _body.size() + length)
 		_body.reserve(_body.size() + length);
 	_body.insert(_body.end(), body.begin(), body.begin() + length);

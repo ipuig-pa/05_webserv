@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 13:13:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:58:33 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,6 +392,7 @@ std::string	HttpReqParser::_mapUploadPath(Client &client)
 		if (uploadPath.empty())
 			return ("");
 	}
+	FileUtils::resolvePath(uploadPath);
 	return uploadPath;
 }
 

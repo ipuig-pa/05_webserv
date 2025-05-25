@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 11:06:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:09:43 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,8 +114,6 @@ void	RequestHandler::_handleFileUpload(Client &client, Part &part, size_t i)
 		client.sendErrorResponse(403, ""); // Forbidden
 		return;
 	}
-
-	LOG_DEBUG("UPLOAD PATH: " + uploadPath);
 	int file_fd = open(uploadPath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 	if (file_fd == -1) {

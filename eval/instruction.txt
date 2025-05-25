@@ -5,7 +5,7 @@ Here is request line command that used to test our webserv project
 GET:
 	- static:
 		curl -v http://127.0.0.1:8080/www/static-bin/index.html
-	- autoinde on:
+	- autoindex on:
 		curl -v http://127.0.0.1:8080/www/
 	- non-exist:
 		curl -v http://127.0.0.1:8080/www/static-bin/bad.html
@@ -17,8 +17,64 @@ POST:
 		curl -v -F "file=@upload_source/Hello.txt" http://localhost:8080/uploads/
 
 DELETE:
-	- curl -v -X DELETE http://localhost:8080/upload/ups/content.txt
-	- curl -v -X DELETE http://localhost:8080/upload/ups/non_exist.txt
+	- curl -v -X DELETE http://localhost:8080/uploads/ups/content.txt
+	- curl -v -X DELETE http://localhost:8080/uploads/ups/non_exist.txt
+
+METHOD:
+	- curl -v -X NONVALIDMETHOD http://127.0.0.1:8080/www/static-bin/bad.html
+
+**telnet**:
+GET:
+	- connect to sever: 
+		- telnet localhost 8080
+	- passing raw request:
+		- GET / HTTP/1.1
+		- Host: localhost
+	Malformed telnet request:
+		- GET /nonexist HTTP/1.1
+		- BAD / HTTP/1.1
+POST:
+	POST /uploads HTTP/1.1
+	Host: localhost
+	Content-Type: text/plain
+	Content-Length: 26
+
+	This is my uploaded text.
+
+
+
+
+	POST /uploads HTTP/1.1
+	Host: localhost
+	Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+	Content-Length: 164
+
+	------WebKitFormBoundary7MA4YWxkTrZu0gW
+	Content-Disposition: form-data; name="file"; filename="test.txt"
+	Content-Type: text/plain
+
+	Hello World!
+	------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+POST /upload_source/goat.png HTTP/1.1
+
+DELETE:
+	- DELETE /uploads/ups/content.txt HTTP/1.1
+	- Host: localhost
+
+**browser**
+	- static:
+		- http://localhost:8080/www/static-bin/index.html
+	- autoindex:
+		- http://127.0.0.1:8080/www/static-bin
+	- cgi:
+		- http://localhost:8080/www/cgi/env.py
+	- cgi with query
+		- http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK
+	- non_exist: (404 case)
+		http://localhost:8080/www/static-bin/bad.html
+
+**cgi**
 CGI:
 	GCI_get:
 		- QUERY_PART:
@@ -35,37 +91,3 @@ CGI:
 
 	CGI_delete: //check later
 		- curl -v -X DELETE http://localhost:8080/www/cgi/todelete.py
-METHOD:
-	culr -v -X NONVALIDMETHOD http://127.0.0.1:8080/www/static-bin/bad.html
-
-**telnet**:
-GET:
-	- connect to sever: 
-		- telnet localhost 8080
-	- passing raw request:
-		- GET / HTTP/1.1
-		- Host: localhost
-	Malformed telnet request:
-		- GET /nonexist HTTP/1.1
-		- BAD / HTTP/1.1
-POST:
-	- POST /www/cgi/todelete.py HTTP/1.1
-	- Host: localhost
-	- Content-Length: 11
-	- Content-Type: application/x-www-form-urlencoded
-	- name=webserv
-DELETE:
-	- DELETE /uploads/ups/content.txt HTTP/1.1
-	- Host: localhost
-
-**browser**
-	- static:
-		- http://localhost:8080/www/static-bin/index.html
-	- autoindex:
-		- http://127.0.0.1:8080/www/static-bin
-	- cgi:
-		- http://localhost:8080/www/cgi/env.py
-	- cgi with query
-		- http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK
-	- non_exist: (404 case)
-		http://localhost:8080/www/static-bin/bad.html
