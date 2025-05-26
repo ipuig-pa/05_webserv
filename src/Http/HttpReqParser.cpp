@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 14:38:56 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/25 17:58:33 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/26 08:16:15 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,7 +247,7 @@ void	HttpReqParser::_parseBody(HttpRequest &request, Client &client)
 	}
 	else {
 		LOG_DEBUG("Parsing body of a NON-chunked request");
-		if (_bodyLength - _buffer.size() > 0) {
+		if (_bodyLength - static_cast<ssize_t>(_buffer.size()) > 0) {
 			request.appendBody(_buffer, _buffer.size());
 			_bodyLength -= _buffer.size();
 			_buffer.clear();

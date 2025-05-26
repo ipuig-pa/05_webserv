@@ -37,7 +37,7 @@ POST:
 	POST /uploads HTTP/1.1
 	Host: localhost
 	Content-Type: text/plain
-	Content-Length: 26
+	Content-Length: 27
 
 	This is my uploaded text.
 
@@ -47,7 +47,7 @@ POST:
 	POST /uploads HTTP/1.1
 	Host: localhost
 	Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-	Content-Length: 164
+	Content-Length: 192
 
 	------WebKitFormBoundary7MA4YWxkTrZu0gW
 	Content-Disposition: form-data; name="file"; filename="test.txt"

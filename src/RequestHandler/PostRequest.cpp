@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 17:09:43 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/26 08:15:28 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void	RequestHandler::_handlePostRequest(Client &client)
 
 void	RequestHandler::_handleRegularPost(Client &client, const std::string& contentType, int i)
 {
+	LOG_DEBUG("Handling Regular POST request");
 	std::string responseBody;
 	
 	std::vector<char> req_body = client.getRequest().getBody();
@@ -61,6 +62,7 @@ void	RequestHandler::_handleRegularPost(Client &client, const std::string& conte
 
 void	RequestHandler::_handleMultipart(HttpRequest &request, Client &client)
 {
+	LOG_DEBUG("Handling multipart POST request");
 	std::string	content_type = request.getHeaderVal("Content-Type"); 
 	size_t	bound_pos = content_type.find("boundary=");
 	if (bound_pos == std::string::npos) {
@@ -183,7 +185,7 @@ bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 	if (client.getRequest().getMultipart())
 		body = client.getRequest().getMultipart()->getParts()[i].getBody();
 
-	if (client.getRequest().getPostBytesWritten() < body.size()) {
+		if (client.getRequest().getPostBytesWritten() < body.size()) {
 		size_t bytesLeft = body.size() - client.getRequest().getPostBytesWritten();
 		ssize_t bytesWritten = write(file_fd, body.data() + client.getRequest().getPostBytesWritten(), bytesLeft);
 		if (bytesWritten > 0)
@@ -199,11 +201,11 @@ bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 		close(file_fd);
 		if (client.getResponse().getStatus().getStatusCode() == 201) {
 			client.getResponse().setStatusCode(200); // OK
-			client.getResponse().setHeaderField("Location", _getAbsoluteUrl(client, client.getRequest().getUri()));
+			client.getResponse().removeHeader("Location");
 		}
 		else {
 			client.getResponse().setStatusCode(201); // succesfully created
-			client.getResponse().removeHeader("Location");
+			client.getResponse().setHeaderField("Location", _getAbsoluteUrl(client, client.getRequest().getUri()));
 		}
 		client.getResponse().setHeaderField("Content-Type", "text/html");
 		std::string responseBody = "<html><body><h1>Successful Upload:</h1><pre>" + _getFilename(client.getRequest(), i) + "</pre></body></html>";
