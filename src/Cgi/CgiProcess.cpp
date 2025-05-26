@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/09 15:11:21 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 11:18:35 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/26 09:32:47 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ std::string	CgiProcess::getStateString(cgiState state) {
 		case READING_CGI: return "READING_CGI";
 		case READ_CGI: return "READ_CGI";
 		case WRITING_CGI: return "WRITING_CGI";
+		default: return "UNKNOWN_STATE";
 	}
 }
 

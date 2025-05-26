@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/26 08:15:28 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/26 09:30:55 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ bool	RequestHandler::handleFileWrite(Client &client, int file_fd, size_t i)
 	if (client.getRequest().getMultipart())
 		body = client.getRequest().getMultipart()->getParts()[i].getBody();
 
-		if (client.getRequest().getPostBytesWritten() < body.size()) {
+	if (client.getRequest().getPostBytesWritten() < body.size()) {
 		size_t bytesLeft = body.size() - client.getRequest().getPostBytesWritten();
 		ssize_t bytesWritten = write(file_fd, body.data() + client.getRequest().getPostBytesWritten(), bytesLeft);
 		if (bytesWritten > 0)
