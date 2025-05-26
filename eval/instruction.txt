@@ -101,3 +101,12 @@ Cmd+Option+I
 		http://localhost:8080/www/static-bin/bad.html
 	- redirection
 		http://localhost:8080/www/static-bin/index.html
+
+
+Docker CMD:
+build image: 
+	docker build -t webserv-valgrind .
+run container:
+	docker run -it --rm -p 8080:8080 webserv-valgrind
+entry docker:
+	docker run -it --rm --entrypoint /bin/bash webserv-valgrind
