@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:38:06 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/25 10:36:36 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/26 09:08:08 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void	RequestHandler::handleClientRead(Client &client)
 void	RequestHandler::handleClientWrite(Client &client)
 {
 	LOG_DEBUG("Handle writing to client at socket " + std::to_string(client.getSocket()));
+	// std::cout << "CONTENT LENGTH HEADER: " << client.getResponse().getHeader("Content-Length") << " ACTUAL BODY LENGTH: " << client.getResponse().getBodyBuffer().size() << std::endl;
 	
 	if (client.getState() == SENDING_RESPONSE)
 	{

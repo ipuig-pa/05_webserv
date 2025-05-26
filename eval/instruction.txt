@@ -2,6 +2,7 @@
 Here is request line command that used to test our webserv project
 
 **curl**:
+
 GET:
 	- static:
 		curl -v http://127.0.0.1:8080/www/static-bin/index.html
@@ -15,6 +16,7 @@ POST:
 		curl -v -X POST -d "POST content evalutor want to test" http://127.0.0.1:8080/form
 	- file upload:
 		curl -v -F "file=@upload_source/Hello.txt" http://localhost:8080/uploads/
+		curl -v -F "file=@upload_source/Goat.jpg" http://localhost:8080/uploads/
 
 DELETE:
 	- curl -v -X DELETE http://localhost:8080/uploads/ups/content.txt
@@ -23,7 +25,9 @@ DELETE:
 METHOD:
 	- curl -v -X NONVALIDMETHOD http://127.0.0.1:8080/www/static-bin/bad.html
 
+
 **telnet**:
+
 GET:
 	- connect to sever: 
 		- telnet localhost 8080
@@ -33,7 +37,9 @@ GET:
 	Malformed telnet request:
 		- GET /nonexist HTTP/1.1
 		- BAD / HTTP/1.1
+
 POST:
+1. 
 	POST /uploads HTTP/1.1
 	Host: localhost
 	Content-Type: text/plain
@@ -41,9 +47,7 @@ POST:
 
 	This is my uploaded text.
 
-
-
-
+2. 
 	POST /uploads HTTP/1.1
 	Host: localhost
 	Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -56,15 +60,37 @@ POST:
 	Hello World!
 	------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
-POST /upload_source/goat.png HTTP/1.1
-
 DELETE:
 	- DELETE /uploads/ups/content.txt HTTP/1.1
 	- Host: localhost
 
+
+**cgi**
+
+CGI:
+	GCI_get:
+		- normal:
+			curl -v http://localhost:8080/www/cgi/env.py
+			curl -v http://localhost:8080/www/cgi/print.php
+			curl -v http://localhost:8080/www/cgi/some.sh
+			curl -v http://localhost:8080/www/cgi/errCGI.py
+			curl -v http://localhost:8080/www/cgi/loop.py
+		- QUERY_PART:
+			curl -v "http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK"
+		- PATH_INFO:
+			curl -v http://localhost:8080/www/cgi/pathinfo.py/tryMe.txt
+	
+	CGI_post:
+		- curl -X POST -d "POST content evalutor wants to test" http://127.0.0.1:8080/www/cgi/post.py -v
+
+
 **browser**
+
+Cmd+Option+I
+
 	- static:
 		- http://localhost:8080/www/static-bin/index.html
+		- http://localhost:8080/uploads/ups/goat.jpg
 	- autoindex:
 		- http://127.0.0.1:8080/www/static-bin
 	- cgi:
@@ -73,21 +99,5 @@ DELETE:
 		- http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK
 	- non_exist: (404 case)
 		http://localhost:8080/www/static-bin/bad.html
-
-**cgi**
-CGI:
-	GCI_get:
-		- QUERY_PART:
-			curl "http://localhost:8080/www/cgi/query.sh?TASK=TesingQuery&Status=200OK"
-		- PATH_INFO:
-			curl -v http://localhost:8080/www/cgi/pathinfo.py/tryMe.txt
-		- normal:
-			curl -v http://localhost:8080/www/cgi/env.py
-			curl -v http://localhost:8080/www/cgi/print.php
-			curl -v http://localhost:8080/www/cgi/some.sh
-	
-	CGI_post:
-		- curl -X POST -d "POST content evalutor wants to test" http://127.0.0.1:8080/www/cgi/post.py
-
-	CGI_delete: //check later
-		- curl -v -X DELETE http://localhost:8080/www/cgi/todelete.py
+	- redirection
+		http://localhost:8080/www/static-bin/index.html

@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/25 13:00:09 by ipuig-pa          #+#    #+#             */
-/*   Updated: 2025/05/24 14:04:15 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/26 09:03:38 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ std::string ErrorPageHandler::_getDefaultErrorPage(int status_code, std::string 
 		<< "<hr>\n"
 		<< "<address>webserv</address>\n"
 		<< "</body>\n"
-		<< "</html>";
+		<< "</html>\n";
 
 	_client->getResponse().setBodyLength(ss.str().length());
 	_client->getResponse().setBytesRead(ss.str().length());
