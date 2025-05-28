@@ -6,7 +6,7 @@
 /*   By: ipuig-pa <ipuig-pa@student.42heilbronn.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/05 16:53:07 by ewu               #+#    #+#             */
-/*   Updated: 2025/05/26 10:05:45 by ipuig-pa         ###   ########.fr       */
+/*   Updated: 2025/05/28 11:36:12 by ipuig-pa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void	ListenSocket::_setaddress(const ServerConf& config)
 	memset(&_address, 0, sizeof(_address));
 	_address.sin_family = AF_INET;
 	_address.sin_addr.s_addr = _getInetAddr(config.getHost());// Convert IP to network byte order 
-	// _address.sin_addr.s_addr = INADDR_ANY;
+	// _address.sin_addr.s_addr = INADDR_ANY; //For using if Docker
 	_address.sin_port = htons(_port);// Convert port to network byte order
 }
 
